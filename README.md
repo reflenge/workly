@@ -1,4 +1,4 @@
-# Workly
+# Workly （Work + Friendly）
 
 ---
 
