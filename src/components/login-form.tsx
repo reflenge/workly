@@ -30,12 +30,12 @@ export function LoginForm({
                 provider: "google",
                 options: {
                     redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
-                },
 
-                // 毎回ログインする設定
-                queryParams: {
-                    access_type: "offline",
-                    prompt: "consent",
+                    // 毎回ログインする設定
+                    queryParams: {
+                        access_type: "offline",
+                        prompt: "consent",
+                    },
                 },
             });
 
