@@ -15,6 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -26,10 +27,10 @@ const CompensationForm = ({ userId }: { userId: string }) => {
     const [hourlyRate, setHourlyRate] = useState("");
     const [monthlySalary, setMonthlySalary] = useState("");
     const [currency, setCurrency] = useState("JPY");
-    const [effectiveFrom, setEffectiveFrom] = useState(
-        new Date().toISOString().split("T")[0]
+    const [effectiveFrom, setEffectiveFrom] = useState<Date | undefined>(
+        new Date()
     );
-    const [effectiveTo, setEffectiveTo] = useState<string | null>(null);
+    const [effectiveTo, setEffectiveTo] = useState<Date | undefined>(undefined);
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
@@ -53,16 +54,16 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                 hourlyRate: isHourly ? hourlyRate : null,
                 monthlySalary: isMonthly ? monthlySalary : null,
                 currency,
-                effectiveFrom: new Date(effectiveFrom),
-                effectiveTo: effectiveTo ? new Date(effectiveTo) : null,
+                effectiveFrom: effectiveFrom!,
+                effectiveTo: effectiveTo || null,
             })
                 .then(() => {
                     toast.success("給与設定を作成しました");
                     // フォームリセット
                     setHourlyRate("");
                     setMonthlySalary("");
-                    setEffectiveFrom(new Date().toISOString().split("T")[0]);
-                    setEffectiveTo(null);
+                    setEffectiveFrom(new Date());
+                    setEffectiveTo(undefined);
                     router.refresh();
                 })
                 .catch((error: unknown) => {
@@ -177,13 +178,10 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                         <label htmlFor="effectiveFrom" className="font-medium">
                             適用開始日
                         </label>
-                        <input
-                            id="effectiveFrom"
-                            type="date"
+                        <DatePicker
                             value={effectiveFrom}
-                            onChange={(e) => setEffectiveFrom(e.target.value)}
-                            className="border rounded px-2 py-1"
-                            required
+                            onChange={setEffectiveFrom}
+                            placeholder="適用開始日を選択"
                         />
                     </div>
 
@@ -191,14 +189,10 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                         <label htmlFor="effectiveTo" className="font-medium">
                             適用終了日（任意）
                         </label>
-                        <input
-                            id="effectiveTo"
-                            type="date"
-                            value={effectiveTo || ""}
-                            onChange={(e) =>
-                                setEffectiveTo(e.target.value || null)
-                            }
-                            className="border rounded px-2 py-1"
+                        <DatePicker
+                            value={effectiveTo}
+                            onChange={setEffectiveTo}
+                            placeholder="適用終了日を選択（任意）"
                         />
                     </div>
 
