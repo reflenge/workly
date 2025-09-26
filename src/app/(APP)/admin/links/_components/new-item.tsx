@@ -9,6 +9,13 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -85,37 +92,35 @@ const NewItem = ({
                             <label htmlFor="userId" className="font-medium">
                                 ユーザー
                             </label>
-                            <select
-                                id="userId"
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
-                                className="border rounded px-2 py-1"
-                                required
-                            >
-                                {users.map((u) => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.lastName} {u.firstName}
-                                    </option>
-                                ))}
-                            </select>
+                            <Select value={userId} onValueChange={setUserId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="ユーザーを選択" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {users.map((u) => (
+                                        <SelectItem key={u.id} value={u.id}>
+                                            {u.lastName} {u.firstName}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="cardUid" className="font-medium">
                                 カード
                             </label>
-                            <select
-                                id="cardUid"
-                                value={cardUid}
-                                onChange={(e) => setCardUid(e.target.value)}
-                                className="border rounded px-2 py-1"
-                                required
-                            >
-                                {cards.map((c) => (
-                                    <option key={c.id} value={c.uid}>
-                                        {c.uid}
-                                    </option>
-                                ))}
-                            </select>
+                            <Select value={cardUid} onValueChange={setCardUid}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="カードを選択" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {cards.map((c) => (
+                                        <SelectItem key={c.id} value={c.uid}>
+                                            {c.uid}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="reason" className="font-medium">

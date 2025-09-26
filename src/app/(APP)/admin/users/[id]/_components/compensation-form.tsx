@@ -8,6 +8,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -154,16 +161,16 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                         <label htmlFor="currency" className="font-medium">
                             通貨
                         </label>
-                        <select
-                            id="currency"
-                            value={currency}
-                            onChange={(e) => setCurrency(e.target.value)}
-                            className="border rounded px-2 py-1"
-                        >
-                            <option value="JPY">JPY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                        </select>
+                        <Select value={currency} onValueChange={setCurrency}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="通貨を選択" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="JPY">JPY</SelectItem>
+                                <SelectItem value="USD">USD</SelectItem>
+                                <SelectItem value="EUR">EUR</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex flex-col gap-2">

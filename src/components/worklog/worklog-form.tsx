@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useState, useTransition, useEffect } from "react";
 import { toast } from "sonner";
 import {
@@ -133,44 +140,46 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
                         <label htmlFor="attendanceLog" className="font-medium">
                             出勤記録 <span className="text-red-500">*</span>
                         </label>
-                        <select
-                            id="attendanceLog"
+                        <Select
                             value={attendanceLogId}
-                            onChange={(e) => setAttendanceLogId(e.target.value)}
-                            className="border rounded px-3 py-2"
-                            required
+                            onValueChange={setAttendanceLogId}
                         >
-                            <option value="">
-                                出勤記録を選択 ({attendanceLogs.length}件)
-                            </option>
-                            {attendanceLogs.map((log) => (
-                                <option key={log.id} value={log.id}>
-                                    {formatAttendanceLog(log)}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder={`出勤記録を選択 (${attendanceLogs.length}件)`}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {attendanceLogs.map((log) => (
+                                    <SelectItem key={log.id} value={log.id}>
+                                        {formatAttendanceLog(log)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <label htmlFor="project" className="font-medium">
                             プロジェクト <span className="text-red-500">*</span>
                         </label>
-                        <select
-                            id="project"
-                            value={projectId}
-                            onChange={(e) => setProjectId(e.target.value)}
-                            className="border rounded px-3 py-2"
-                            required
-                        >
-                            <option value="">
-                                プロジェクトを選択 ({projects.length}件)
-                            </option>
-                            {projects.map((project) => (
-                                <option key={project.id} value={project.id}>
-                                    {project.name}
-                                </option>
-                            ))}
-                        </select>
+                        <Select value={projectId} onValueChange={setProjectId}>
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder={`プロジェクトを選択 (${projects.length}件)`}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {projects.map((project) => (
+                                    <SelectItem
+                                        key={project.id}
+                                        value={project.id}
+                                    >
+                                        {project.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex flex-col gap-2">
