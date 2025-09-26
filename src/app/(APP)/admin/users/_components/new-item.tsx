@@ -9,6 +9,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import React, { useState, useTransition } from "react";
 import { createUser } from "./user-actions";
 import { toast } from "sonner";
@@ -68,57 +71,47 @@ const NewItem = () => {
                 <CardContent>
                     <div className="grid grid-cols-1 gap-3">
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="lastName" className="font-medium">
-                                姓
-                            </label>
-                            <input
+                            <Label htmlFor="lastName">姓</Label>
+                            <Input
                                 id="lastName"
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="border rounded px-2 py-1"
                                 required
                                 placeholder="山田"
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="firstName" className="font-medium">
-                                名
-                            </label>
-                            <input
+                            <Label htmlFor="firstName">名</Label>
+                            <Input
                                 id="firstName"
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="border rounded px-2 py-1"
                                 required
                                 placeholder="太郎"
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="email" className="font-medium">
-                                メールアドレス
-                            </label>
-                            <input
+                            <Label htmlFor="email">メールアドレス</Label>
+                            <Input
                                 id="email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="border rounded px-2 py-1"
                                 required
                                 placeholder="taro@example.com"
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <input
+                            <Checkbox
                                 id="isAdmin"
-                                type="checkbox"
                                 checked={isAdmin}
-                                onChange={(e) => setIsAdmin(e.target.checked)}
+                                onCheckedChange={(checked) =>
+                                    setIsAdmin(checked as boolean)
+                                }
                             />
-                            <label htmlFor="isAdmin" className="font-medium">
-                                管理者にする
-                            </label>
+                            <Label htmlFor="isAdmin">管理者にする</Label>
                         </div>
                     </div>
                 </CardContent>

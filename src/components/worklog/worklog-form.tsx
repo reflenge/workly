@@ -10,6 +10,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useTransition, useEffect } from "react";
 import { toast } from "sonner";
 import {
@@ -137,9 +139,9 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="attendanceLog" className="font-medium">
+                        <Label htmlFor="attendanceLog">
                             出勤記録 <span className="text-red-500">*</span>
-                        </label>
+                        </Label>
                         <Select
                             value={attendanceLogId}
                             onValueChange={setAttendanceLogId}
@@ -160,9 +162,9 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="project" className="font-medium">
+                        <Label htmlFor="project">
                             プロジェクト <span className="text-red-500">*</span>
-                        </label>
+                        </Label>
                         <Select value={projectId} onValueChange={setProjectId}>
                             <SelectTrigger>
                                 <SelectValue
@@ -183,15 +185,15 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="content" className="font-medium">
+                        <Label htmlFor="content">
                             作業内容 <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
+                        </Label>
+                        <Textarea
                             id="content"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             placeholder="作業内容を入力してください"
-                            className="border rounded px-3 py-2 min-h-[100px] resize-y"
+                            className="min-h-[100px] resize-y"
                             required
                         />
                     </div>

@@ -18,6 +18,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { projects } from "@/db/schema";
 import React, { useState, useTransition } from "react";
 import { MoreVerticalIcon } from "lucide-react";
@@ -94,63 +98,43 @@ const ProjectItems = ({
                             </DialogHeader>
                             <form onSubmit={onSubmit} className="space-y-4">
                                 <div className="flex flex-col gap-2">
-                                    <label
-                                        htmlFor="name"
-                                        className="font-medium"
-                                    >
-                                        名称
-                                    </label>
-                                    <input
+                                    <Label htmlFor="name">名称</Label>
+                                    <Input
                                         id="name"
                                         type="text"
                                         value={name}
                                         onChange={(e) =>
                                             setName(e.target.value)
                                         }
-                                        className="border rounded px-2 py-1"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label
-                                        htmlFor="description"
-                                        className="font-medium"
-                                    >
-                                        説明
-                                    </label>
-                                    <textarea
+                                    <Label htmlFor="description">説明</Label>
+                                    <Textarea
                                         id="description"
                                         value={description}
                                         onChange={(e) =>
                                             setDescription(e.target.value)
                                         }
-                                        className="border rounded px-2 py-1 min-h-24"
+                                        className="min-h-24"
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <input
+                                    <Checkbox
                                         id="isActive"
-                                        type="checkbox"
                                         checked={isActive}
-                                        onChange={(e) =>
-                                            setIsActive(e.target.checked)
+                                        onCheckedChange={(checked) =>
+                                            setIsActive(checked as boolean)
                                         }
                                     />
-                                    <label
-                                        htmlFor="isActive"
-                                        className="font-medium"
-                                    >
-                                        有効にする
-                                    </label>
+                                    <Label htmlFor="isActive">有効にする</Label>
                                 </div>
                                 {!isActive && (
                                     <div className="flex flex-col gap-2">
-                                        <label
-                                            htmlFor="inactiveReason"
-                                            className="font-medium"
-                                        >
+                                        <Label htmlFor="inactiveReason">
                                             無効化理由
-                                        </label>
-                                        <textarea
+                                        </Label>
+                                        <Textarea
                                             id="inactiveReason"
                                             value={inactiveReason}
                                             onChange={(e) =>
@@ -158,7 +142,7 @@ const ProjectItems = ({
                                                     e.target.value
                                                 )
                                             }
-                                            className="border rounded px-2 py-1 min-h-24"
+                                            className="min-h-24"
                                             placeholder="必須"
                                         />
                                     </div>

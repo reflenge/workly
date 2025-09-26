@@ -9,6 +9,8 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -72,9 +74,9 @@ const UserSettingsForm = ({ user }: { user: User }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="lastName" className="font-medium">
+                            <Label htmlFor="lastName">
                                 姓 <span className="text-red-500">*</span>
-                            </label>
+                            </Label>
                             <Input
                                 id="lastName"
                                 value={lastName}
@@ -84,9 +86,9 @@ const UserSettingsForm = ({ user }: { user: User }) => {
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="firstName" className="font-medium">
+                            <Label htmlFor="firstName">
                                 名 <span className="text-red-500">*</span>
-                            </label>
+                            </Label>
                             <Input
                                 id="firstName"
                                 value={firstName}
@@ -99,12 +101,7 @@ const UserSettingsForm = ({ user }: { user: User }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
-                            <label
-                                htmlFor="lastNameKana"
-                                className="font-medium"
-                            >
-                                姓（カナ）
-                            </label>
+                            <Label htmlFor="lastNameKana">姓（カナ）</Label>
                             <Input
                                 id="lastNameKana"
                                 value={lastNameKana}
@@ -115,12 +112,7 @@ const UserSettingsForm = ({ user }: { user: User }) => {
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label
-                                htmlFor="firstNameKana"
-                                className="font-medium"
-                            >
-                                名（カナ）
-                            </label>
+                            <Label htmlFor="firstNameKana">名（カナ）</Label>
                             <Input
                                 id="firstNameKana"
                                 value={firstNameKana}
@@ -133,22 +125,20 @@ const UserSettingsForm = ({ user }: { user: User }) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="bio" className="font-medium">
-                            自己紹介
-                        </label>
-                        <textarea
+                        <Label htmlFor="bio">自己紹介</Label>
+                        <Textarea
                             id="bio"
                             value={bio}
                             onChange={(e) => setBio(e.target.value)}
                             placeholder="自己紹介を入力"
-                            className="border rounded px-3 py-2 min-h-[100px] resize-y"
+                            className="min-h-[100px] resize-y"
                         />
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="iconUrl" className="font-medium">
+                        <Label htmlFor="iconUrl">
                             アイコンURL（プレビュー付き）
-                        </label>
+                        </Label>
                         <Input
                             id="iconUrl"
                             value={iconUrl}
@@ -157,7 +147,9 @@ const UserSettingsForm = ({ user }: { user: User }) => {
                         />
                         {iconUrl && (
                             <div className="mt-2">
-                                <span className="text-sm text-gray-500">プレビュー:</span>
+                                <span className="text-sm text-gray-500">
+                                    プレビュー:
+                                </span>
                                 <div className="mt-1">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img

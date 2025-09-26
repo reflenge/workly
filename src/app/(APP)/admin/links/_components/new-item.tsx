@@ -16,6 +16,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -89,9 +91,7 @@ const NewItem = ({
                 <CardContent>
                     <div className="grid grid-cols-1 gap-3">
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="userId" className="font-medium">
-                                ユーザー
-                            </label>
+                            <Label htmlFor="userId">ユーザー</Label>
                             <Select value={userId} onValueChange={setUserId}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="ユーザーを選択" />
@@ -106,9 +106,7 @@ const NewItem = ({
                             </Select>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="cardUid" className="font-medium">
-                                カード
-                            </label>
+                            <Label htmlFor="cardUid">カード</Label>
                             <Select value={cardUid} onValueChange={setCardUid}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="カードを選択" />
@@ -123,15 +121,12 @@ const NewItem = ({
                             </Select>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="reason" className="font-medium">
-                                理由（任意）
-                            </label>
-                            <input
+                            <Label htmlFor="reason">理由（任意）</Label>
+                            <Input
                                 id="reason"
                                 type="text"
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
-                                className="border rounded px-2 py-1"
                                 placeholder="replace / lost など"
                             />
                         </div>

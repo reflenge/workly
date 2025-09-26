@@ -20,6 +20,9 @@ import {
 } from "@/components/ui/dialog";
 import { MoreVerticalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -82,35 +85,26 @@ const CardItems = ({ card }: { card: typeof cards.$inferSelect }) => {
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <input
+                                    <Checkbox
                                         id="isActive"
-                                        type="checkbox"
                                         checked={isActive}
-                                        onChange={(e) =>
-                                            setIsActive(e.target.checked)
+                                        onCheckedChange={(checked) =>
+                                            setIsActive(checked as boolean)
                                         }
                                     />
-                                    <label
-                                        htmlFor="isActive"
-                                        className="font-medium"
-                                    >
-                                        有効にする
-                                    </label>
+                                    <Label htmlFor="isActive">有効にする</Label>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label
-                                        htmlFor="inactiveReason"
-                                        className="font-medium"
-                                    >
+                                    <Label htmlFor="inactiveReason">
                                         無効化理由
-                                    </label>
-                                    <textarea
+                                    </Label>
+                                    <Textarea
                                         id="inactiveReason"
                                         value={inactiveReason}
                                         onChange={(e) =>
                                             setInactiveReason(e.target.value)
                                         }
-                                        className="border rounded px-2 py-1 min-h-24"
+                                        className="min-h-24"
                                         placeholder="無効化する場合は理由を入力"
                                         disabled={isActive}
                                     />

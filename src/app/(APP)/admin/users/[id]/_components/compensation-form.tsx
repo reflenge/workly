@@ -16,6 +16,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -88,46 +91,37 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex gap-4">
                         <div className="flex items-center gap-2">
-                            <input
+                            <Checkbox
                                 id="isHourly"
-                                type="checkbox"
                                 checked={isHourly}
-                                onChange={(e) => {
-                                    setIsHourly(e.target.checked);
-                                    if (e.target.checked) setIsMonthly(false);
+                                onCheckedChange={(checked) => {
+                                    setIsHourly(checked as boolean);
+                                    if (checked) setIsMonthly(false);
                                 }}
                             />
-                            <label htmlFor="isHourly" className="font-medium">
-                                時給制
-                            </label>
+                            <Label htmlFor="isHourly">時給制</Label>
                         </div>
                         <div className="flex items-center gap-2">
-                            <input
+                            <Checkbox
                                 id="isMonthly"
-                                type="checkbox"
                                 checked={isMonthly}
-                                onChange={(e) => {
-                                    setIsMonthly(e.target.checked);
-                                    if (e.target.checked) setIsHourly(false);
+                                onCheckedChange={(checked) => {
+                                    setIsMonthly(checked as boolean);
+                                    if (checked) setIsHourly(false);
                                 }}
                             />
-                            <label htmlFor="isMonthly" className="font-medium">
-                                月給制
-                            </label>
+                            <Label htmlFor="isMonthly">月給制</Label>
                         </div>
                     </div>
 
                     {isHourly && (
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="hourlyRate" className="font-medium">
-                                時給
-                            </label>
-                            <input
+                            <Label htmlFor="hourlyRate">時給</Label>
+                            <Input
                                 id="hourlyRate"
                                 type="number"
                                 value={hourlyRate}
                                 onChange={(e) => setHourlyRate(e.target.value)}
-                                className="border rounded px-2 py-1"
                                 placeholder="1000"
                                 step="0.01"
                                 min="0"
@@ -137,20 +131,14 @@ const CompensationForm = ({ userId }: { userId: string }) => {
 
                     {isMonthly && (
                         <div className="flex flex-col gap-2">
-                            <label
-                                htmlFor="monthlySalary"
-                                className="font-medium"
-                            >
-                                月給
-                            </label>
-                            <input
+                            <Label htmlFor="monthlySalary">月給</Label>
+                            <Input
                                 id="monthlySalary"
                                 type="number"
                                 value={monthlySalary}
                                 onChange={(e) =>
                                     setMonthlySalary(e.target.value)
                                 }
-                                className="border rounded px-2 py-1"
                                 placeholder="300000"
                                 step="0.01"
                                 min="0"
@@ -159,9 +147,7 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                     )}
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="currency" className="font-medium">
-                            通貨
-                        </label>
+                        <Label htmlFor="currency">通貨</Label>
                         <Select value={currency} onValueChange={setCurrency}>
                             <SelectTrigger>
                                 <SelectValue placeholder="通貨を選択" />
@@ -175,9 +161,7 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="effectiveFrom" className="font-medium">
-                            適用開始日
-                        </label>
+                        <Label htmlFor="effectiveFrom">適用開始日</Label>
                         <DatePicker
                             value={effectiveFrom}
                             onChange={setEffectiveFrom}
@@ -186,9 +170,7 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="effectiveTo" className="font-medium">
-                            適用終了日（任意）
-                        </label>
+                        <Label htmlFor="effectiveTo">適用終了日（任意）</Label>
                         <DatePicker
                             value={effectiveTo}
                             onChange={setEffectiveTo}
