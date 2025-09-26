@@ -10,10 +10,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-                <main className="h-full">
-                    <SidebarTrigger className="mx-2 my-1" />
-                    {children}
-                </main>
+                <SidebarTrigger className="mx-2 my-1" />
+                {children}
             </SidebarInset>
         </SidebarProvider>
     );
