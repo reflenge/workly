@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { userCompensation, users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
 import CompensationForm from "./_components/compensation-form";
 import CompensationList from "./_components/compensation-list";

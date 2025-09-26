@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
     createWorkLog,
@@ -48,7 +47,7 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
     const [projects, setProjects] = useState<Project[]>([]);
 
     // データを取得
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             console.log("Fetching data for userId:", userId);
             const [logs, projs] = await Promise.all([
@@ -75,11 +74,11 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId, attendanceLogId, projectId]);
 
     useEffect(() => {
         fetchData();
-    }, [userId]);
+    }, [userId, fetchData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

@@ -16,10 +16,8 @@ import {
     integer,
     timestamp,
     numeric,
-    primaryKey,
     uniqueIndex,
     index,
-    foreignKey,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -50,7 +48,9 @@ export const users = pgTable(
     // これにより、同じauthIdを持つユーザーが複数登録されることを防ぎます。
     // authIdがnullの場合、unique制約は「null同士は重複とみなさない」ため、複数行でnullが許容されます。
     (t) => ({
-        authIdx: uniqueIndex("uniq_user_auth").on(t.authId).where(sql`"auth_id" IS NOT NULL`),
+        authIdx: uniqueIndex("uniq_user_auth")
+            .on(t.authId)
+            .where(sql`"auth_id" IS NOT NULL`),
     })
 );
 
@@ -102,15 +102,18 @@ export const cardAssignments = pgTable(
         reason: varchar("reason"),
         // 割当・解除の実施者（任意）
         assignedByUserId: uuid("assigned_by_user_id")
-        .notNull()
-        .references(() => users.id, {
-            onDelete: "restrict",
-            onUpdate: "cascade",
-        }),
-        unassignedByUserId: uuid("unassigned_by_user_id").references(() => users.id, {
-            onDelete: "restrict",
-            onUpdate: "cascade",
-        }),
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "restrict",
+                onUpdate: "cascade",
+            }),
+        unassignedByUserId: uuid("unassigned_by_user_id").references(
+            () => users.id,
+            {
+                onDelete: "restrict",
+                onUpdate: "cascade",
+            }
+        ),
         createdAt: timestamp("created_at", { withTimezone: true })
             .notNull()
             .defaultNow(),
@@ -153,21 +156,25 @@ export const attendanceStatus = pgTable(
     })
 );
 
-export const attendanceLogSource = pgTable("attendance_log_source", {
-    id: smallint("id").primaryKey(), // 固定シード 1.. WEB/DISCORD/NFC/ADMIN
-    code: varchar("code", { length: 64 }).notNull(),
-    label: varchar("label", { length: 64 }).notNull(),
-    isActive: boolean("is_active").notNull().default(true),
-    sortNo: integer("sort_no").notNull().default(0),
-    createdAt: timestamp("created_at", { withTimezone: true })
-        .notNull()
-        .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-        .notNull()
-        .defaultNow(),
-}, (t) => ({
-    codeUnique: uniqueIndex("uniq_att_source_code").on(t.code),
-}));
+export const attendanceLogSource = pgTable(
+    "attendance_log_source",
+    {
+        id: smallint("id").primaryKey(), // 固定シード 1.. WEB/DISCORD/NFC/ADMIN
+        code: varchar("code", { length: 64 }).notNull(),
+        label: varchar("label", { length: 64 }).notNull(),
+        isActive: boolean("is_active").notNull().default(true),
+        sortNo: integer("sort_no").notNull().default(0),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp("updated_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => ({
+        codeUnique: uniqueIndex("uniq_att_source_code").on(t.code),
+    })
+);
 
 export const attendanceLogs = pgTable(
     "attendance_log",

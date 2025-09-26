@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { cardAssignments, cards, users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import LinkItems from "./_components/link-items";

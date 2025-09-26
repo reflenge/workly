@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
     recordAttendance,
@@ -32,7 +32,7 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
     const [isLoading, setIsLoading] = useState(true);
 
     // 現在の打刻状況を取得
-    const fetchCurrentAttendance = async () => {
+    const fetchCurrentAttendance = useCallback(async () => {
         try {
             const attendance = await getCurrentAttendance(userId);
             setCurrentAttendance(attendance);
@@ -41,11 +41,11 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId]);
 
     useEffect(() => {
         fetchCurrentAttendance();
-    }, [userId]);
+    }, [userId, fetchCurrentAttendance]);
 
     const handlePunch = (action: AttendanceAction) => {
         startTransition(async () => {

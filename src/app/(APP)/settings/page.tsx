@@ -2,7 +2,7 @@ import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { users, cards } from "@/db/schema";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import UserSettingsForm from "./_components/user-settings-form";
@@ -51,7 +51,13 @@ export default async function SettingsPage() {
               inactiveReason: string | null;
               assignedAt: string;
           }[])
-        : (currentCardRaw as unknown as { rows?: any[] }).rows ?? [];
+        : ((currentCardRaw as unknown as { rows?: unknown[] }).rows as {
+              cardId: string;
+              cardUid: string;
+              isActive: boolean;
+              inactiveReason: string | null;
+              assignedAt: string;
+          }[]) ?? [];
 
     return (
         <div className="container mx-auto py-6">

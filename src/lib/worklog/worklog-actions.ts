@@ -8,7 +8,7 @@ import {
     attendanceStatus,
     users,
 } from "@/db/schema";
-import { eq, and, desc, isNull } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 
 export interface WorkLogInput {

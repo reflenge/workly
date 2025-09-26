@@ -4,7 +4,6 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const admin = createClient(

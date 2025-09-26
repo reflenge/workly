@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { userCompensation } from "@/db/schema";
-import { and, eq, or, isNull, gte, lte, sql } from "drizzle-orm";
+import { and, eq, isNull, gte, lte, sql } from "drizzle-orm";
 
 export async function createCompensation(input: {
     userId: string;
