@@ -58,11 +58,11 @@ export async function updateSession(request: NextRequest) {
     }
 
     // ログインしているとき/auth/loginにアクセスした場合は、トップページ（"/"）へリダイレクトする
-    if (user && request.nextUrl.pathname === "/auth/login") {
-        const url = request.nextUrl.clone();
-        url.pathname = "/workly";
-        return NextResponse.redirect(url);
-    }
+    // if (user && request.nextUrl.pathname === "/auth/login") {
+    //     const url = request.nextUrl.clone();
+    //     url.pathname = "/workly";
+    //     return NextResponse.redirect(url);
+    // }
 
     // 重要: 必ずsupabaseResponseオブジェクトをそのまま返してください。
     // NextResponse.next()で新しいレスポンスオブジェクトを作成する場合は、必ず以下を守ってください:
