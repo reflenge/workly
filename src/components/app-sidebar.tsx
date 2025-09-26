@@ -3,16 +3,22 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { LogoutButton } from "./logout-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { UserIcon } from "lucide-react";
+import { HomeIcon, UserIcon, UsersIcon, IdCardIcon } from "lucide-react";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import Link from "next/link";
 
 export async function AppSidebar() {
     const supabase = await createClient();
@@ -31,27 +37,88 @@ export async function AppSidebar() {
     if (!user) {
         redirect("/auth/login");
     }
+
     return (
-        <Sidebar>
-            <SidebarHeader />
+        <Sidebar variant="inset" collapsible="icon">
             <SidebarContent>
-                <SidebarGroup />
-                <SidebarGroup />
+                <SidebarGroup>
+                    <SidebarGroupLabel>User</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/">
+                                        <HomeIcon />
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                {user.isAdmin && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href="/admin/users">
+                                            <UsersIcon />
+                                            <span>従業員作成・編集</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href="/admin/cards">
+                                            <IdCardIcon />
+                                            <span>カード作成・編集</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
-            <SidebarFooter />
             <SidebarFooter>
-                <div className="flex items-center gap-2 w-full">
-                    <Avatar>
-                        <AvatarImage src={user?.iconUrl ?? undefined} />
-                        <AvatarFallback>
-                            <UserIcon />
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="text-center w-full">
-                        {user?.lastName ?? ""} {user?.firstName ?? ""}
-                    </div>
-                </div>
-                <LogoutButton />
+                <SidebarGroup className="p-0">
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    className="
+                h-10 w-full
+                hover:bg-transparent
+                focus-visible:ring-0
+                data-[state=open]:bg-transparent
+              "
+                                >
+                                    <div className="flex w-full items-center justify-center gap-2">
+                                        <Avatar className="size-6 shrink-0">
+                                            <AvatarImage
+                                                src={user?.iconUrl ?? undefined}
+                                            />
+                                            <AvatarFallback>
+                                                <UserIcon />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        {/* 折りたたみ時は自動で非表示になる */}
+                                        <span className="text-center group-data-[collapsible=icon]:hidden">
+                                            {user?.lastName ?? ""}{" "}
+                                            {user?.firstName ?? ""}
+                                        </span>
+                                    </div>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+
+                            <SidebarMenuItem>
+                                <LogoutButton />
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
             </SidebarFooter>
         </Sidebar>
     );
