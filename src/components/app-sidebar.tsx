@@ -14,7 +14,7 @@ import { LogoutButton } from "./logout-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { HomeIcon, UserIcon, UsersIcon, IdCardIcon } from "lucide-react";
+import { HomeIcon, UserIcon, UsersIcon, IdCardIcon, Link2Icon } from "lucide-react";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -81,6 +81,14 @@ export async function AppSidebar() {
                                         <Link href="/admin/cards">
                                             <IdCardIcon />
                                             <span>カード作成・編集</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href="/admin/links">
+                                            <Link2Icon />
+                                            <span>カード紐づけ・管理</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

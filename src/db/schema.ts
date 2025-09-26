@@ -100,8 +100,17 @@ export const cardAssignments = pgTable(
         // カード割当・解除の理由（例: replace/return/lost等）。任意入力のためNULL可。
         // 最大191文字まで格納可能。
         reason: varchar("reason"),
-        assignedByUserId: uuid("assigned_by_user_id"),
-        unassignedByUserId: uuid("unassigned_by_user_id"),
+        // 割当・解除の実施者（任意）
+        assignedByUserId: uuid("assigned_by_user_id")
+        .notNull()
+        .references(() => users.id, {
+            onDelete: "restrict",
+            onUpdate: "cascade",
+        }),
+        unassignedByUserId: uuid("unassigned_by_user_id").references(() => users.id, {
+            onDelete: "restrict",
+            onUpdate: "cascade",
+        }),
         createdAt: timestamp("created_at", { withTimezone: true })
             .notNull()
             .defaultNow(),

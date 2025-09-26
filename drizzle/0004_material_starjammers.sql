@@ -1,0 +1,3 @@
+ALTER TABLE "card_assignment" ALTER COLUMN "assigned_by_user_id" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "card_assignment" ADD CONSTRAINT "card_assignment_assigned_by_user_id_user_id_fk" FOREIGN KEY ("assigned_by_user_id") REFERENCES "public"."user"("id") ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "card_assignment" ADD CONSTRAINT "card_assignment_unassigned_by_user_id_user_id_fk" FOREIGN KEY ("unassigned_by_user_id") REFERENCES "public"."user"("id") ON DELETE restrict ON UPDATE cascade;
