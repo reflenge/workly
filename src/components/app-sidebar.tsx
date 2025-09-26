@@ -87,7 +87,7 @@ export async function AppSidebar() {
                                     <SidebarMenuButton asChild>
                                         <Link href="/admin/users">
                                             <UsersIcon />
-                                            <span>従業員作成・編集</span>
+                                            <span>従業員作成・編集・給与</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

@@ -18,12 +18,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { MoreVerticalIcon } from "lucide-react";
+import { MoreVerticalIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateUser } from "./user-actions";
+import Link from "next/link";
 
 const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
     const [open, setOpen] = useState(false);
@@ -79,119 +80,140 @@ const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
                     {user.isActive ? "有効" : "無効"}
                 </CardDescription>
                 <CardAction>
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreVerticalIcon />
+                    <div className="flex gap-2">
+                        <Link href={`/admin/users/${user.id}`}>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                title="詳細・給与設定"
+                            >
+                                <UserIcon />
                             </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>ユーザー情報の編集</DialogTitle>
-                                <DialogDescription>
-                                    ステータス・プロフィールを編集できます。
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="flex flex-col gap-2">
+                        </Link>
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <MoreVerticalIcon />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        ユーザー情報の編集
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        ステータス・プロフィールを編集できます。
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form
+                                    onSubmit={handleSubmit}
+                                    className="space-y-4"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-2">
+                                            <label
+                                                htmlFor="lastName"
+                                                className="font-medium"
+                                            >
+                                                姓
+                                            </label>
+                                            <input
+                                                id="lastName"
+                                                type="text"
+                                                value={lastName}
+                                                onChange={(e) =>
+                                                    setLastName(e.target.value)
+                                                }
+                                                className="border rounded px-2 py-1"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <label
+                                                htmlFor="firstName"
+                                                className="font-medium"
+                                            >
+                                                名
+                                            </label>
+                                            <input
+                                                id="firstName"
+                                                type="text"
+                                                value={firstName}
+                                                onChange={(e) =>
+                                                    setFirstName(e.target.value)
+                                                }
+                                                className="border rounded px-2 py-1"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="isActive"
+                                            type="checkbox"
+                                            checked={isActive}
+                                            onChange={(e) =>
+                                                setIsActive(e.target.checked)
+                                            }
+                                        />
                                         <label
-                                            htmlFor="lastName"
+                                            htmlFor="isActive"
                                             className="font-medium"
                                         >
-                                            姓
+                                            有効にする
                                         </label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         <input
-                                            id="lastName"
-                                            type="text"
-                                            value={lastName}
+                                            id="isAdmin"
+                                            type="checkbox"
+                                            checked={isAdmin}
                                             onChange={(e) =>
-                                                setLastName(e.target.value)
+                                                setIsAdmin(e.target.checked)
                                             }
-                                            className="border rounded px-2 py-1"
                                         />
+                                        <label
+                                            htmlFor="isAdmin"
+                                            className="font-medium"
+                                        >
+                                            管理者にする
+                                        </label>
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <label
-                                            htmlFor="firstName"
+                                            htmlFor="bio"
                                             className="font-medium"
                                         >
-                                            名
+                                            プロフィール
                                         </label>
-                                        <input
-                                            id="firstName"
-                                            type="text"
-                                            value={firstName}
+                                        <textarea
+                                            id="bio"
+                                            value={bio}
                                             onChange={(e) =>
-                                                setFirstName(e.target.value)
+                                                setBio(e.target.value)
                                             }
-                                            className="border rounded px-2 py-1"
+                                            className="border rounded px-2 py-1 min-h-24"
+                                            placeholder="自己紹介など"
                                         />
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="isActive"
-                                        type="checkbox"
-                                        checked={isActive}
-                                        onChange={(e) =>
-                                            setIsActive(e.target.checked)
-                                        }
-                                    />
-                                    <label
-                                        htmlFor="isActive"
-                                        className="font-medium"
-                                    >
-                                        有効にする
-                                    </label>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="isAdmin"
-                                        type="checkbox"
-                                        checked={isAdmin}
-                                        onChange={(e) =>
-                                            setIsAdmin(e.target.checked)
-                                        }
-                                    />
-                                    <label
-                                        htmlFor="isAdmin"
-                                        className="font-medium"
-                                    >
-                                        管理者にする
-                                    </label>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label
-                                        htmlFor="bio"
-                                        className="font-medium"
-                                    >
-                                        プロフィール
-                                    </label>
-                                    <textarea
-                                        id="bio"
-                                        value={bio}
-                                        onChange={(e) => setBio(e.target.value)}
-                                        className="border rounded px-2 py-1 min-h-24"
-                                        placeholder="自己紹介など"
-                                    />
-                                </div>
-                                <div className="flex gap-2 justify-end">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onClick={() => setOpen(false)}
-                                        disabled={isPending}
-                                    >
-                                        キャンセル
-                                    </Button>
-                                    <Button type="submit" disabled={isPending}>
-                                        {isPending ? "保存中..." : "保存"}
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                    <div className="flex gap-2 justify-end">
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={() => setOpen(false)}
+                                            disabled={isPending}
+                                        >
+                                            キャンセル
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            disabled={isPending}
+                                        >
+                                            {isPending ? "保存中..." : "保存"}
+                                        </Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </CardAction>
             </CardHeader>
             <CardContent>
