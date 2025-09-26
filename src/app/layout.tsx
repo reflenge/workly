@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 
 const notoSansJP = Noto_Sans_JP({
     variable: "--font-noto-sans-jp",
@@ -27,7 +27,7 @@ export default function RootLayout({
         <html lang="ja">
             <body className={cn(notoSansJP.variable, "min-w-80 antialiased")}>
                 <Suspense fallback={null}>{children}</Suspense>
-                <Toaster />
+                <Toaster richColors closeButton />
                 <SpeedInsights />
                 <Analytics />
             </body>

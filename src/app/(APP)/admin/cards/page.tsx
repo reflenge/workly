@@ -1,8 +1,10 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { cards, users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import NewItem from "./_components/new-item";
+import CardItems from "./_components/card-items";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能
@@ -23,9 +25,20 @@ export default async function page() {
     if (!user.isAdmin) {
         redirect("/");
     }
+
+    const cardResult = await db.select().from(cards).orderBy(desc(cards.updatedAt));
     return (
-        <div className="flex flex-col items-center justify-center h-full">
-            <h1>cards</h1>
+        <div className="">
+            <h1 className="text-2xl font-bold mb-4 px-6 text-center">
+                NFC Card 登録・管理
+            </h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                <NewItem />
+                {cardResult.length > 0 &&
+                    cardResult.map((card) => (
+                        <CardItems key={card.id} card={card} />
+                    ))}
+            </div>
         </div>
     );
 }
