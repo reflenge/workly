@@ -56,6 +56,7 @@ export async function AppSidebar() {
                                 <SidebarMenuButton asChild>
                                     <Link href="/">
                                         <HomeIcon />
+                                        <span>トップ</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
