@@ -14,7 +14,14 @@ import { LogoutButton } from "./logout-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { HomeIcon, UserIcon, UsersIcon, IdCardIcon, Link2Icon } from "lucide-react";
+import {
+    HomeIcon,
+    UserIcon,
+    UsersIcon,
+    IdCardIcon,
+    Link2Icon,
+    BriefcaseBusinessIcon,
+} from "lucide-react";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -49,6 +56,14 @@ export async function AppSidebar() {
                                 <SidebarMenuButton asChild>
                                     <Link href="/">
                                         <HomeIcon />
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/projects">
+                                        <BriefcaseBusinessIcon />
+                                        <span>プロジェクト</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
