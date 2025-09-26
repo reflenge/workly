@@ -28,7 +28,7 @@ export const users = pgTable(
     {
         id: uuid("id").primaryKey().defaultRandom(),
         // authIdがNULLの場合は未セットアップ
-        authId: uuid("auth_id"),
+        authId: uuid("auth_id").notNull().unique(),
         isAdmin: boolean("is_admin").notNull().default(false),
 
         lastName: varchar("last_name", { length: 191 }).notNull().default(""),
@@ -38,11 +38,7 @@ export const users = pgTable(
         bio: text("bio"),
         iconUrl: text("icon_url"),
 
-        isActive: boolean("is_active").notNull().default(false),
-        // 初期状態では未セットアップ
-        // withTimezone: true を指定すると、PostgreSQLのtimestamptz型（タイムゾーン付きタイムスタンプ）としてカラムを作成します。
-        // これにより、タイムゾーン情報を持つ日時が保存されます。
-        setupedAt: timestamp("setuped_at", { withTimezone: true }),
+        isActive: boolean("is_active").notNull().default(true),
         createdAt: timestamp("created_at", { withTimezone: true })
             .notNull()
             .defaultNow(),
@@ -54,7 +50,7 @@ export const users = pgTable(
     // これにより、同じauthIdを持つユーザーが複数登録されることを防ぎます。
     // authIdがnullの場合、unique制約は「null同士は重複とみなさない」ため、複数行でnullが許容されます。
     (t) => ({
-        authIdx: uniqueIndex("uniq_user_auth").on(t.authId),
+        authIdx: uniqueIndex("uniq_user_auth").on(t.authId).where(sql`"auth_id" IS NOT NULL`),
     })
 );
 
