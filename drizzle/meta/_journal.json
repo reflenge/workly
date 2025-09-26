@@ -15,6 +15,20 @@
       "when": 1758874307149,
       "tag": "0001_set",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758881477158,
+      "tag": "0002_public_ego",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758881478724,
+      "tag": "0003_set",
+      "breakpoints": true
     }
   ]
 }
