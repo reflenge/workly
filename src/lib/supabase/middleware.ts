@@ -43,12 +43,8 @@ export async function updateSession(request: NextRequest) {
     if (
         // 1. userがnullまたはundefinedの場合（＝認証されていない状態）
         !user &&
-        // 2. 現在のリクエストパスが「/login」で始まっていない場合
-        !request.nextUrl.pathname.startsWith("/login") &&
-        // 3. 現在のリクエストパスが「/auth」で始まっていない場合
-        !request.nextUrl.pathname.startsWith("/auth") &&
-        // 4. トップページ（"/"）でない場合
-        request.nextUrl.pathname !== "/"
+        // 2. 現在のリクエストパスが「/auth」で始まっていない場合
+        !request.nextUrl.pathname.startsWith("/auth")
     ) {
         // 上記すべての条件を満たす場合（＝未認証ユーザーが認証関連ページ・トップページ以外にアクセスした場合）、
         // 強制的にログインページ（/auth/login）へリダイレクトする
