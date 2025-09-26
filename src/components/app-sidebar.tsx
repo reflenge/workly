@@ -21,6 +21,7 @@ import {
     IdCardIcon,
     Link2Icon,
     BriefcaseBusinessIcon,
+    SettingsIcon,
 } from "lucide-react";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -65,6 +66,14 @@ export async function AppSidebar() {
                                     <Link href="/projects">
                                         <BriefcaseBusinessIcon />
                                         <span>プロジェクト</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/settings">
+                                        <SettingsIcon />
+                                        <span>設定</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
