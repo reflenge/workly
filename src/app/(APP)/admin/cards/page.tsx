@@ -26,7 +26,10 @@ export default async function page() {
         redirect("/");
     }
 
-    const cardResult = await db.select().from(cards).orderBy(desc(cards.updatedAt));
+    const cardResult = await db
+        .select()
+        .from(cards)
+        .orderBy(desc(cards.updatedAt));
     return (
         <div className="">
             <h1 className="text-2xl font-bold mb-4 px-6 text-center">

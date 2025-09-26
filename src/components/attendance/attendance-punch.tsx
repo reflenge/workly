@@ -11,6 +11,7 @@ import {
     AttendanceAction,
 } from "@/lib/attendance/attendance-actions";
 import { ClockIcon, PlayIcon, PauseIcon, SquareIcon } from "lucide-react";
+import WorkLogForm from "@/components/worklog/worklog-form";
 
 interface AttendancePunchProps {
     userId: string;
@@ -196,6 +197,9 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* 作業ログフォーム */}
+            <WorkLogForm userId={userId} />
         </div>
     );
 };
