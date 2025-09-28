@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { attendanceLogs, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import { createClient } from "@supabase/supabase-js";
@@ -26,12 +26,23 @@ export async function createUser(input: {
         if (error || !data?.user?.id) {
             throw error ?? new Error("Failed to create auth user");
         }
-
-        await db.insert(users).values({
-            authId: data.user.id,
-            lastName: input.lastName,
-            firstName: input.firstName,
-            isAdmin: !!input.isAdmin,
+        await db.transaction(async (tx) => {
+            const [newUser] = await tx
+                .insert(users)
+                .values({
+                    authId: data.user.id,
+                    lastName: input.lastName,
+                    firstName: input.firstName,
+                    isAdmin: !!input.isAdmin,
+                })
+                .returning();
+            await tx.insert(attendanceLogs).values({
+                userId: newUser.id, // ユーザーID
+                statusId: 1, // ステータスID
+                startedAt: new Date(), // 開始時刻
+                startedSource: 1, // 開始時のソース
+                note: "ユーザー登録Action 自動登録", // メモ（オプション）
+            });
         });
     } catch (error) {
         throw error;
