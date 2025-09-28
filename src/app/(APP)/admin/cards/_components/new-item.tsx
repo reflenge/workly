@@ -8,6 +8,14 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+
 import { Button } from "@/components/ui/button";
 import React, { useState, useTransition } from "react";
 import { createCard } from "./card-actions";
@@ -62,7 +70,7 @@ const NewItem = () => {
                         <label htmlFor="uid" className="font-medium">
                             カードUID
                         </label>
-                        <input
+                        {/* <input
                             id="uid"
                             type="text"
                             value={uid}
@@ -70,13 +78,44 @@ const NewItem = () => {
                             className="border rounded px-2 py-1"
                             required
                             placeholder="カードのUIDを入力"
-                        />
+                        /> */}
+                        <InputOTP
+                            maxLength={14}
+                            value={uid}
+                            onChange={(e) => setUid(e.toLowerCase())}
+                            id="uid"
+                            type="text"
+                            autoComplete="off"
+                            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                        >
+                            <InputOTPGroup className="w-full">
+                                <InputOTPSlot index={0} />
+                                <InputOTPSlot index={1} />
+                                <InputOTPSlot index={2} />
+                                <InputOTPSlot index={3} />
+                                <InputOTPSlot index={4} />
+                                <InputOTPSlot index={5} />
+                                <InputOTPSlot index={6} />
+                                <InputOTPSlot index={7} />
+                                <InputOTPSlot index={8} />
+                                <InputOTPSlot index={9} />
+                                <InputOTPSlot index={10} />
+                                <InputOTPSlot index={11} />
+                                <InputOTPSlot index={12} />
+                                <InputOTPSlot index={13} />
+                            </InputOTPGroup>
+                        </InputOTP>
                     </div>
                 </CardContent>
                 <CardFooter>
                     <Button
                         type="submit"
-                        disabled={isPending || !uid}
+                        disabled={
+                            isPending ||
+                            !uid ||
+                            uid.length !== 14 ||
+                            !/^[a-z0-9]{14}$/.test(uid)
+                        }
                         className="w-full"
                     >
                         {isPending ? "登録中..." : "Card 登録"}
