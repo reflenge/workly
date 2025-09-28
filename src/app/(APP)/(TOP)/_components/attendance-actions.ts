@@ -143,13 +143,24 @@ export async function recordAttendance(
         // 現在時刻を取得
         const now = new Date();
 
-        // ===== 連打チェック =====
-        // 同じステータスを連続で選択できないようにチェック
-        if (activeLog.length > 0 && activeLog[0].statusCode === input.action) {
-            return {
-                success: false,
-                message: "同じステータスを連続で選択することはできません",
-            };
+        // ===== 状態遷移チェック =====
+        // 現在の状態に基づいて許可されるアクションをチェック
+        if (activeLog.length > 0) {
+            const currentStatus = activeLog[0].statusCode;
+            const isValidTransition = validateStatusTransition(
+                currentStatus,
+                input.action
+            );
+
+            if (!isValidTransition) {
+                return {
+                    success: false,
+                    message: getInvalidTransitionMessage(
+                        currentStatus,
+                        input.action
+                    ),
+                };
+            }
         }
 
         // ===== 打刻処理（トランザクション使用） =====
@@ -222,6 +233,59 @@ export async function recordAttendance(
             message:
                 error instanceof Error ? error.message : "打刻に失敗しました",
         };
+    }
+}
+
+/**
+ * 状態遷移が有効かどうかをチェック
+ *
+ * @param currentStatus 現在のステータス
+ * @param newAction 新しいアクション
+ * @returns 遷移が有効かどうか
+ */
+function validateStatusTransition(
+    currentStatus: string,
+    newAction: AttendanceAction
+): boolean {
+    switch (currentStatus) {
+        case "WORKING":
+            // 出勤時は休憩・退勤のみ可能
+            return newAction === "BREAK" || newAction === "OFF";
+        case "BREAK":
+            // 休憩時は出勤・退勤のみ可能
+            return newAction === "WORKING" || newAction === "OFF";
+        case "OFF":
+            // 退勤時は出勤のみ可能
+            return newAction === "WORKING";
+        default:
+            // 不明な状態の場合は全て許可
+            return true;
+    }
+}
+
+/**
+ * 無効な状態遷移のメッセージを取得
+ *
+ * @param currentStatus 現在のステータス
+ * @param newAction 新しいアクション
+ * @returns エラーメッセージ
+ */
+function getInvalidTransitionMessage(
+    currentStatus: string,
+    newAction: AttendanceAction
+): string {
+    const statusLabel = getStatusLabel(currentStatus as AttendanceAction);
+    const actionLabel = getStatusLabel(newAction);
+
+    switch (currentStatus) {
+        case "WORKING":
+            return `${statusLabel}中は${actionLabel}を選択できません。休憩または退勤を選択してください。`;
+        case "BREAK":
+            return `${statusLabel}中は${actionLabel}を選択できません。勤務再開または退勤を選択してください。`;
+        case "OFF":
+            return `${statusLabel}中は${actionLabel}を選択できません。勤務開始を選択してください。`;
+        default:
+            return "無効な状態遷移です。";
     }
 }
 

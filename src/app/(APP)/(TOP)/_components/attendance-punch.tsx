@@ -121,6 +121,31 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
         }
     };
 
+    // ===== ボタンの有効/無効状態を判定 =====
+    const isButtonEnabled = (action: AttendanceAction) => {
+        if (isPending) return false; // 処理中は全て無効
+
+        if (!currentAttendance) {
+            // 打刻中でない場合は勤務開始のみ有効
+            return action === "WORKING";
+        }
+
+        const currentStatus = currentAttendance.statusCode;
+        switch (currentStatus) {
+            case "WORKING":
+                // 出勤時は休憩・退勤のみ有効
+                return action === "BREAK" || action === "OFF";
+            case "BREAK":
+                // 休憩時は出勤・退勤のみ有効
+                return action === "WORKING" || action === "OFF";
+            case "OFF":
+                // 退勤時は出勤のみ有効
+                return action === "WORKING";
+            default:
+                return true; // 不明な状態の場合は全て有効
+        }
+    };
+
     // ===== ローディング状態の表示 =====
     if (isLoading) {
         return (
@@ -196,15 +221,12 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                         {/* 勤務開始ボタン */}
                         <Button
                             onClick={() => handlePunch("WORKING")}
-                            disabled={
-                                isPending ||
-                                currentAttendance?.statusCode === "WORKING"
-                            }
+                            disabled={!isButtonEnabled("WORKING")}
                             className="w-full h-12 text-lg"
                             variant={
-                                currentAttendance?.statusCode === "WORKING"
-                                    ? "outline" // 現在勤務中の場合はアウトライン
-                                    : "default" // それ以外は強調表示
+                                isButtonEnabled("WORKING")
+                                    ? "default"
+                                    : "outline"
                             }
                         >
                             <PlayIcon className="w-5 h-5 mr-2" />
@@ -214,15 +236,10 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                         {/* 休憩開始ボタン */}
                         <Button
                             onClick={() => handlePunch("BREAK")}
-                            disabled={
-                                isPending ||
-                                currentAttendance?.statusCode === "BREAK"
-                            }
+                            disabled={!isButtonEnabled("BREAK")}
                             className="w-full h-12 text-lg"
                             variant={
-                                currentAttendance?.statusCode === "BREAK"
-                                    ? "outline" // 現在勤務中の場合はアウトライン
-                                    : "default" // それ以外は強調表示
+                                isButtonEnabled("BREAK") ? "default" : "outline"
                             }
                         >
                             <PauseIcon className="w-5 h-5 mr-2" />
@@ -232,15 +249,10 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                         {/* 退勤ボタン */}
                         <Button
                             onClick={() => handlePunch("OFF")}
-                            disabled={
-                                isPending ||
-                                currentAttendance?.statusCode === "OFF"
-                            }
+                            disabled={!isButtonEnabled("OFF")}
                             className="w-full h-12 text-lg"
                             variant={
-                                currentAttendance?.statusCode === "OFF"
-                                    ? "outline" // 現在勤務中の場合はアウトライン
-                                    : "default" // それ以外は強調表示
+                                isButtonEnabled("OFF") ? "default" : "outline"
                             }
                         >
                             <SquareIcon className="w-5 h-5 mr-2" />
