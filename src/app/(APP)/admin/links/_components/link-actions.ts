@@ -113,22 +113,27 @@ export async function unlink(
     if (!assignment) throw new Error("リンクが見つかりません");
     if (assignment.unassignedAt) return; // 既に解除
 
-    await db
-        .update(cardAssignments)
-        .set({
-            unassignedAt: new Date(),
-            reason: reason || assignment.reason,
-            unassignedByUserId: actor.id,
-        })
-        .where(eq(cardAssignments.id, assignmentId));
-
-    if (options?.setCardInactive) {
-        await db
-            .update(cards)
+    // トランザクションを使用してカード割当の解除とカードの無効化を安全に処理
+    await db.transaction(async (tx) => {
+        // 1. カード割当を解除
+        await tx
+            .update(cardAssignments)
             .set({
-                isActive: false,
-                inactiveReason: reason || assignment.reason,
+                unassignedAt: new Date(),
+                reason: reason || assignment.reason,
+                unassignedByUserId: actor.id,
             })
-            .where(eq(cards.id, assignment.cardId));
-    }
+            .where(eq(cardAssignments.id, assignmentId));
+
+        // 2. オプションでカードを無効化
+        if (options?.setCardInactive) {
+            await tx
+                .update(cards)
+                .set({
+                    isActive: false,
+                    inactiveReason: reason || assignment.reason,
+                })
+                .where(eq(cards.id, assignment.cardId));
+        }
+    });
 }

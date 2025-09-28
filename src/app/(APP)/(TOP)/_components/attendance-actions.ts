@@ -152,65 +152,69 @@ export async function recordAttendance(
             };
         }
 
-        // ===== 打刻処理 =====
-        if (activeLog.length > 0) {
-            // 既存の打刻が進行中の場合：既存の打刻を終了してから新しい打刻を開始
+        // ===== 打刻処理（トランザクション使用） =====
+        const result = await db.transaction(async (tx) => {
+            if (activeLog.length > 0) {
+                // 既存の打刻が進行中の場合：既存の打刻を終了してから新しい打刻を開始
 
-            // 1. 既存の打刻を終了
-            await db
-                .update(attendanceLogs)
-                .set({
-                    endedAt: now, // 終了時刻を設定
-                    endedSource: sourceId, // 終了時のソースを記録
-                    updatedAt: now, // 更新時刻を設定
-                })
-                .where(eq(attendanceLogs.id, activeLog[0].id));
+                // 1. 既存の打刻を終了
+                await tx
+                    .update(attendanceLogs)
+                    .set({
+                        endedAt: now, // 終了時刻を設定
+                        endedSource: sourceId, // 終了時のソースを記録
+                        updatedAt: now, // 更新時刻を設定
+                    })
+                    .where(eq(attendanceLogs.id, activeLog[0].id));
 
-            // 2. 新しい打刻を開始
-            const [newLog] = await db
-                .insert(attendanceLogs)
-                .values({
-                    userId: input.userId, // ユーザーID
-                    statusId: statusId, // ステータスID
-                    startedAt: now, // 開始時刻
-                    startedSource: sourceId, // 開始時のソース
-                    note: input.note, // メモ（オプション）
-                })
-                .returning();
+                // 2. 新しい打刻を開始
+                const [newLog] = await tx
+                    .insert(attendanceLogs)
+                    .values({
+                        userId: input.userId, // ユーザーID
+                        statusId: statusId, // ステータスID
+                        startedAt: now, // 開始時刻
+                        startedSource: sourceId, // 開始時のソース
+                        note: input.note, // メモ（オプション）
+                    })
+                    .returning();
 
-            return {
-                success: true,
-                message: `${getStatusLabel(input.action)}を開始しました`,
-                data: {
-                    logId: newLog.id,
-                    status: input.action,
-                    startedAt: newLog.startedAt,
-                },
-            };
-        } else {
-            // 既存の打刻がない場合：新しい打刻を開始
+                return {
+                    success: true,
+                    message: `${getStatusLabel(input.action)}を開始しました`,
+                    data: {
+                        logId: newLog.id,
+                        status: input.action,
+                        startedAt: newLog.startedAt,
+                    },
+                };
+            } else {
+                // 既存の打刻がない場合：新しい打刻を開始
 
-            const [newLog] = await db
-                .insert(attendanceLogs)
-                .values({
-                    userId: input.userId, // ユーザーID
-                    statusId: statusId, // ステータスID
-                    startedAt: now, // 開始時刻
-                    startedSource: sourceId, // 開始時のソース
-                    note: input.note, // メモ（オプション）
-                })
-                .returning();
+                const [newLog] = await tx
+                    .insert(attendanceLogs)
+                    .values({
+                        userId: input.userId, // ユーザーID
+                        statusId: statusId, // ステータスID
+                        startedAt: now, // 開始時刻
+                        startedSource: sourceId, // 開始時のソース
+                        note: input.note, // メモ（オプション）
+                    })
+                    .returning();
 
-            return {
-                success: true,
-                message: `${getStatusLabel(input.action)}を開始しました`,
-                data: {
-                    logId: newLog.id,
-                    status: input.action,
-                    startedAt: newLog.startedAt,
-                },
-            };
-        }
+                return {
+                    success: true,
+                    message: `${getStatusLabel(input.action)}を開始しました`,
+                    data: {
+                        logId: newLog.id,
+                        status: input.action,
+                        startedAt: newLog.startedAt,
+                    },
+                };
+            }
+        });
+
+        return result;
     } catch (error) {
         // エラーが発生した場合は失敗レスポンスを返す
         return {

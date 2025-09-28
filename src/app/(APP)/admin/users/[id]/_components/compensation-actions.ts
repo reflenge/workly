@@ -52,39 +52,43 @@ export async function createCompensation(input: {
                 )
             );
 
-        // Step 3: 無期限レコードがある場合の処理
-        if (unlimitedRecords.length > 0) {
-            const unlimitedRecord = unlimitedRecords[0]; // 無期限レコードは1つのはず
+        // Step 3: トランザクションを使用して既存レコードの更新と新しいレコードの作成を安全に処理
+        await db.transaction(async (tx) => {
+            // 無期限レコードがある場合の処理
+            if (unlimitedRecords.length > 0) {
+                const unlimitedRecord = unlimitedRecords[0]; // 無期限レコードは1つのはず
 
-            if (input.effectiveFrom > unlimitedRecord.effectiveFrom) {
-                // 入力の開始日が無期限レコードの開始日より後の場合
-                // 無期限レコードを終了させる
-                await db
-                    .update(userCompensation)
-                    .set({
-                        effectiveTo: input.effectiveFrom,
-                        updatedAt: new Date(),
-                    })
-                    .where(eq(userCompensation.id, unlimitedRecord.id));
-            } else {
-                // 入力の開始日が無期限レコードの開始日以前の場合
-                if (input.effectiveTo === null) {
-                    // 入力の終了日がNULL（無期限）の場合はエラー
-                    throw new Error("現行のオープン期間と競合します");
+                if (input.effectiveFrom > unlimitedRecord.effectiveFrom) {
+                    // 入力の開始日が無期限レコードの開始日より後の場合
+                    // 無期限レコードを終了させる
+                    await tx
+                        .update(userCompensation)
+                        .set({
+                            effectiveTo: input.effectiveFrom,
+                            updatedAt: new Date(),
+                        })
+                        .where(eq(userCompensation.id, unlimitedRecord.id));
+                } else {
+                    // 入力の開始日が無期限レコードの開始日以前の場合
+                    if (input.effectiveTo === null) {
+                        // 入力の終了日がNULL（無期限）の場合はエラー
+                        throw new Error("現行のオープン期間と競合します");
+                    }
+                    // 入力の終了日がNULLでない場合はそのまま登録（期間が空いている場合）
                 }
-                // 入力の終了日がNULLでない場合はそのまま登録（期間が空いている場合）
             }
-        }
 
-        await db.insert(userCompensation).values({
-            userId: input.userId,
-            isHourly: input.isHourly,
-            isMonthly: input.isMonthly,
-            hourlyRate: input.hourlyRate,
-            monthlySalary: input.monthlySalary,
-            currency: input.currency,
-            effectiveFrom: input.effectiveFrom,
-            effectiveTo: input.effectiveTo,
+            // 新しい給与設定を作成
+            await tx.insert(userCompensation).values({
+                userId: input.userId,
+                isHourly: input.isHourly,
+                isMonthly: input.isMonthly,
+                hourlyRate: input.hourlyRate,
+                monthlySalary: input.monthlySalary,
+                currency: input.currency,
+                effectiveFrom: input.effectiveFrom,
+                effectiveTo: input.effectiveTo,
+            });
         });
     } catch (error) {
         throw error;
