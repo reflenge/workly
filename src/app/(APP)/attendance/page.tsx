@@ -104,8 +104,17 @@ export default async function AttendancePage({
                             勤務時間合計
                         </div>
                         <div className="text-xl font-semibold">
-                            {Math.floor(summary.workedMinutes / 60)}時間
-                            {summary.workedMinutes % 60}分
+                            {(() => {
+                                const totalMs = summary.workedMillis;
+                                const hours = Math.floor(totalMs / 3_600_000);
+                                const minutes = Math.floor(
+                                    (totalMs % 3_600_000) / 60_000
+                                );
+                                const seconds = Math.floor(
+                                    (totalMs % 60_000) / 1000
+                                );
+                                return `${hours}時間${minutes}分${seconds}秒`;
+                            })()}
                         </div>
                     </div>
                 </div>

@@ -126,7 +126,7 @@ export interface FetchMyAttendanceMonthlySummaryParams {
 
 export interface AttendanceMonthlySummaryResult {
     workedDays: number; // 勤務した日数（JST、同日複数回は1日としてカウント）
-    workedMinutes: number; // 勤務合計分（休憩は除外、JST月境界でクリップ）
+    workedMillis: number; // 勤務合計ミリ秒（休憩は除外、JST月境界でクリップ）
 }
 
 // JSTのYYYY-MM-DD文字列を作る（DateはUTC基準のまま内部で+9hシフト）
@@ -164,14 +164,14 @@ export async function fetchMyAttendanceMonthlySummary(
         data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-        return { workedDays: 0, workedMinutes: 0 };
+        return { workedDays: 0, workedMillis: 0 };
     }
 
     const me = (
         await db.select().from(users).where(eq(users.authId, user.id)).limit(1)
     )[0];
     if (!me) {
-        return { workedDays: 0, workedMinutes: 0 };
+        return { workedDays: 0, workedMillis: 0 };
     }
 
     // JST月初・翌月初（UTCで-9hシフトした境界を使う）
@@ -193,7 +193,7 @@ export async function fetchMyAttendanceMonthlySummary(
             .limit(1)
     )[0];
     if (!workingStatus) {
-        return { workedDays: 0, workedMinutes: 0 };
+        return { workedDays: 0, workedMillis: 0 };
     }
 
     const rows = await db
@@ -209,7 +209,7 @@ export async function fetchMyAttendanceMonthlySummary(
         )
         .orderBy(desc(attendanceLogs.startedAt));
 
-    let workedMinutes = 0;
+    let workedMillis = 0;
     const workedDaySet = new Set<string>();
     const now = new Date();
 
@@ -227,10 +227,8 @@ export async function fetchMyAttendanceMonthlySummary(
         );
         if (clippedEnd.getTime() <= clippedStart.getTime()) continue;
 
-        // 分を加算
-        workedMinutes += Math.floor(
-            (clippedEnd.getTime() - clippedStart.getTime()) / 60000
-        );
+        // ミリ秒を加算
+        workedMillis += clippedEnd.getTime() - clippedStart.getTime();
 
         // JST日単位で日数をカウント（同日複数回は1日）
         let dayCursor = getJstStartOfDay(clippedStart);
@@ -241,5 +239,5 @@ export async function fetchMyAttendanceMonthlySummary(
         }
     }
 
-    return { workedDays: workedDaySet.size, workedMinutes };
+    return { workedDays: workedDaySet.size, workedMillis };
 }
