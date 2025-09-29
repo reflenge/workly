@@ -5,6 +5,7 @@ import {
 import { AttendancePageWrapper } from "./_components/attendance-page-wrapper";
 import { redirect } from "next/navigation";
 import { AttendanceDataTable } from "./_components/attendance-data-table";
+import { updateAttendanceLog } from "./_components/attendance-actions";
 
 interface AttendancePageProps {
     searchParams: {
@@ -119,7 +120,13 @@ export default async function AttendancePage({
                     </div>
                 </div>
                 <div className="mt-6">
-                    <AttendanceDataTable data={items} />
+                    <AttendanceDataTable
+                        data={items}
+                        onUpdate={async (args) => {
+                            "use server";
+                            return await updateAttendanceLog(args);
+                        }}
+                    />
                 </div>
             </AttendancePageWrapper>
         </div>

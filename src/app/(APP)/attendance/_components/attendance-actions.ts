@@ -1,3 +1,4 @@
+"use server";
 import { db } from "@/db";
 import {
     attendanceLogs,
@@ -6,7 +7,7 @@ import {
     attendanceLogSource,
 } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, lt, gt, sql } from "drizzle-orm";
 
 export interface FetchMyAttendanceParams {
     year: number; // 西暦
@@ -240,4 +241,187 @@ export async function fetchMyAttendanceMonthlySummary(
     }
 
     return { workedDays: workedDaySet.size, workedMillis };
+}
+
+// ---- 勤怠ログの startedAt / endedAt 修正（サーバー関数） ----
+export interface UpdateAttendanceLogInput {
+    logId: string;
+    target: "startedAt" | "endedAt";
+    newDateTimeIso: string; // クライアントから受け取るISO文字列
+    reason: string; // 必須
+}
+
+export interface UpdateAttendanceLogResult {
+    success: boolean;
+    message: string;
+}
+
+export async function updateAttendanceLog(
+    input: UpdateAttendanceLogInput
+): Promise<UpdateAttendanceLogResult> {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: "認証が必要です" };
+
+    if (!input.reason?.trim()) {
+        return { success: false, message: "理由は必須です" };
+    }
+
+    // 入力はJSTのローカル日時（"YYYY-MM-DDTHH:MM"）前提で受け取り、JST から UTC に変換したうえで分丸め
+    // 受け取る文字列を Date として解釈せず、手動でJST->UTC変換
+    const originalStr = input.newDateTimeIso;
+    const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2})$/.exec(
+        originalStr
+    );
+    if (!m) {
+        return { success: false, message: "日時の形式が不正です" };
+    }
+    const yy = Number(m[1]);
+    const MM = Number(m[2]) - 1;
+    const dd = Number(m[3]);
+    const hh = Number(m[4]);
+    const mm = Number(m[5]);
+    // JSTローカルをUTCにするために -9h したUTCのDateを作る
+    const utcMs = Date.UTC(yy, MM, dd, hh - 9, mm, 0, 0);
+    const original = new Date(utcMs);
+    if (Number.isNaN(original.getTime())) {
+        return { success: false, message: "日時の形式が不正です" };
+    }
+    const newDt = new Date(original);
+    newDt.setSeconds(0, 0);
+
+    // 対象ログを取得（自分のレコードのみ）
+    const me = (
+        await db.select().from(users).where(eq(users.authId, user.id)).limit(1)
+    )[0];
+    if (!me) return { success: false, message: "ユーザーが見つかりません" };
+
+    const current = (
+        await db
+            .select()
+            .from(attendanceLogs)
+            .where(
+                and(
+                    eq(attendanceLogs.id, input.logId),
+                    eq(attendanceLogs.userId, me.id)
+                )
+            )
+            .limit(1)
+    )[0];
+    if (!current)
+        return { success: false, message: "対象レコードが見つかりません" };
+
+    // 進行中(ended_at IS NULL)は編集不可
+    if (current.endedAt === null) {
+        return { success: false, message: "進行中のレコードは編集できません" };
+    }
+
+    // 入力後の値が変更前と同一なら即返す（連打対策・冪等）
+    if (input.target === "startedAt") {
+        if (new Date(current.startedAt).getTime() === newDt.getTime()) {
+            return { success: true, message: "変更はありません" };
+        }
+    } else {
+        if (
+            current.endedAt &&
+            new Date(current.endedAt as Date).getTime() === newDt.getTime()
+        ) {
+            return { success: true, message: "変更はありません" };
+        }
+    }
+
+    // 前後レコードの取得
+    const prev = (
+        await db
+            .select({ id: attendanceLogs.id, endedAt: attendanceLogs.endedAt })
+            .from(attendanceLogs)
+            .where(
+                and(
+                    eq(attendanceLogs.userId, me.id),
+                    lt(attendanceLogs.startedAt, current.startedAt)
+                )
+            )
+            .orderBy(desc(attendanceLogs.startedAt))
+            .limit(1)
+    )[0];
+    const next = (
+        await db
+            .select({
+                id: attendanceLogs.id,
+                startedAt: attendanceLogs.startedAt,
+            })
+            .from(attendanceLogs)
+            .where(
+                and(
+                    eq(attendanceLogs.userId, me.id),
+                    gt(attendanceLogs.startedAt, current.startedAt)
+                )
+            )
+            .orderBy(attendanceLogs.startedAt)
+            .limit(1)
+    )[0];
+
+    // 制約チェック
+    if (input.target === "startedAt") {
+        // 範囲: 前レコードのendedAt(存在すれば) <= newDt < 現レコードのendedAt
+        if (
+            prev?.endedAt &&
+            new Date(prev.endedAt).getTime() > newDt.getTime()
+        ) {
+            return {
+                success: false,
+                message: "開始時刻は前のレコード終了以降にしてください",
+            };
+        }
+        if (newDt.getTime() >= new Date(current.endedAt as Date).getTime()) {
+            return {
+                success: false,
+                message: "開始時刻は終了時刻より前にしてください",
+            };
+        }
+    } else {
+        // endedAt: 現レコードstartedAt < newDt <= 次レコードのstartedAt(存在すれば)
+        if (newDt.getTime() <= new Date(current.startedAt).getTime()) {
+            return {
+                success: false,
+                message: "終了時刻は開始時刻より後にしてください",
+            };
+        }
+        if (
+            next?.startedAt &&
+            newDt.getTime() > new Date(next.startedAt).getTime()
+        ) {
+            return {
+                success: false,
+                message: "終了時刻は次のレコード開始以前にしてください",
+            };
+        }
+    }
+
+    // 変更前値の記録
+    const beforeStarted = new Date(current.startedAt);
+    const beforeEnded = new Date(current.endedAt as Date);
+
+    // ノート追記
+    const reasonNote = `\n[修正] ${
+        input.reason
+    } (before: ${beforeStarted.toISOString()} - ${beforeEnded.toISOString()})`;
+    const newNote = (current.note || "") + reasonNote;
+
+    // 更新
+    if (input.target === "startedAt") {
+        await db
+            .update(attendanceLogs)
+            .set({ startedAt: newDt, note: newNote, updatedAt: new Date() })
+            .where(eq(attendanceLogs.id, current.id));
+    } else {
+        await db
+            .update(attendanceLogs)
+            .set({ endedAt: newDt, note: newNote, updatedAt: new Date() })
+            .where(eq(attendanceLogs.id, current.id));
+    }
+
+    return { success: true, message: "更新しました" };
 }
