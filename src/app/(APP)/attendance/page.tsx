@@ -3,6 +3,7 @@ import {
     fetchMyAttendanceMonthlySummary,
 } from "./_components/attendance-actions";
 import { AttendancePageWrapper } from "./_components/attendance-page-wrapper";
+import { redirect } from "next/navigation";
 import { AttendanceDataTable } from "./_components/attendance-data-table";
 
 interface AttendancePageProps {
@@ -18,14 +19,53 @@ export default async function AttendancePage({
     const now = new Date();
     // JST基準の現在年月を採用（UTCだと月境界がJSTとズレるため）
     const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-    const year = Number.parseInt(
+    let year = Number.parseInt(
         searchParams.year || String(jstNow.getUTCFullYear()),
         10
     );
-    const month = Number.parseInt(
+    let month = Number.parseInt(
         searchParams.month || String(jstNow.getUTCMonth() + 1),
         10
     );
+    // 明らかにおかしいパラメータは今月にフォールバック（JST）し、クエリを除去してリダイレクト
+    let corrected = false;
+    // 2025/01から今月までの範囲のみ許可
+    const minYear = 2025;
+    const minMonth = 1;
+    const maxYear = jstNow.getUTCFullYear();
+    const maxMonth = jstNow.getUTCMonth() + 1;
+
+    // 年の範囲チェック
+    if (Number.isNaN(year) || year < minYear || year > maxYear) {
+        year = maxYear;
+        month = maxMonth;
+        corrected = true;
+    }
+
+    // 月の範囲チェック
+    if (Number.isNaN(month) || month < 1 || month > 12) {
+        month = maxMonth;
+        corrected = true;
+    }
+
+    // 2025/01より前は不可
+    if (year === minYear && month < minMonth) {
+        month = minMonth;
+        corrected = true;
+    }
+
+    // 今月より未来は不可
+    if (year === maxYear && month > maxMonth) {
+        month = maxMonth;
+        corrected = true;
+    }
+
+    if (corrected) {
+        redirect("/attendance");
+    }
+
+    const canPrev = year > minYear || (year === minYear && month > minMonth);
+    const canNext = year < maxYear || (year === maxYear && month < maxMonth);
 
     const [{ items, totalCount }, summary] = await Promise.all([
         fetchMyAttendanceLogs({
@@ -44,7 +84,12 @@ export default async function AttendancePage({
                 </p>
             </div>
 
-            <AttendancePageWrapper year={year} month={month}>
+            <AttendancePageWrapper
+                year={year}
+                month={month}
+                canPrev={canPrev}
+                canNext={canNext}
+            >
                 <div className="mt-6 grid grid-cols-2 gap-4">
                     <div className="rounded-md border p-4">
                         <div className="text-sm text-muted-foreground">

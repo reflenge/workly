@@ -9,12 +9,16 @@ interface AttendancePageWrapperProps {
     year: number;
     month: number; // 1-12
     children: React.ReactNode;
+    canPrev?: boolean;
+    canNext?: boolean;
 }
 
 export function AttendancePageWrapper({
     year,
     month,
     children,
+    canPrev = true,
+    canNext = true,
 }: AttendancePageWrapperProps) {
     const navigateTo = (y: number, m: number) => {
         const url = new URL(window.location.href);
@@ -51,47 +55,63 @@ export function AttendancePageWrapper({
     return (
         <>
             <div className="flex items-center justify-between mt-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleMove(-1)}
-                >
-                    <ChevronLeft className="h-4 w-4" />
-                    {prev.label}
-                </Button>
+                {canPrev ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleMove(-1)}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                        {prev.label}
+                    </Button>
+                ) : (
+                    <div />
+                )}
                 <div className="text-base sm:text-lg md:text-xl font-semibold">
                     {label}
                 </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleMove(1)}
-                >
-                    {next.label}
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
+                {canNext ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleMove(1)}
+                    >
+                        {next.label}
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
+                ) : (
+                    <div />
+                )}
             </div>
             {children}
             <div className="flex items-center justify-between mt-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleMove(-1)}
-                >
-                    <ChevronLeft className="h-4 w-4" />
-                    {prev.label}
-                </Button>
+                {canPrev ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleMove(-1)}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                        {prev.label}
+                    </Button>
+                ) : (
+                    <div />
+                )}
                 <div className="text-base sm:text-lg md:text-xl font-semibold">
                     {label}
                 </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleMove(1)}
-                >
-                    {next.label}
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
+                {canNext ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleMove(1)}
+                    >
+                        {next.label}
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
+                ) : (
+                    <div />
+                )}
             </div>
         </>
     );
