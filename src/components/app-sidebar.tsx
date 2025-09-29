@@ -79,6 +79,14 @@ export async function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
+                                    <Link href="/list">
+                                        <UsersIcon />
+                                        <span>一覧</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
                                     <Link href="/settings">
                                         <SettingsIcon />
                                         <span>設定</span>
