@@ -7,7 +7,7 @@ import {
     attendanceLogSource,
 } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { and, desc, eq, isNull, lt, gt, sql } from "drizzle-orm";
+import { and, desc, eq, lt, gt, sql } from "drizzle-orm";
 
 export interface FetchMyAttendanceParams {
     year: number; // 西暦

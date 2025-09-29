@@ -400,11 +400,11 @@ function getDatesBetween(startDate: Date, endDate: Date): Date[] {
     const dates: Date[] = [];
 
     // 日付の文字列比較で正確に判定
-    const startDateStr = startDate.toISOString().split("T")[0];
+    // const startDateStr = startDate.toISOString().split("T")[0];
     const endDateStr = endDate.toISOString().split("T")[0];
 
     // 開始日の翌日から終了日の前日まで
-    let current = new Date(startDate);
+    const current = new Date(startDate);
     current.setDate(current.getDate() + 1);
 
     while (current.toISOString().split("T")[0] < endDateStr) {
