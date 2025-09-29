@@ -16,7 +16,14 @@ import {
     AttendanceAction, // 打刻アクション型
 } from "./attendance-actions";
 // Lucide React アイコン
-import { ClockIcon, PlayIcon, PauseIcon, SquareIcon } from "lucide-react";
+import {
+    ClockIcon,
+    PlayIcon,
+    PauseIcon,
+    SquareIcon,
+    RefreshCcwIcon,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 /**
  * 勤務打刻コンポーネントのプロパティ
@@ -52,6 +59,8 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
     // 初期データ読み込み状態
     const [isLoading, setIsLoading] = useState(true);
 
+    const router = useRouter();
+
     // ===== 現在の打刻状況を取得する関数 =====
     const fetchCurrentAttendance = useCallback(async () => {
         try {
@@ -86,6 +95,7 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                 toast.success(result.message);
                 // 現在の打刻状況を再取得して状態を更新
                 await fetchCurrentAttendance();
+                router.refresh();
             } else {
                 // 失敗時：エラーメッセージを表示
                 toast.error(result.message);
@@ -229,7 +239,11 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                                     : "outline"
                             }
                         >
-                            <PlayIcon className="w-5 h-5 mr-2" />
+                            {isPending ? (
+                                <RefreshCcwIcon className="w-5 h-5 mr-2 animate-spin" />
+                            ) : (
+                                <PlayIcon className="w-5 h-5 mr-2" />
+                            )}
                             勤務開始
                         </Button>
 
@@ -242,7 +256,11 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                                 isButtonEnabled("BREAK") ? "default" : "outline"
                             }
                         >
-                            <PauseIcon className="w-5 h-5 mr-2" />
+                            {isPending ? (
+                                <RefreshCcwIcon className="w-5 h-5 mr-2 animate-spin" />
+                            ) : (
+                                <PauseIcon className="w-5 h-5 mr-2" />
+                            )}
                             休憩開始
                         </Button>
 
@@ -255,7 +273,11 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                                 isButtonEnabled("OFF") ? "default" : "outline"
                             }
                         >
-                            <SquareIcon className="w-5 h-5 mr-2" />
+                            {isPending ? (
+                                <RefreshCcwIcon className="w-5 h-5 mr-2 animate-spin" />
+                            ) : (
+                                <SquareIcon className="w-5 h-5 mr-2" />
+                            )}
                             退勤
                         </Button>
                     </div>

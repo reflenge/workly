@@ -167,16 +167,79 @@ export async function recordAttendance(
         const result = await db.transaction(async (tx) => {
             if (activeLog.length > 0) {
                 // 既存の打刻が進行中の場合：既存の打刻を終了してから新しい打刻を開始
+                const startedAt = activeLog[0].startedAt;
 
-                // 1. 既存の打刻を終了
-                await tx
-                    .update(attendanceLogs)
-                    .set({
-                        endedAt: now, // 終了時刻を設定
-                        endedSource: sourceId, // 終了時のソースを記録
-                        updatedAt: now, // 更新時刻を設定
-                    })
-                    .where(eq(attendanceLogs.id, activeLog[0].id));
+                // 日付が異なる場合の処理
+                if (isDifferentDate(startedAt, now)) {
+                    // 1. 既存の打刻を開始日の23:59:59で終了
+                    const endOfStartDay = getEndOfDay(startedAt);
+
+                    await tx
+                        .update(attendanceLogs)
+                        .set({
+                            endedAt: endOfStartDay, // 開始日の終了時刻を設定
+                            endedSource: sourceId, // 終了時のソースを記録
+                            updatedAt: now, // 更新時刻を設定
+                        })
+                        .where(eq(attendanceLogs.id, activeLog[0].id));
+
+                    // 2. 中間日（開始日の翌日から終了日の前日まで）のレコードを作成
+                    const datesBetween = getDatesBetween(startedAt, now);
+
+                    // 中間日がある場合のみ処理を実行
+                    if (datesBetween.length > 0) {
+                        for (const date of datesBetween) {
+                            const dayStart = getMidnightDate(date);
+                            const dayEnd = getEndOfDay(date);
+
+                            // 1日分のレコードを作成（0時から23:59:59まで）
+                            await tx.insert(attendanceLogs).values({
+                                userId: input.userId,
+                                statusId: activeLog[0].statusId, // 同じステータスを継続
+                                startedAt: dayStart, // その日の0時から開始
+                                endedAt: dayEnd, // その日の23:59:59で終了
+                                startedSource: sourceId,
+                                endedSource: sourceId,
+                                note: "自動生成", // 自動生成されたレコードであることを明記
+                            });
+                        }
+                    }
+
+                    // 3. 終了日の0時から新しいレコードを作成して即座に終了
+                    const midnightToday = getMidnightDate(now);
+
+                    // 終了日0時から開始のレコードを作成
+                    const [midnightLog] = await tx
+                        .insert(attendanceLogs)
+                        .values({
+                            userId: input.userId,
+                            statusId: activeLog[0].statusId, // 同じステータスを継続
+                            startedAt: midnightToday, // 終了日の0時から開始
+                            startedSource: sourceId,
+                            note: "自動生成", // 自動生成されたレコードであることを明記
+                        })
+                        .returning();
+
+                    // 4. 作成したレコードを即座に終了
+                    await tx
+                        .update(attendanceLogs)
+                        .set({
+                            endedAt: now, // 現在時刻で終了
+                            endedSource: sourceId,
+                            updatedAt: now,
+                        })
+                        .where(eq(attendanceLogs.id, midnightLog.id));
+                } else {
+                    // 日付が同じ場合：通常の終了処理
+                    await tx
+                        .update(attendanceLogs)
+                        .set({
+                            endedAt: now, // 終了時刻を設定
+                            endedSource: sourceId, // 終了時のソースを記録
+                            updatedAt: now, // 更新時刻を設定
+                        })
+                        .where(eq(attendanceLogs.id, activeLog[0].id));
+                }
 
                 // 2. 新しい打刻を開始
                 const [newLog] = await tx
@@ -287,6 +350,69 @@ function getInvalidTransitionMessage(
         default:
             return "無効な状態遷移です。";
     }
+}
+
+/**
+ * 開始日と終了日が異なるかチェック
+ *
+ * @param startDate 開始日時
+ * @param endDate 終了日時
+ * @returns 日付が異なるかどうか
+ */
+function isDifferentDate(startDate: Date, endDate: Date): boolean {
+    const startDateStr = startDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
+    const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
+    return startDateStr !== endDateStr;
+}
+
+/**
+ * 指定した日付の0時（00:00:00）の日時を取得
+ *
+ * @param date 基準となる日付
+ * @returns その日の0時の日時
+ */
+function getMidnightDate(date: Date): Date {
+    const midnight = new Date(date);
+    midnight.setHours(0, 0, 0, 0);
+    return midnight;
+}
+
+/**
+ * 指定した日付の23:59:59の日時を取得
+ *
+ * @param date 基準となる日付
+ * @returns その日の23:59:59の日時
+ */
+function getEndOfDay(date: Date): Date {
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    return endOfDay;
+}
+
+/**
+ * 2つの日付間の日付配列を取得
+ *
+ * @param startDate 開始日
+ * @param endDate 終了日
+ * @returns 日付の配列（開始日と終了日は含まない）
+ */
+function getDatesBetween(startDate: Date, endDate: Date): Date[] {
+    const dates: Date[] = [];
+
+    // 日付の文字列比較で正確に判定
+    const startDateStr = startDate.toISOString().split("T")[0];
+    const endDateStr = endDate.toISOString().split("T")[0];
+
+    // 開始日の翌日から終了日の前日まで
+    let current = new Date(startDate);
+    current.setDate(current.getDate() + 1);
+
+    while (current.toISOString().split("T")[0] < endDateStr) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
 }
 
 /**
