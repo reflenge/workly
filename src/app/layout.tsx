@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import ClarityInit from "@/components/clarity-init";
 
 const notoSansJP = Noto_Sans_JP({
     variable: "--font-noto-sans-jp",
@@ -30,6 +31,7 @@ export default function RootLayout({
                 <Toaster richColors closeButton />
                 <SpeedInsights />
                 <Analytics />
+                <ClarityInit />
             </body>
         </html>
     );
