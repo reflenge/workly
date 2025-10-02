@@ -59,6 +59,8 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
     const [isPending, startTransition] = useTransition();
     // 初期データ読み込み状態
     const [isLoading, setIsLoading] = useState(true);
+    // 経過時間の状態
+    const [elapsedTime, setElapsedTime] = useState<string>("");
 
     const router = useRouter();
 
@@ -75,10 +77,52 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
         }
     }, [userId]);
 
+    // ===== 経過時間を計算・更新する関数 =====
+    const updateElapsedTime = useCallback(() => {
+        if (!currentAttendance) {
+            setElapsedTime("");
+            return;
+        }
+
+        const now = new Date();
+        const startTime = new Date(currentAttendance.startedAt);
+        const diffMs = now.getTime() - startTime.getTime();
+
+        if (diffMs < 0) {
+            setElapsedTime("00:00:00");
+            return;
+        }
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        setElapsedTime(formattedTime);
+    }, [currentAttendance]);
+
     // ===== コンポーネントマウント時に現在の打刻状況を取得 =====
     useEffect(() => {
         fetchCurrentAttendance();
     }, [userId, fetchCurrentAttendance]);
+
+    // ===== 経過時間の定期更新 =====
+    useEffect(() => {
+        if (!currentAttendance) {
+            setElapsedTime("");
+            return;
+        }
+
+        // 初回実行
+        updateElapsedTime();
+
+        // 1秒ごとに更新
+        const interval = setInterval(updateElapsedTime, 1000);
+
+        return () => clearInterval(interval);
+    }, [currentAttendance, updateElapsedTime]);
 
     // ===== 打刻ボタンクリック時の処理 =====
     const handlePunch = (action: AttendanceAction) => {
@@ -206,6 +250,15 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                                     )}
                                 </span>
                             </div>
+                            {/* 経過時間の表示 */}
+                            {elapsedTime && (
+                                <div className="flex items-center gap-2">
+                                    <ClockIcon className="w-4 h-4 text-blue-600" />
+                                    <span className="text-lg font-semibold text-blue-600">
+                                        経過時間: {elapsedTime}
+                                    </span>
+                                </div>
+                            )}
                             {/* メモがある場合の表示 */}
                             {currentAttendance.note && (
                                 <p className="text-sm text-gray-600">
