@@ -430,6 +430,7 @@ function getDatesBetween(startDate: Date, endDate: Date): Date[] {
     ).padStart(2, "0")}-${String(endJst.getUTCDate()).padStart(2, "0")}`;
 
     // 開始日の翌日から終了日の前日まで（JST基準）
+    // eslint-disable-next-line prefer-const
     let currentJst = new Date(startJst);
     currentJst.setUTCDate(currentJst.getUTCDate() + 1);
 
