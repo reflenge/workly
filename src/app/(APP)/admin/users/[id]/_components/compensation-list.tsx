@@ -1,7 +1,7 @@
 "use client";
 
 import { userCompensation } from "@/db/schema";
-import { formatToJstDateTime } from "@/lib/utils";
+import { formatToJstDateTime, formatToJstDate } from "@/lib/utils";
 import {
     Card,
     CardContent,
@@ -75,9 +75,9 @@ const CompensationList = ({
                                 </div>
                             </div>
                             <CardDescription>
-                                {comp.effectiveFrom.toLocaleDateString()} ～
+                                {formatToJstDate(comp.effectiveFrom)} ～
                                 {comp.effectiveTo
-                                    ? comp.effectiveTo.toLocaleDateString()
+                                    ? formatToJstDate(comp.effectiveTo)
                                     : (() => {
                                           const now = new Date();
                                           const effectiveFrom = new Date(

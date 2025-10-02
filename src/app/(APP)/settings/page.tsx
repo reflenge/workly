@@ -6,6 +6,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import UserSettingsForm from "./_components/user-settings-form";
+import { formatToJstDate } from "@/lib/utils";
 
 export default async function SettingsPage() {
     const supabase = await createClient();
@@ -90,9 +91,7 @@ export default async function SettingsPage() {
                                     <span className="font-medium">
                                         割り当て日:
                                     </span>{" "}
-                                    {new Date(
-                                        currentCard[0].assignedAt
-                                    ).toLocaleDateString()}
+                                    {formatToJstDate(currentCard[0].assignedAt)}
                                 </p>
                             )}
                             {!currentCard[0].isActive &&

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { formatToJstDateTime } from "@/lib/utils";
 // React Hooks
 import { useState, useTransition, useEffect, useCallback } from "react";
 // トースト通知ライブラリ
@@ -143,14 +144,11 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
 
     // ===== 勤務記録の表示用フォーマット関数 =====
     const formatAttendanceLog = (log: AttendanceLog) => {
-        const startDate = new Date(log.startedAt).toLocaleDateString(); // 開始日
-        const startTime = new Date(log.startedAt).toLocaleTimeString(); // 開始時刻
+        const startDateTime = formatToJstDateTime(log.startedAt); // 開始日時
         const endTime = log.endedAt
-            ? `${new Date(log.endedAt).toLocaleDateString()} ${new Date(
-                  log.endedAt
-              ).toLocaleTimeString()}` // 終了日時
+            ? formatToJstDateTime(log.endedAt) // 終了日時
             : "進行中"; // 終了していない場合は「進行中」
-        return `${log.statusLabel} (${startDate} ${startTime} - ${endTime})`;
+        return `${log.statusLabel} (${startDateTime} - ${endTime})`;
     };
 
     // ===== ローディング状態の表示 =====
