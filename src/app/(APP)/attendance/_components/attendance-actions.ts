@@ -290,7 +290,7 @@ export async function updateAttendanceLog(
         return { success: false, message: "日時の形式が不正です" };
     }
     const newDt = new Date(original);
-    newDt.setSeconds(0, 0);
+    newDt.setUTCSeconds(0, 0);
 
     // 対象ログを取得（自分のレコードのみ）
     const me = (

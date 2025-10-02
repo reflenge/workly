@@ -66,7 +66,8 @@ export function AttendanceDataTable({
             target === "startedAt" ? log.startedAt : (log.endedAt as string);
         const d = new Date(raw);
         const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-        jst.setSeconds(0, 0);
+        // UTC基準で秒を0に設定
+        jst.setUTCSeconds(0, 0);
         const pad = (n: number) => String(n).padStart(2, "0");
         const local = `${jst.getUTCFullYear()}-${pad(
             jst.getUTCMonth() + 1

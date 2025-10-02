@@ -366,26 +366,26 @@ function isDifferentDate(startDate: Date, endDate: Date): boolean {
 }
 
 /**
- * 指定した日付の0時（00:00:00）の日時を取得
+ * 指定した日付の0時（00:00:00）の日時を取得（UTC基準）
  *
  * @param date 基準となる日付
- * @returns その日の0時の日時
+ * @returns その日の0時の日時（UTC）
  */
 function getMidnightDate(date: Date): Date {
     const midnight = new Date(date);
-    midnight.setHours(0, 0, 0, 0);
+    midnight.setUTCHours(0, 0, 0, 0);
     return midnight;
 }
 
 /**
- * 指定した日付の23:59:59の日時を取得
+ * 指定した日付の23:59:59の日時を取得（UTC基準）
  *
  * @param date 基準となる日付
- * @returns その日の23:59:59の日時
+ * @returns その日の23:59:59の日時（UTC）
  */
 function getEndOfDay(date: Date): Date {
     const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    endOfDay.setUTCHours(23, 59, 59, 999);
     return endOfDay;
 }
 
@@ -403,13 +403,13 @@ function getDatesBetween(startDate: Date, endDate: Date): Date[] {
     // const startDateStr = startDate.toISOString().split("T")[0];
     const endDateStr = endDate.toISOString().split("T")[0];
 
-    // 開始日の翌日から終了日の前日まで
+    // 開始日の翌日から終了日の前日まで（UTC基準）
     const current = new Date(startDate);
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
 
     while (current.toISOString().split("T")[0] < endDateStr) {
         dates.push(new Date(current));
-        current.setDate(current.getDate() + 1);
+        current.setUTCDate(current.getUTCDate() + 1);
     }
 
     return dates;

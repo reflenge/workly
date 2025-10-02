@@ -47,12 +47,15 @@ export default async function UsersCurrentStatusPage() {
 
     const formatDateTime = (date?: Date | null) => {
         if (!date) return "-";
-        return new Date(date).toLocaleString("ja-JP", {
+        // UTC時刻をJSTに変換して表示
+        const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+        return jstDate.toLocaleString("ja-JP", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
+            timeZone: "UTC", // UTC時刻として解釈
         });
     };
 
