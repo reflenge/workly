@@ -140,7 +140,7 @@ export async function recordAttendance(
             )
             .limit(1);
 
-        // 現在時刻を取得
+        // 現在時刻を取得（UTC基準）
         const now = new Date();
 
         // ===== 状態遷移チェック =====
@@ -353,63 +353,102 @@ function getInvalidTransitionMessage(
 }
 
 /**
- * 開始日と終了日が異なるかチェック
+ * 開始日と終了日が異なるかチェック（JST基準）
  *
- * @param startDate 開始日時
- * @param endDate 終了日時
- * @returns 日付が異なるかどうか
+ * @param startDate 開始日時（UTC時刻）
+ * @param endDate 終了日時（UTC時刻）
+ * @returns JST基準で日付が異なるかどうか
  */
 function isDifferentDate(startDate: Date, endDate: Date): boolean {
-    const startDateStr = startDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
-    const endDateStr = endDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
+    // JST基準で日付を比較
+    const startJst = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
+    const endJst = new Date(endDate.getTime() + 9 * 60 * 60 * 1000);
+
+    const startDateStr = `${startJst.getUTCFullYear()}-${String(
+        startJst.getUTCMonth() + 1
+    ).padStart(2, "0")}-${String(startJst.getUTCDate()).padStart(2, "0")}`;
+    const endDateStr = `${endJst.getUTCFullYear()}-${String(
+        endJst.getUTCMonth() + 1
+    ).padStart(2, "0")}-${String(endJst.getUTCDate()).padStart(2, "0")}`;
+
     return startDateStr !== endDateStr;
 }
 
 /**
- * 指定した日付の0時（00:00:00）の日時を取得（UTC基準）
+ * 指定した日付の0時（00:00:00）の日時を取得（JST基準）
  *
- * @param date 基準となる日付
- * @returns その日の0時の日時（UTC）
+ * @param date 基準となる日付（UTC時刻）
+ * @returns JST基準のその日の0時の日時（UTC時刻で返す）
  */
 function getMidnightDate(date: Date): Date {
-    const midnight = new Date(date);
-    midnight.setUTCHours(0, 0, 0, 0);
-    return midnight;
+    // JSTに変換して日付部分を取得
+    const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+    const year = jst.getUTCFullYear();
+    const month = jst.getUTCMonth();
+    const day = jst.getUTCDate();
+
+    // JST基準の0時をUTC時刻で作成
+    return new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
 }
 
 /**
- * 指定した日付の23:59:59の日時を取得（UTC基準）
+ * 指定した日付の23:59:59の日時を取得（JST基準）
  *
- * @param date 基準となる日付
- * @returns その日の23:59:59の日時（UTC）
+ * @param date 基準となる日付（UTC時刻）
+ * @returns JST基準のその日の23:59:59の日時（UTC時刻で返す）
  */
 function getEndOfDay(date: Date): Date {
-    const endOfDay = new Date(date);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-    return endOfDay;
+    // JSTに変換して日付部分を取得
+    const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+    const year = jst.getUTCFullYear();
+    const month = jst.getUTCMonth();
+    const day = jst.getUTCDate();
+
+    // JST基準の23:59:59をUTC時刻で作成
+    return new Date(Date.UTC(year, month, day, 14, 59, 59, 999));
 }
 
 /**
- * 2つの日付間の日付配列を取得
+ * 2つの日付間の日付配列を取得（JST基準）
  *
- * @param startDate 開始日
- * @param endDate 終了日
- * @returns 日付の配列（開始日と終了日は含まない）
+ * @param startDate 開始日（UTC時刻）
+ * @param endDate 終了日（UTC時刻）
+ * @returns JST基準の日付の配列（開始日と終了日は含まない）
  */
 function getDatesBetween(startDate: Date, endDate: Date): Date[] {
     const dates: Date[] = [];
 
-    // 日付の文字列比較で正確に判定
-    // const startDateStr = startDate.toISOString().split("T")[0];
-    const endDateStr = endDate.toISOString().split("T")[0];
+    // JST基準で日付を取得
+    const startJst = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
+    const endJst = new Date(endDate.getTime() + 9 * 60 * 60 * 1000);
 
-    // 開始日の翌日から終了日の前日まで（UTC基準）
-    const current = new Date(startDate);
-    current.setUTCDate(current.getUTCDate() + 1);
+    const startDateStr = `${startJst.getUTCFullYear()}-${String(
+        startJst.getUTCMonth() + 1
+    ).padStart(2, "0")}-${String(startJst.getUTCDate()).padStart(2, "0")}`;
+    const endDateStr = `${endJst.getUTCFullYear()}-${String(
+        endJst.getUTCMonth() + 1
+    ).padStart(2, "0")}-${String(endJst.getUTCDate()).padStart(2, "0")}`;
 
-    while (current.toISOString().split("T")[0] < endDateStr) {
-        dates.push(new Date(current));
-        current.setUTCDate(current.getUTCDate() + 1);
+    // 開始日の翌日から終了日の前日まで（JST基準）
+    let currentJst = new Date(startJst);
+    currentJst.setUTCDate(currentJst.getUTCDate() + 1);
+
+    while (
+        `${currentJst.getUTCFullYear()}-${String(
+            currentJst.getUTCMonth() + 1
+        ).padStart(2, "0")}-${String(currentJst.getUTCDate()).padStart(
+            2,
+            "0"
+        )}` < endDateStr
+    ) {
+        // JST基準の日付をUTC時刻に戻す
+        const year = currentJst.getUTCFullYear();
+        const month = currentJst.getUTCMonth();
+        const day = currentJst.getUTCDate();
+        const utcDate = new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
+        dates.push(utcDate);
+
+        currentJst.setUTCDate(currentJst.getUTCDate() + 1);
     }
 
     return dates;
