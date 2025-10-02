@@ -174,10 +174,10 @@ export async function getRecentAttendanceLogs(userId: string) {
             .limit(10); // 最大5件
 
         // デバッグ用ログ出力
-        console.log(
-            `Found ${logs.length} WORKING attendance logs for user ${userId}:`,
-            logs
-        );
+        // console.log(
+        //     `Found ${logs.length} WORKING attendance logs for user ${userId}:`,
+        //     logs
+        // );
         return logs;
     } catch (error) {
         console.error("Error fetching attendance logs:", error);
@@ -204,10 +204,10 @@ export async function getActiveProjects() {
             .orderBy(projects.name); // プロジェクト名の昇順
 
         // デバッグ用ログ出力
-        console.log(
-            `Found ${projectList.length} active projects:`,
-            projectList
-        );
+        // console.log(
+        //     `Found ${projectList.length} active projects:`,
+        //     projectList
+        // );
         return projectList;
     } catch (error) {
         console.error("Error fetching projects:", error);

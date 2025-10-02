@@ -76,7 +76,7 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
     // ===== データ取得関数 =====
     const fetchData = useCallback(async () => {
         try {
-            console.log("Fetching data for userId:", userId);
+            // console.log("Fetching data for userId:", userId);
 
             // 並列で勤務記録とプロジェクトを取得（パフォーマンス向上）
             const [logs, projs] = await Promise.all([
@@ -84,8 +84,8 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
                 getActiveProjects(), // アクティブなプロジェクトを取得
             ]);
 
-            console.log("Fetched logs:", logs);
-            console.log("Fetched projects:", projs);
+            // console.log("Fetched logs:", logs);
+            // console.log("Fetched projects:", projs);
 
             // 取得したデータを状態に設定
             setAttendanceLogs(logs);
