@@ -1,6 +1,7 @@
 "use client";
 
 import { cards } from "@/db/schema";
+import { formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
     CardAction,
@@ -132,10 +133,10 @@ const CardItems = ({ card }: { card: typeof cards.$inferSelect }) => {
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
                 <div className="w-full text-sm">
-                    登録日時: {card.createdAt.toLocaleString()}
+                    登録日時: {formatToJstDateTime(card.createdAt)}
                 </div>
                 <div className="w-full text-sm">
-                    更新日時: {card.updatedAt.toLocaleString()}
+                    更新日時: {formatToJstDateTime(card.updatedAt)}
                 </div>
             </CardFooter>
         </Card>

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
     CardAction,
@@ -177,10 +178,10 @@ const ProjectItems = ({
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
                 <div className="w-full text-sm">
-                    登録日時: {project.createdAt.toLocaleString()}
+                    登録日時: {formatToJstDateTime(project.createdAt)}
                 </div>
                 <div className="w-full text-sm">
-                    更新日時: {project.updatedAt.toLocaleString()}
+                    更新日時: {formatToJstDateTime(project.updatedAt)}
                 </div>
             </CardFooter>
         </Card>

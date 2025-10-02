@@ -1,5 +1,6 @@
 "use client";
 
+import { formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
     CardAction,
@@ -156,14 +157,14 @@ const LinkItems = ({ row }: { row: Row }) => {
             </CardHeader>
             <CardContent>
                 <div className="text-sm">
-                    割当日時: {row.assignedAt.toLocaleString()}
+                    割当日時: {formatToJstDateTime(row.assignedAt)}
                 </div>
                 {row.assignedByName && (
                     <div className="text-sm">実施者: {row.assignedByName}</div>
                 )}
                 {row.unassignedAt && (
                     <div className="text-sm">
-                        解除日時: {row.unassignedAt.toLocaleString()}
+                        解除日時: {formatToJstDateTime(row.unassignedAt)}
                     </div>
                 )}
                 {row.unassignedByName && (

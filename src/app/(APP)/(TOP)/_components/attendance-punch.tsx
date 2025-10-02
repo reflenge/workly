@@ -15,6 +15,7 @@ import {
     getCurrentAttendance, // 現在の打刻状況取得関数
     AttendanceAction, // 打刻アクション型
 } from "./attendance-actions";
+import { formatToJstDateTime } from "@/lib/utils";
 // Lucide React アイコン
 import {
     ClockIcon,
@@ -200,9 +201,9 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                                 {/* 開始時刻の表示 */}
                                 <span className="text-sm text-gray-500">
                                     開始:{" "}
-                                    {new Date(
+                                    {formatToJstDateTime(
                                         currentAttendance.startedAt
-                                    ).toLocaleString()}
+                                    )}
                                 </span>
                             </div>
                             {/* メモがある場合の表示 */}

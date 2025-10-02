@@ -1,6 +1,7 @@
 "use client";
 
 import { userCompensation } from "@/db/schema";
+import { formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
     CardContent,
@@ -120,8 +121,14 @@ const CompensationList = ({
                                 )}
                             </div>
                             <div className="mt-4 text-sm text-muted-foreground">
-                                <p>作成日: {comp.createdAt.toLocaleString()}</p>
-                                <p>更新日: {comp.updatedAt.toLocaleString()}</p>
+                                <p>
+                                    作成日:{" "}
+                                    {formatToJstDateTime(comp.createdAt)}
+                                </p>
+                                <p>
+                                    更新日:{" "}
+                                    {formatToJstDateTime(comp.updatedAt)}
+                                </p>
                             </div>
                         </CardContent>
                     </Card>

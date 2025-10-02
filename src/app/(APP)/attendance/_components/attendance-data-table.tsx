@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import type { AttendanceLogItem } from "./attendance-actions";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { formatToJstDateTime } from "@/lib/utils";
 import {
     Dialog,
     DialogContent,
@@ -112,13 +113,7 @@ export function AttendanceDataTable({
     };
 
     const formatDateTime = (dateString: string) => {
-        return new Date(dateString).toLocaleString("ja-JP", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+        return formatToJstDateTime(dateString);
     };
 
     return (

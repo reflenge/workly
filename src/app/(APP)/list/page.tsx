@@ -10,6 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { formatToJstDateTime } from "@/lib/utils";
 
 export default async function UsersCurrentStatusPage() {
     // 全ユーザーと、進行中(ended_at IS NULL)の打刻を LEFT JOIN
@@ -47,16 +48,7 @@ export default async function UsersCurrentStatusPage() {
 
     const formatDateTime = (date?: Date | null) => {
         if (!date) return "-";
-        // UTC時刻をJSTに変換して表示
-        const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
-        return jstDate.toLocaleString("ja-JP", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: "UTC", // UTC時刻として解釈
-        });
+        return formatToJstDateTime(date);
     };
 
     return (
