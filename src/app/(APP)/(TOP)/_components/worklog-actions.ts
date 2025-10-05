@@ -73,8 +73,23 @@ export async function createWorkLog(
             throw new Error("ユーザーが見つかりません");
         }
 
+        // 現在のユーザーのデータベース情報を取得
+        const currentUserData = await db
+            .select({ id: users.id, isAdmin: users.isAdmin })
+            .from(users)
+            .where(eq(users.authId, user.id))
+            .limit(1);
+
+        // 現在のユーザーが存在しない場合はエラー
+        if (currentUserData.length === 0) {
+            throw new Error("認証ユーザーが見つかりません");
+        }
+
         // 一般ユーザーは自分の作業ログのみ作成可能、管理者は任意のユーザーの作業ログが作成可能
-        if (!userData[0].isAdmin && userData[0].id !== user.id) {
+        if (
+            !currentUserData[0].isAdmin &&
+            userData[0].id !== currentUserData[0].id
+        ) {
             throw new Error("権限がありません");
         }
 
