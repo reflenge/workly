@@ -13,6 +13,7 @@ import {
 } from "./admin-attendance-actions";
 
 export function AdminAttendancePageWrapper() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [data, setData] = useState<any[]>([]);
     const [summary, setSummary] = useState<UserAttendanceSummary[]>([]);
     const [users, setUsers] = useState<
