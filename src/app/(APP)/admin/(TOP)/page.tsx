@@ -3,6 +3,7 @@ import { users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { AdminAttendancePageWrapper } from "../_components/admin-attendance-page-wrapper";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能
@@ -23,9 +24,19 @@ export default async function page() {
     if (!user.isAdmin) {
         redirect("/");
     }
+
     return (
-        <div className="flex flex-col items-center justify-center h-full">
-            <h1>Home</h1>
+        <div className="container mx-auto py-6 space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                    管理者ダッシュボード
+                </h1>
+                <p className="text-muted-foreground">
+                    全ユーザーの出退勤記録を確認できます
+                </p>
+            </div>
+
+            <AdminAttendancePageWrapper />
         </div>
     );
 }
