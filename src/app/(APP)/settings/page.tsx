@@ -61,10 +61,14 @@ export default async function SettingsPage() {
           }[]) ?? [];
 
     return (
-        <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">設定</h1>
+                <p className="text-muted-foreground">
+                    アカウント情報とカード設定を管理できます
+                </p>
+            </div>
             <div className="max-w-2xl mx-auto space-y-6">
-                <h1 className="text-2xl font-bold">設定</h1>
-
                 {/* カード情報表示 */}
                 <div className="bg-gray-50 p-4 rounded-lg">
                     <h2 className="text-lg font-semibold mb-2">カード情報</h2>

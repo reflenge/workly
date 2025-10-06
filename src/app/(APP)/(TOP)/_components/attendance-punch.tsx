@@ -3,7 +3,13 @@
 
 // UIコンポーネントのインポート
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 // React Hooks
 import { useState, useTransition, useEffect, useCallback } from "react";
@@ -337,6 +343,23 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                         </Button>
                     </div>
                 </CardContent>
+
+                {/* 注意事項フッター */}
+                <CardFooter className="">
+                    <div className="flex items-center gap-3 w-full">
+                        {/* 時計アイコン */}
+                        <ClockIcon className="w-5 h-5 text-blue-600 flex-shrink-0" />
+
+                        {/* 注意メッセージ */}
+                        <span className="text-blue-900 text-sm">
+                            休憩から勤務に戻るときも
+                            <span className="font-semibold underline decoration-blue-300 decoration-2 underline-offset-2 mx-1">
+                                勤務開始
+                            </span>
+                            ボタンを押してください。
+                        </span>
+                    </div>
+                </CardFooter>
             </Card>
         </>
     );

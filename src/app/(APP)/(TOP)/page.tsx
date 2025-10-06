@@ -12,7 +12,6 @@ import { eq } from "drizzle-orm";
 // カスタムコンポーネント
 import AttendancePunch from "./_components/attendance-punch";
 import WorkLogForm from "./_components/worklog-form";
-import { ClockIcon } from "lucide-react";
 
 /**
  * トップページコンポーネント
@@ -45,35 +44,23 @@ export default async function TopPage() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 sm:px-6 lg:px-8">
-            {/* ページタイトル */}
-            <h1 className="text-4xl font-bold mb-10 text-center">打刻</h1>
-
-            {/* メインコンテンツエリア */}
-            <div className="w-full flex justify-center space-y-4 flex-col max-w-md mx-auto">
-                {/* 勤務打刻コンポーネント - 勤務開始/休憩/退勤の打刻機能 */}
-                <AttendancePunch userId={userData[0].id} />
-
-                {/* 作業ログフォームコンポーネント - 作業内容の記録機能 */}
-                <WorkLogForm userId={userData[0].id} />
+        <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">打刻</h1>
+                <p className="text-muted-foreground">
+                    勤務開始・休憩・退勤の打刻を行えます
+                </p>
             </div>
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                {/* メインコンテンツエリア */}
+                <div className="w-full flex justify-center space-y-4 flex-col max-w-md mx-auto">
+                    {/* 勤務打刻コンポーネント - 勤務開始/休憩/退勤の打刻機能 */}
+                    <AttendancePunch userId={userData[0].id} />
 
-            {/* 注意事項セクション */}
-            <section className="mt-8 w-full max-w-md mx-auto px-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center gap-3 shadow-sm">
-                    {/* 時計アイコン（SVG） */}
-                    <ClockIcon className="w-5 h-5" />
-
-                    {/* 注意メッセージ */}
-                    <span className="text-blue-900 text-base">
-                        休憩から勤務に戻るときも
-                        <span className="font-semibold underline decoration-blue-300 decoration-2 underline-offset-2 mx-1">
-                            勤務開始
-                        </span>
-                        ボタンを押してください。
-                    </span>
+                    {/* 作業ログフォームコンポーネント - 作業内容の記録機能 */}
+                    <WorkLogForm userId={userData[0].id} />
                 </div>
-            </section>
+            </div>
         </div>
     );
 }

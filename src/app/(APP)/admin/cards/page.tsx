@@ -32,9 +32,14 @@ export default async function page() {
         .orderBy(desc(cards.updatedAt));
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-bold mb-4 text-center">
-                NFC Card 登録・管理
-            </h1>
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                    NFC Card 登録・管理
+                </h1>
+                <p className="text-muted-foreground">
+                    NFCカードの登録・編集・管理を行えます
+                </p>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 <NewItem />
                 {cardResult.length > 0 &&
