@@ -25,7 +25,7 @@ import {
     getActiveProjects, // アクティブなプロジェクト取得関数
 } from "./worklog-actions";
 // Lucide React アイコン
-import { FileTextIcon } from "lucide-react";
+import { FileTextIcon, RefreshCcwIcon } from "lucide-react";
 
 /**
  * 作業ログフォームコンポーネントのプロパティ
@@ -156,9 +156,10 @@ const WorkLogForm = ({ userId }: WorkLogFormProps) => {
         return (
             <Card>
                 <CardContent className="p-6 text-center">
-                    {/* スピナーアニメーション */}
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-sm text-gray-500">読み込み中...</p>
+                    <RefreshCcwIcon className="w-8 h-8 mx-auto animate-spin text-muted-foreground" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        読み込み中...
+                    </p>
                 </CardContent>
             </Card>
         );

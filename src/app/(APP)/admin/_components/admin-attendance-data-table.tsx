@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { formatToJstDateTime } from "@/lib/utils";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react";
 import type { AdminAttendanceLogItem } from "./admin-attendance-actions";
 
 interface AdminAttendanceDataTableProps {
@@ -211,7 +211,10 @@ export function AdminAttendanceDataTable({
                                     colSpan={7}
                                     className="text-center py-8 text-muted-foreground"
                                 >
-                                    読み込み中...
+                                    <div className="flex items-center justify-center gap-2">
+                                        <RefreshCcwIcon className="w-5 h-5 animate-spin" />
+                                        読み込み中...
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : data.length === 0 ? (

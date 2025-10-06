@@ -206,9 +206,10 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
         return (
             <Card>
                 <CardContent className="p-6 text-center">
-                    {/* スピナーアニメーション */}
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-sm text-gray-500">読み込み中...</p>
+                    <RefreshCcwIcon className="w-8 h-8 mx-auto animate-spin text-muted-foreground" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        読み込み中...
+                    </p>
                 </CardContent>
             </Card>
         );
