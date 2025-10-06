@@ -55,7 +55,7 @@ export async function AppSidebar() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/">
+                                    <Link href="/" prefetch={true}>
                                         <HomeIcon />
                                         <span>トップ</span>
                                     </Link>
@@ -63,7 +63,7 @@ export async function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/attendance">
+                                    <Link href="/attendance" prefetch={true}>
                                         <ClockIcon />
                                         <span>勤怠</span>
                                     </Link>
@@ -71,7 +71,7 @@ export async function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/projects">
+                                    <Link href="/projects" prefetch={true}>
                                         <BriefcaseBusinessIcon />
                                         <span>プロジェクト</span>
                                     </Link>
@@ -79,7 +79,7 @@ export async function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/list">
+                                    <Link href="/list" prefetch={true}>
                                         <UsersIcon />
                                         <span>一覧</span>
                                     </Link>
@@ -87,7 +87,7 @@ export async function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/settings">
+                                    <Link href="/settings" prefetch={true}>
                                         <SettingsIcon />
                                         <span>設定</span>
                                     </Link>
@@ -103,7 +103,7 @@ export async function AppSidebar() {
                             <SidebarMenu>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
-                                        <Link href="/admin">
+                                        <Link href="/admin" prefetch={true}>
                                             <HomeIcon />
                                             <span>管理者トップ</span>
                                         </Link>
@@ -111,7 +111,10 @@ export async function AppSidebar() {
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
-                                        <Link href="/admin/users">
+                                        <Link
+                                            href="/admin/users"
+                                            prefetch={true}
+                                        >
                                             <UsersIcon />
                                             <span>従業員作成・編集・給与</span>
                                         </Link>
@@ -119,7 +122,10 @@ export async function AppSidebar() {
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
-                                        <Link href="/admin/cards">
+                                        <Link
+                                            href="/admin/cards"
+                                            prefetch={true}
+                                        >
                                             <IdCardIcon />
                                             <span>カード作成・編集</span>
                                         </Link>
@@ -127,7 +133,10 @@ export async function AppSidebar() {
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
-                                        <Link href="/admin/links">
+                                        <Link
+                                            href="/admin/links"
+                                            prefetch={true}
+                                        >
                                             <Link2Icon />
                                             <span>カード紐づけ・管理</span>
                                         </Link>
