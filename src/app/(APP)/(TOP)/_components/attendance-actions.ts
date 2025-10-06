@@ -185,65 +185,62 @@ export async function recordAttendance(
                 const startedAt = activeLog[0].startedAt;
 
                 // 日付が異なる場合の処理
-                if (isDifferentDate(startedAt, now)) {
+                if (isDifferentMonth(startedAt, now)) {
                     // 1. 既存の打刻を開始日の23:59:59で終了
-                    const endOfStartDay = getEndOfDay(startedAt);
+                    const endOfStartMonth = getEndOfMonth(startedAt);
 
                     await tx
                         .update(attendanceLogs)
                         .set({
-                            endedAt: endOfStartDay, // 開始日の終了時刻を設定
+                            endedAt: endOfStartMonth, // 開始月の終了時刻を設定
                             endedSource: sourceId, // 終了時のソースを記録
                             updatedAt: now, // 更新時刻を設定
                         })
                         .where(eq(attendanceLogs.id, activeLog[0].id));
 
-                    // 2. 中間日（開始日の翌日から終了日の前日まで）のレコードを作成
-                    const datesBetween = getDatesBetween(startedAt, now);
+                    // 2. 中間月（開始月の翌月から終了月の前月まで）のレコードを作成
+                    const monthsBetween = getMonthsBetween(startedAt, now);
 
                     // 中間日がある場合のみ処理を実行
-                    if (datesBetween.length > 0) {
-                        for (const date of datesBetween) {
-                            const dayStart = getMidnightDate(date);
-                            const dayEnd = getEndOfDay(date);
+                    if (monthsBetween.length > 0) {
+                        for (const monthStart of monthsBetween) {
+                            const monthEnd = getEndOfMonth(monthStart);
 
-                            // 1日分のレコードを作成（0時から23:59:59まで）
+                            // 1ヶ月分のレコードを作成（月初0時から月末23:59:59まで）
                             await tx.insert(attendanceLogs).values({
                                 userId: input.userId,
-                                statusId: activeLog[0].statusId, // 同じステータスを継続
-                                startedAt: dayStart, // その日の0時から開始
-                                endedAt: dayEnd, // その日の23:59:59で終了
+                                statusId: activeLog[0].statusId,
+                                startedAt: monthStart,
+                                endedAt: monthEnd,
                                 startedSource: sourceId,
                                 endedSource: sourceId,
-                                note: "自動生成", // 自動生成されたレコードであることを明記
+                                note: "自動生成",
                             });
                         }
                     }
 
-                    // 3. 終了日の0時から新しいレコードを作成して即座に終了
-                    const midnightToday = getMidnightDate(now);
+                    // 3. 終了月の1日0時から新しいレコードを作成して即座に終了
+                    const startOfCurrentMonth = getStartOfMonth(now);
 
-                    // 終了日0時から開始のレコードを作成
-                    const [midnightLog] = await tx
+                    const [monthHeadLog] = await tx
                         .insert(attendanceLogs)
                         .values({
                             userId: input.userId,
-                            statusId: activeLog[0].statusId, // 同じステータスを継続
-                            startedAt: midnightToday, // 終了日の0時から開始
+                            statusId: activeLog[0].statusId,
+                            startedAt: startOfCurrentMonth,
                             startedSource: sourceId,
-                            note: "自動生成", // 自動生成されたレコードであることを明記
+                            note: "自動生成",
                         })
                         .returning();
 
-                    // 4. 作成したレコードを即座に終了
                     await tx
                         .update(attendanceLogs)
                         .set({
-                            endedAt: now, // 現在時刻で終了
+                            endedAt: now,
                             endedSource: sourceId,
                             updatedAt: now,
                         })
-                        .where(eq(attendanceLogs.id, midnightLog.id));
+                        .where(eq(attendanceLogs.id, monthHeadLog.id));
                 } else {
                     // 日付が同じ場合：通常の終了処理
                     await tx
@@ -368,106 +365,97 @@ function getInvalidTransitionMessage(
 }
 
 /**
- * 開始日と終了日が異なるかチェック（JST基準）
+ * 開始日と終了日が異なる月かチェック（JST基準）
  *
  * @param startDate 開始日時（UTC時刻）
  * @param endDate 終了日時（UTC時刻）
- * @returns JST基準で日付が異なるかどうか
+ * @returns JST基準で月が異なるかどうか
  */
-function isDifferentDate(startDate: Date, endDate: Date): boolean {
-    // JST基準で日付を比較
+function isDifferentMonth(startDate: Date, endDate: Date): boolean {
     const startJst = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
     const endJst = new Date(endDate.getTime() + 9 * 60 * 60 * 1000);
 
-    const startDateStr = `${startJst.getUTCFullYear()}-${String(
+    const startMonthStr = `${startJst.getUTCFullYear()}-${String(
         startJst.getUTCMonth() + 1
-    ).padStart(2, "0")}-${String(startJst.getUTCDate()).padStart(2, "0")}`;
-    const endDateStr = `${endJst.getUTCFullYear()}-${String(
+    ).padStart(2, "0")}`;
+    const endMonthStr = `${endJst.getUTCFullYear()}-${String(
         endJst.getUTCMonth() + 1
-    ).padStart(2, "0")}-${String(endJst.getUTCDate()).padStart(2, "0")}`;
+    ).padStart(2, "0")}`;
 
-    return startDateStr !== endDateStr;
+    return startMonthStr !== endMonthStr;
 }
 
 /**
- * 指定した日付の0時（00:00:00）の日時を取得（JST基準）
+ * 指定した月の1日0時（00:00:00）の日時を取得（JST基準）
  *
  * @param date 基準となる日付（UTC時刻）
- * @returns JST基準のその日の0時の日時（UTC時刻で返す）
+ * @returns JST基準のその月1日の0時の日時（UTC時刻で返す）
  */
-function getMidnightDate(date: Date): Date {
-    // JSTに変換して日付部分を取得
+function getStartOfMonth(date: Date): Date {
     const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
     const year = jst.getUTCFullYear();
     const month = jst.getUTCMonth();
-    const day = jst.getUTCDate();
 
-    // JST基準の0時をUTC時刻で作成
-    return new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
+    // JST基準の月初0時をUTC時刻で作成
+    return new Date(Date.UTC(year, month, 1, -9, 0, 0, 0));
 }
 
 /**
- * 指定した日付の23:59:59の日時を取得（JST基準）
+ * 指定した月の最終日23:59:59の日時を取得（JST基準）
  *
  * @param date 基準となる日付（UTC時刻）
- * @returns JST基準のその日の23:59:59の日時（UTC時刻で返す）
+ * @returns JST基準のその月最終日の23:59:59の日時（UTC時刻で返す）
  */
-function getEndOfDay(date: Date): Date {
-    // JSTに変換して日付部分を取得
+function getEndOfMonth(date: Date): Date {
     const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
     const year = jst.getUTCFullYear();
     const month = jst.getUTCMonth();
-    const day = jst.getUTCDate();
 
-    // JST基準の23:59:59をUTC時刻で作成
-    return new Date(Date.UTC(year, month, day, 14, 59, 59, 999));
+    // 翌月1日0時(JST)のUTCを取得し1ミリ秒引くことで当月最終日の23:59:59(JST)を得る
+    const startOfNextMonthUtc = new Date(
+        Date.UTC(year, month + 1, 1, -9, 0, 0, 0)
+    );
+    return new Date(startOfNextMonthUtc.getTime() - 1);
 }
 
 /**
- * 2つの日付間の日付配列を取得（JST基準）
+ * 2つの日付間の月配列を取得（JST基準）
  *
  * @param startDate 開始日（UTC時刻）
  * @param endDate 終了日（UTC時刻）
- * @returns JST基準の日付の配列（開始日と終了日は含まない）
+ * @returns JST基準の月初日時の配列（開始月と終了月は含まない）
  */
-function getDatesBetween(startDate: Date, endDate: Date): Date[] {
-    const dates: Date[] = [];
+function getMonthsBetween(startDate: Date, endDate: Date): Date[] {
+    const months: Date[] = [];
 
-    // JST基準で日付を取得
     const startJst = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
     const endJst = new Date(endDate.getTime() + 9 * 60 * 60 * 1000);
 
-    const startDateStr = `${startJst.getUTCFullYear()}-${String(
-        startJst.getUTCMonth() + 1
-    ).padStart(2, "0")}-${String(startJst.getUTCDate()).padStart(2, "0")}`;
-    const endDateStr = `${endJst.getUTCFullYear()}-${String(
-        endJst.getUTCMonth() + 1
-    ).padStart(2, "0")}-${String(endJst.getUTCDate()).padStart(2, "0")}`;
+    let currentYear = startJst.getUTCFullYear();
+    let currentMonth = startJst.getUTCMonth() + 1; // 翌月から開始
 
-    // 開始日の翌日から終了日の前日まで（JST基準）
-    // eslint-disable-next-line prefer-const
-    let currentJst = new Date(startJst);
-    currentJst.setUTCDate(currentJst.getUTCDate() + 1);
+    // endMonth string for comparison
+    const endYear = endJst.getUTCFullYear();
+    const endMonth = endJst.getUTCMonth();
 
     while (
-        `${currentJst.getUTCFullYear()}-${String(
-            currentJst.getUTCMonth() + 1
-        ).padStart(2, "0")}-${String(currentJst.getUTCDate()).padStart(
-            2,
-            "0"
-        )}` < endDateStr
+        currentYear < endYear ||
+        (currentYear === endYear && currentMonth < endMonth)
     ) {
-        // JST基準の日付をUTC時刻に戻す
-        const year = currentJst.getUTCFullYear();
-        const month = currentJst.getUTCMonth();
-        const day = currentJst.getUTCDate();
-        const utcDate = new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
-        dates.push(utcDate);
+        const monthIndex = currentMonth; // 0-indexed month value expected by Date.UTC is handled below
+        const monthStartUtc = new Date(
+            Date.UTC(currentYear, monthIndex, 1, -9, 0, 0, 0)
+        );
+        months.push(monthStartUtc);
 
-        currentJst.setUTCDate(currentJst.getUTCDate() + 1);
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
     }
 
-    return dates;
+    return months;
 }
 
 /**
