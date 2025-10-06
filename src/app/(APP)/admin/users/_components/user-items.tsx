@@ -1,7 +1,7 @@
 "use client";
 
 import { users } from "@/db/schema";
-import { formatToJstDateTime } from "@/lib/utils";
+import { cn, formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
     CardAction,
@@ -82,7 +82,7 @@ const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
                     {user.lastName} {user.firstName}
                 </CardTitle>
                 <CardDescription>
-                    {user.isActive ? "有効" : "無効"}
+                    {user.isActive ? "有効" : "無効"} {isAdmin && "管理者"}
                 </CardDescription>
                 <CardAction>
                     <div className="flex gap-2">
