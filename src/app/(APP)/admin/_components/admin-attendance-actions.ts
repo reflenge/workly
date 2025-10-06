@@ -159,7 +159,7 @@ export async function fetchUserAttendanceSummary({
     month: number;
     userId?: string;
 }) {
-    // 指定された月の開始日と終了日を計算
+    // 指定された月の開始日と終了日を計算（JST基準）
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
@@ -177,33 +177,94 @@ export async function fetchUserAttendanceSummary({
         conditions.push(eq(attendanceLogs.userId, userId));
     }
 
-    const rows = await db
+    // まず、各ユーザーの勤務ログを取得
+    const logs = await db
         .select({
             userId: attendanceLogs.userId,
             userLastName: users.lastName,
             userFirstName: users.firstName,
-            workedDays: sql<number>`COUNT(DISTINCT DATE(${attendanceLogs.startedAt}))`,
-            totalWorkedMinutes: sql<number>`
-                COALESCE(
-                    SUM(
-                        EXTRACT(EPOCH FROM (${attendanceLogs.endedAt} - ${attendanceLogs.startedAt})) / 60
-                    ),
-                    0
-                )
-            `,
+            startedAt: attendanceLogs.startedAt,
+            endedAt: attendanceLogs.endedAt,
         })
         .from(attendanceLogs)
         .innerJoin(users, eq(attendanceLogs.userId, users.id))
         .where(and(...conditions))
-        .groupBy(attendanceLogs.userId, users.lastName, users.firstName)
-        .orderBy(users.lastName, users.firstName);
+        .orderBy(attendanceLogs.userId, attendanceLogs.startedAt);
 
-    return rows.map((row) => ({
-        userId: row.userId,
-        userLastName: row.userLastName,
-        userFirstName: row.userFirstName,
-        workedDays: row.workedDays,
-        totalWorkedMinutes: Math.round(row.totalWorkedMinutes),
-        totalWorkedHours: Math.round((row.totalWorkedMinutes / 60) * 100) / 100, // 小数点2桁まで
+    // ユーザーごとに勤務日数と総勤務時間を計算
+    const userSummary = new Map<
+        string,
+        {
+            userId: string;
+            userLastName: string;
+            userFirstName: string;
+            workedDays: Set<string>;
+            totalWorkedMinutes: number;
+        }
+    >();
+
+    for (const log of logs) {
+        const key = log.userId;
+        if (!userSummary.has(key)) {
+            userSummary.set(key, {
+                userId: log.userId,
+                userLastName: log.userLastName,
+                userFirstName: log.userFirstName,
+                workedDays: new Set<string>(),
+                totalWorkedMinutes: 0,
+            });
+        }
+
+        const summary = userSummary.get(key)!;
+
+        // 勤務時間を計算（ミリ秒単位で正確に計算）
+        const workedMilliseconds =
+            log.endedAt!.getTime() - log.startedAt.getTime();
+        summary.totalWorkedMinutes += workedMilliseconds / (1000 * 60);
+
+        // 日をまたいだレコードを考慮して勤務日数を計算
+        const startDateJst = new Date(
+            log.startedAt.getTime() + 9 * 60 * 60 * 1000
+        );
+        const endDateJst = new Date(
+            log.endedAt!.getTime() + 9 * 60 * 60 * 1000
+        );
+
+        // 開始日から終了日までの各日を勤務日として追加
+        const currentDate = new Date(startDateJst);
+        currentDate.setUTCHours(0, 0, 0, 0);
+
+        const endDateOnly = new Date(endDateJst);
+        endDateOnly.setUTCHours(0, 0, 0, 0);
+
+        while (currentDate <= endDateOnly) {
+            const currentYear = currentDate.getUTCFullYear();
+            const currentMonth = String(currentDate.getUTCMonth() + 1).padStart(
+                2,
+                "0"
+            );
+            const day = String(currentDate.getUTCDate()).padStart(2, "0");
+            const dateKey = `${currentYear}-${currentMonth}-${day}`;
+
+            // 指定された月の範囲内の日のみをカウント
+            if (
+                currentYear === year &&
+                currentDate.getUTCMonth() + 1 === month
+            ) {
+                summary.workedDays.add(dateKey);
+            }
+
+            currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        }
+    }
+
+    // 結果を配列に変換
+    return Array.from(userSummary.values()).map((summary) => ({
+        userId: summary.userId,
+        userLastName: summary.userLastName,
+        userFirstName: summary.userFirstName,
+        workedDays: summary.workedDays.size,
+        totalWorkedMinutes: Math.round(summary.totalWorkedMinutes), // 分単位で丸める
+        totalWorkedHours: summary.totalWorkedMinutes / 60, // ミリ秒まで正確に計算
     }));
 }

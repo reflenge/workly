@@ -38,6 +38,7 @@ interface AdminAttendanceDataTableProps {
         userId?: string;
         statusId?: number;
     }) => void;
+    loading?: boolean;
 }
 
 export function AdminAttendanceDataTable({
@@ -49,6 +50,7 @@ export function AdminAttendanceDataTable({
     selectedUserId,
     selectedStatusId,
     onFilterChange,
+    loading = false,
 }: AdminAttendanceDataTableProps) {
     const [localUserId, setLocalUserId] = useState(selectedUserId || "all");
     const [localStatusId, setLocalStatusId] = useState(
@@ -203,7 +205,16 @@ export function AdminAttendanceDataTable({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={7}
+                                    className="text-center py-8 text-muted-foreground"
+                                >
+                                    読み込み中...
+                                </TableCell>
+                            </TableRow>
+                        ) : data.length === 0 ? (
                             <TableRow>
                                 <TableCell
                                     colSpan={7}

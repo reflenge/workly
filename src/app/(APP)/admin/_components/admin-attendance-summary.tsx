@@ -25,8 +25,10 @@ export function AdminAttendanceSummary({
 }: AdminAttendanceSummaryProps) {
     const formatHours = (hours: number) => {
         const wholeHours = Math.floor(hours);
-        const minutes = Math.round((hours - wholeHours) * 60);
-        return `${wholeHours}時間${minutes}分`;
+        const minutesFloat = (hours - wholeHours) * 60;
+        const minutes = Math.floor(minutesFloat);
+        const seconds = Math.round((minutesFloat - minutes) * 60);
+        return `${wholeHours}時間${minutes}分${seconds}秒`;
     };
 
     const totalWorkedDays = summary.reduce(
