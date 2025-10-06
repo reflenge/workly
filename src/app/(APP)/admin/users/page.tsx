@@ -32,11 +32,11 @@ export default async function page() {
         .orderBy(desc(users.updatedAt));
 
     return (
-        <div className="">
-            <h1 className="text-2xl font-bold mb-4 px-6 text-center">
+        <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <h1 className="text-2xl font-bold mb-4 text-center">
                 ユーザー登録・管理
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem />
                 {userList.length > 0 &&
                     userList.map((u) => <UserItems key={u.id} user={u} />)}

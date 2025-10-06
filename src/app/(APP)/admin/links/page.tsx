@@ -97,11 +97,11 @@ export default async function Page() {
     const dropdownCards = availableCards.map((c) => ({ id: c.id, uid: c.uid }));
 
     return (
-        <div className="">
-            <h1 className="text-2xl font-bold mb-4 px-6 text-center">
+        <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <h1 className="text-2xl font-bold mb-4 text-center">
                 ユーザーとカードのリンク管理
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem users={dropdownUsers} cards={dropdownCards} />
                 {linkHistory.map((row) => (
                     <LinkItems

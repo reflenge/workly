@@ -29,11 +29,11 @@ export default async function Page() {
         .orderBy(desc(projects.updatedAt));
 
     return (
-        <div className="">
-            <h1 className="text-2xl font-bold mb-4 px-6 text-center">
+        <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <h1 className="text-2xl font-bold mb-4 text-center">
                 プロジェクト管理
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem />
                 {list.map((p) => (
                     <ProjectItems key={p.id} project={p} />
