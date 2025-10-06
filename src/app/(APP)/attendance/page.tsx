@@ -8,10 +8,10 @@ import { AttendanceDataTable } from "./_components/attendance-data-table";
 import { updateAttendanceLog } from "./_components/attendance-actions";
 
 interface AttendancePageProps {
-    searchParams: {
+    searchParams: Promise<{
         year?: string;
         month?: string; // 1-12
-    };
+    }>;
 }
 
 export default async function AttendancePage({
@@ -20,12 +20,16 @@ export default async function AttendancePage({
     const now = new Date();
     // JST基準の現在年月を採用（UTCだと月境界がJSTとズレるため）
     const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+
+    // searchParamsをawaitで取得
+    const params = await searchParams;
+
     let year = Number.parseInt(
-        searchParams.year || String(jstNow.getUTCFullYear()),
+        params.year || String(jstNow.getUTCFullYear()),
         10
     );
     let month = Number.parseInt(
-        searchParams.month || String(jstNow.getUTCMonth() + 1),
+        params.month || String(jstNow.getUTCMonth() + 1),
         10
     );
     // 明らかにおかしいパラメータは今月にフォールバック（JST）し、クエリを除去してリダイレクト
