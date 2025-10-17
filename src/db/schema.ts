@@ -24,8 +24,9 @@ import { sql } from "drizzle-orm";
 export const users = pgTable(
     "user",
     {
+        // プログラム内で使うUSER IDはこちら
         id: uuid("id").primaryKey().defaultRandom(),
-        // authIdがNULLの場合は未セットアップ
+        // authIdがNULLの場合は未セットアップ。こちらはSupabase Auth ID。
         authId: uuid("auth_id").notNull().unique(),
         isAdmin: boolean("is_admin").notNull().default(false),
 
