@@ -3,6 +3,7 @@ import {
     fetchMyAttendanceMonthlySummary,
 } from "./_components/attendance-actions";
 import { AttendancePageWrapper } from "./_components/attendance-page-wrapper";
+import { PageHeaderMeta } from "../_components/page-header-meta";
 import { redirect } from "next/navigation";
 import { AttendanceDataTable } from "./_components/attendance-data-table";
 import { updateAttendanceLog } from "./_components/attendance-actions";
@@ -82,12 +83,10 @@ export default async function AttendancePage({
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">出勤記録</h1>
-                <p className="text-muted-foreground">
-                    あなたの出勤・退勤記録を確認できます。全{totalCount}件
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="出勤記録"
+                description="あなたの出勤・退勤記録を確認できます。"
+            />
 
             <AttendancePageWrapper
                 year={year}

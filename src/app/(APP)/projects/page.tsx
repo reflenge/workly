@@ -5,6 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import ProjectItems from "./_components/project-items";
+import { PageHeaderMeta } from "../_components/page-header-meta";
 
 export default async function Page() {
     // admin 権限のユーザーのみアクセス可能
@@ -30,14 +31,10 @@ export default async function Page() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                    プロジェクト管理
-                </h1>
-                <p className="text-muted-foreground">
-                    プロジェクトの作成・編集・管理を行えます
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="プロジェクト管理"
+                description="プロジェクトの作成・編集・管理を行えます"
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem />
                 {list.map((p) => (

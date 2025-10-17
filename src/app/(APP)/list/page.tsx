@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatToJstDateTime } from "@/lib/utils";
+import { PageHeaderMeta } from "../_components/page-header-meta";
 
 export default async function UsersCurrentStatusPage() {
     // 全ユーザーと、進行中(ended_at IS NULL)の打刻を LEFT JOIN
@@ -53,14 +54,10 @@ export default async function UsersCurrentStatusPage() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                    ユーザー現在ステータス
-                </h1>
-                <p className="text-muted-foreground">
-                    全ユーザーの進行中の勤怠状態
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="ユーザー現在ステータス"
+                description="全ユーザーの進行中の勤怠状態"
+            />
 
             <div className="rounded-md border">
                 <Table>

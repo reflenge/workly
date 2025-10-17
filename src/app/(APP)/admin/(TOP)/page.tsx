@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { AdminAttendancePageWrapper } from "../_components/admin-attendance-page-wrapper";
+import { PageHeaderMeta } from "../../_components/page-header-meta";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能
@@ -27,14 +28,10 @@ export default async function page() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                    管理者ダッシュボード
-                </h1>
-                <p className="text-muted-foreground">
-                    全ユーザーの出退勤記録を確認できます
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="管理者ダッシュボード"
+                description="全ユーザーの出退勤記録を確認できます"
+            />
 
             <AdminAttendancePageWrapper />
         </div>

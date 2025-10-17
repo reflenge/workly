@@ -19,7 +19,7 @@ export default async function Layout({
     const isSupported = isPcChrome(ua);
 
     return (
-        <div className="min-h-screen">
+        <div className="">
             {!isSupported && (
                 <div className="bg-yellow-200 text-red-700 px-4 py-2 text-center font-bold">
                     ※ADMINページはPC版Chromeのみ動作保証しています

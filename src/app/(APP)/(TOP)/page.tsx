@@ -1,5 +1,6 @@
 // React関連のインポート
 import React from "react";
+import { PageHeaderMeta } from "../_components/page-header-meta";
 // Supabaseクライアント（サーバーサイド用）
 import { createClient } from "@/lib/supabase/server";
 // Next.jsのリダイレクト機能
@@ -45,12 +46,10 @@ export default async function TopPage() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">打刻</h1>
-                <p className="text-muted-foreground">
-                    勤務開始・休憩・退勤の打刻を行えます
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="打刻"
+                description="勤務開始・休憩・退勤の打刻を行えます"
+            />
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 {/* メインコンテンツエリア */}
                 <div className="w-full flex justify-center space-y-4 flex-col max-w-md mx-auto">

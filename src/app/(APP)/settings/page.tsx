@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import UserSettingsForm from "./_components/user-settings-form";
 import { formatToJstDate } from "@/lib/utils";
+import { PageHeaderMeta } from "../_components/page-header-meta";
 
 export default async function SettingsPage() {
     const supabase = await createClient();
@@ -62,12 +63,10 @@ export default async function SettingsPage() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">設定</h1>
-                <p className="text-muted-foreground">
-                    アカウント情報とカード設定を管理できます
-                </p>
-            </div>
+            <PageHeaderMeta
+                title="設定"
+                description="アカウント情報とカード設定を管理できます"
+            />
             <div className="max-w-2xl mx-auto space-y-6">
                 {/* カード情報表示 */}
                 <div className="bg-gray-50 p-4 rounded-lg">

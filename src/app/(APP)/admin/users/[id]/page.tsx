@@ -5,6 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
 import CompensationForm from "./_components/compensation-form";
 import CompensationList from "./_components/compensation-list";
+import { PageHeaderMeta } from "../../../_components/page-header-meta";
 
 export default async function UserDetailPage({
     params,
@@ -42,15 +43,12 @@ export default async function UserDetailPage({
 
     return (
         <div className="container mx-auto p-6">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">
-                    {user.lastName} {user.firstName} の給与設定
-                </h1>
-                <p className="text-muted-foreground">
-                    {user.isActive ? "有効" : "無効"} |
-                    {user.isAdmin ? "管理者" : "一般ユーザー"}
-                </p>
-            </div>
+            <PageHeaderMeta
+                title={`${user.lastName} ${user.firstName} の給与設定`}
+                description={`${user.isActive ? "有効" : "無効"} | ${
+                    user.isAdmin ? "管理者" : "一般ユーザー"
+                }`}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
