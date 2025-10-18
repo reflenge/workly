@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { userCompensation, users } from "@/db/schema";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/requireUser";
 import { desc, eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
 import CompensationForm from "./_components/compensation-form";
@@ -12,21 +12,12 @@ export default async function UserDetailPage({
 }: {
     params: { id: string };
 }) {
+    const currentUser = await requireUser();
+
     // admin 権限のユーザーのみアクセス可能
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getClaims();
-    if (error || !data?.claims) {
-        redirect("/auth/login");
+    if (!currentUser.isAdmin) {
+        redirect("/");
     }
-    const me = (
-        await db
-            .select()
-            .from(users)
-            .where(eq(users.authId, data?.claims?.sub))
-            .limit(1)
-    )[0];
-    if (!me) redirect("/auth/login");
-    if (!me.isAdmin) redirect("/");
 
     // 対象ユーザーを取得
     const user = (

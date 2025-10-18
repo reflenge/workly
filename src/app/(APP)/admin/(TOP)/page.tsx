@@ -1,27 +1,12 @@
-import { db } from "@/db";
-import { users } from "@/db/schema";
-import { createClient } from "@/lib/supabase/server";
-import { eq } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/requireUser";
 import { redirect } from "next/navigation";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 import AttendanceView from "@/components/attendance";
 
 export default async function page() {
+    const user = await requireUser();
+
     // admin 権限のユーザーのみアクセス可能
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getClaims();
-    if (error || !data?.claims) {
-        redirect("/auth/login");
-    }
-    const userResult = await db
-        .select()
-        .from(users)
-        .where(eq(users.authId, data?.claims?.sub))
-        .limit(1);
-    const user = userResult[0];
-    if (!user) {
-        redirect("/auth/login");
-    }
     if (!user.isAdmin) {
         redirect("/");
     }
@@ -32,7 +17,7 @@ export default async function page() {
                 title="管理者ダッシュボード"
                 description="全ユーザーの出退勤記録を確認できます"
             />
-            <AttendanceView isAdmin={true}/>
+            <AttendanceView isAdmin={true} />
         </div>
     );
 }

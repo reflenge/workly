@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { cardAssignments, cards, users } from "@/db/schema";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/requireUser";
 import { desc, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
@@ -8,21 +8,12 @@ import LinkItems from "./_components/link-items";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function Page() {
+    const user = await requireUser();
+
     // admin 権限のユーザーのみアクセス可能
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getClaims();
-    if (error || !data?.claims) {
-        redirect("/auth/login");
+    if (!user.isAdmin) {
+        redirect("/");
     }
-    const me = (
-        await db
-            .select()
-            .from(users)
-            .where(eq(users.authId, data?.claims?.sub))
-            .limit(1)
-    )[0];
-    if (!me) redirect("/auth/login");
-    if (!me.isAdmin) redirect("/");
 
     // 現在有効なリンク（未解除）を取得
     const linkHistory = await db

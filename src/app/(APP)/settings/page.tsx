@@ -1,6 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth/requireUser";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,24 +9,15 @@ import { formatToJstDate } from "@/lib/utils";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function SettingsPage() {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const user = await requireUser();
 
-    if (!user) {
-        redirect("/auth/login");
-    }
+    // 完全なユーザー情報を取得（UserSettingsForm用）
+    const fullUserData = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+    });
 
-    // ユーザー情報を取得
-    const userData = await db
-        .select()
-        .from(users)
-        .where(eq(users.authId, user.id))
-        .limit(1);
-
-    if (userData.length === 0) {
-        redirect("/auth/login");
+    if (!fullUserData) {
+        throw new Error("User not found");
     }
 
     // ユーザーの現在のカード情報を取得（v_current_card_assignment ビューを使用）
@@ -41,7 +31,7 @@ export default async function SettingsPage() {
         FROM v_current_card_assignment vca
         INNER JOIN card c ON vca.card_id = c.id
         INNER JOIN card_assignment ca ON vca.user_id = ca.user_id AND vca.card_id = ca.card_id
-        WHERE vca.user_id = ${userData[0].id}
+        WHERE vca.user_id = ${user.id}
         LIMIT 1
     `);
 
@@ -115,7 +105,7 @@ export default async function SettingsPage() {
                 </div>
 
                 {/* プロフィール設定 */}
-                <UserSettingsForm user={userData[0]} />
+                <UserSettingsForm user={fullUserData} />
             </div>
         </div>
     );

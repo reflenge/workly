@@ -1,29 +1,17 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { createClient } from "@/lib/supabase/server";
-import { desc, eq } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/requireUser";
+import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import UserItems from "./_components/user-items";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function page() {
+    const user = await requireUser();
+
     // admin 権限のユーザーのみアクセス可能
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getClaims();
-    if (error || !data?.claims) {
-        redirect("/auth/login");
-    }
-    const userResult = await db
-        .select()
-        .from(users)
-        .where(eq(users.authId, data?.claims?.sub))
-        .limit(1);
-    const me = userResult[0];
-    if (!me) {
-        redirect("/auth/login");
-    }
-    if (!me.isAdmin) {
+    if (!user.isAdmin) {
         redirect("/");
     }
 
