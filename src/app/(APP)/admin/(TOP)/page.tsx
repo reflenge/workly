@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
+import AttendanceView from "@/components/attendance";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能
@@ -31,7 +32,7 @@ export default async function page() {
                 title="管理者ダッシュボード"
                 description="全ユーザーの出退勤記録を確認できます"
             />
-
+            <AttendanceView isAdmin={true}/>
         </div>
     );
 }
