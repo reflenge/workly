@@ -5,7 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import UserItems from "./_components/user-items";
-import { PageHeaderMeta } from "../../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能

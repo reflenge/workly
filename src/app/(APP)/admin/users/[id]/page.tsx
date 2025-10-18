@@ -5,7 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { redirect, notFound } from "next/navigation";
 import CompensationForm from "./_components/compensation-form";
 import CompensationList from "./_components/compensation-list";
-import { PageHeaderMeta } from "../../../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function UserDetailPage({
     params,

@@ -1,12 +1,5 @@
-import {
-    fetchMyAttendanceLogs,
-    fetchMyAttendanceMonthlySummary,
-} from "./_components/attendance-actions";
-import { AttendancePageWrapper } from "./_components/attendance-page-wrapper";
-import { PageHeaderMeta } from "../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 import { redirect } from "next/navigation";
-import { AttendanceDataTable } from "./_components/attendance-data-table";
-import { updateAttendanceLog } from "./_components/attendance-actions";
 
 interface AttendancePageProps {
     searchParams: Promise<{
@@ -73,65 +66,12 @@ export default async function AttendancePage({
     const canPrev = year > minYear || (year === minYear && month > minMonth);
     const canNext = year < maxYear || (year === maxYear && month < maxMonth);
 
-    const [{ items, totalCount }, summary] = await Promise.all([
-        fetchMyAttendanceLogs({
-            year,
-            month,
-        }),
-        fetchMyAttendanceMonthlySummary({ year, month }),
-    ]);
-
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
                 title="出勤記録"
                 description="あなたの出勤・退勤記録を確認できます。"
             />
-
-            <AttendancePageWrapper
-                year={year}
-                month={month}
-                canPrev={canPrev}
-                canNext={canNext}
-            >
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div className="rounded-md border p-4">
-                        <div className="text-sm text-muted-foreground">
-                            勤務日数
-                        </div>
-                        <div className="text-xl font-semibold">
-                            {summary.workedDays} 日
-                        </div>
-                    </div>
-                    <div className="rounded-md border p-4">
-                        <div className="text-sm text-muted-foreground">
-                            勤務時間合計
-                        </div>
-                        <div className="text-xl font-semibold">
-                            {(() => {
-                                const totalMs = summary.workedMillis;
-                                const hours = Math.floor(totalMs / 3_600_000);
-                                const minutes = Math.floor(
-                                    (totalMs % 3_600_000) / 60_000
-                                );
-                                const seconds = Math.floor(
-                                    (totalMs % 60_000) / 1000
-                                );
-                                return `${hours}時間${minutes}分${seconds}秒`;
-                            })()}
-                        </div>
-                    </div>
-                </div>
-                <div className="mt-6">
-                    <AttendanceDataTable
-                        data={items}
-                        onUpdate={async (args) => {
-                            "use server";
-                            return await updateAttendanceLog(args);
-                        }}
-                    />
-                </div>
-            </AttendancePageWrapper>
         </div>
     );
 }

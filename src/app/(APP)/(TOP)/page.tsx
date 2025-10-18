@@ -1,6 +1,6 @@
 // React関連のインポート
 import React from "react";
-import { PageHeaderMeta } from "../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 // Supabaseクライアント（サーバーサイド用）
 import { createClient } from "@/lib/supabase/server";
 // Next.jsのリダイレクト機能

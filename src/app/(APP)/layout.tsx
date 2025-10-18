@@ -1,7 +1,7 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { PageHeaderProvider } from "./_components/page-header-context";
-import { PageHeader } from "./_components/page-header";
+import { PageHeaderProvider } from "@/components/page-header/page-header-context";
+import { PageHeader } from "@/components/page-header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (

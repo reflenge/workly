@@ -3,8 +3,7 @@ import { users } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { AdminAttendancePageWrapper } from "../_components/admin-attendance-page-wrapper";
-import { PageHeaderMeta } from "../../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function page() {
     // admin 権限のユーザーのみアクセス可能
@@ -33,7 +32,6 @@ export default async function page() {
                 description="全ユーザーの出退勤記録を確認できます"
             />
 
-            <AdminAttendancePageWrapper />
         </div>
     );
 }

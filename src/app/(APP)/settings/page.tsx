@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import UserSettingsForm from "./_components/user-settings-form";
 import { formatToJstDate } from "@/lib/utils";
-import { PageHeaderMeta } from "../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function SettingsPage() {
     const supabase = await createClient();

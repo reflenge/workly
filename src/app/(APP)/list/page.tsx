@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatToJstDateTime } from "@/lib/utils";
-import { PageHeaderMeta } from "../_components/page-header-meta";
+import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function UsersCurrentStatusPage() {
     // 全ユーザーと、進行中(ended_at IS NULL)の打刻を LEFT JOIN
