@@ -47,7 +47,7 @@ export default async function TopPage() {
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
-                title="打刻"
+                title="dev打刻"
                 description="勤務開始・休憩・退勤の打刻を行えます"
             />
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
