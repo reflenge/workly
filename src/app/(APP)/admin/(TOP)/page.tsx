@@ -17,7 +17,7 @@ export default async function page() {
                 title="管理者ダッシュボード"
                 description="全ユーザーの出退勤記録を確認できます"
             />
-            <AttendanceView isAdmin={true} />
+            <AttendanceView isAdmin={true} userId={user.id} />
         </div>
     );
 }

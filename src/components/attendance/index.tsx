@@ -1,78 +1,88 @@
-import React from "react";
-import { db } from "@/db";
-import {
-    attendanceLogs,
-    attendanceStatus,
-    attendanceLogSource,
-    users,
-} from "@/db/schema";
+"use client";
 
-import { eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core"; // ← 重要
-
-// 同一テーブルの別名を用意
-const startSource = alias(attendanceLogSource, "start_source");
-const endSource = alias(attendanceLogSource, "end_source");
+import { useEffect, useTransition, useState } from "react";
+import { AttendanceRecordsResult } from "./actions";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AttendanceRecordsResultType } from "./actions";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { parseNumberArrayParam, parseUuidV4ArrayParam } from "./util";
+import { format, toZonedTime } from "date-fns-tz";
+import { DataTable } from "./data-table";
+import { columns } from "./columns";
 
 interface AttendanceViewProps {
     isAdmin: boolean;
+    userId: string;
 }
 
-const AttendanceView = async ({ isAdmin }: AttendanceViewProps) => {
-    const attendanceRecordsResult = await db
-        .select({
-            log: {
-                id: attendanceLogs.id,
-                startedAt: attendanceLogs.startedAt,
-                endedAt: attendanceLogs.endedAt,
-                note: attendanceLogs.note,
-            },
-            user: {
-                id: users.id,
-                isAdmin: users.isAdmin,
-                lastName: users.lastName,
-                firstName: users.firstName,
-            },
-            status: {
-                id: attendanceStatus.id,
-                label: attendanceStatus.label,
-            },
-            startedSource: {
-                id: startSource.id,
-                label: startSource.label,
-            },
-            endedSource: {
-                id: endSource.id,
-                label: endSource.label,
-            },
-        })
-        .from(attendanceLogs)
-        .innerJoin(users, eq(attendanceLogs.userId, users.id))
-        .leftJoin(
-            attendanceStatus,
-            eq(attendanceLogs.statusId, attendanceStatus.id)
-        )
-        .leftJoin(startSource, eq(attendanceLogs.startedSource, startSource.id))
-        .leftJoin(endSource, eq(attendanceLogs.endedSource, endSource.id))
-        .limit(2);
-    console.log(
-        "🚀 -----------------------------------------------------------------------------------------🚀"
-    );
-    console.log(
-        "🚀 => index.tsx:11 => AttendanceView => attendanceRecordsResult:",
-        attendanceRecordsResult
-    );
-    console.log(
-        "🚀 -----------------------------------------------------------------------------------------🚀"
-    );
+interface AttendanceFilter {
+    userIdFilter: string[] | null;
+    statusIdFilter: number[] | null;
+    startedSourceIdFilter: number[] | null;
+    endedSourceIdFilter: number[] | null;
+}
+
+const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
+    const searchParams = useSearchParams();
+
+    const filters: AttendanceFilter = {
+        userIdFilter: parseUuidV4ArrayParam(searchParams.get("u")),
+        statusIdFilter: parseNumberArrayParam(searchParams.get("s"), {
+            min: 1,
+            max: 4,
+        }),
+        startedSourceIdFilter: parseNumberArrayParam(searchParams.get("ss"), {
+            min: 1,
+            max: 3,
+        }),
+        endedSourceIdFilter: parseNumberArrayParam(searchParams.get("es"), {
+            min: 1,
+            max: 3,
+        }),
+    };
+
+    const [isPending, startTransition] = useTransition(); // データ取得中かどうかを管理する状態
+    const [attendanceRecords, setAttendanceRecords] = useState<
+        AttendanceRecordsResultType[]
+    >([]); // 元データを格納する配列
+    const [monthList, setMonthList] = useState(null);
+
+    useEffect(() => {
+        const fetchAttendanceRecords = async () => {
+            startTransition(async () => {
+                const result: AttendanceRecordsResultType[] =
+                    await AttendanceRecordsResult();
+
+                // TODO: 実装手順
+                // 1. adminか?trueなら全ユーザーのレコードを表示、falseなら自分のレコードを表示
+                // 2. レコードを月で分ける
+                // 3. 月ごとにレコードを表示
+
+                const yesAdmin = () => {
+                    const data = result;
+                    return data;
+                };
+                const noAdmin = () => {
+                    const data = result.filter(
+                        (record) => record.user.id === userId
+                    );
+                    return data;
+                };
+                const view = isAdmin ? yesAdmin() : noAdmin();
+                setAttendanceRecords(view);
+            });
+        };
+        fetchAttendanceRecords();
+    }, []);
+
+    if (isPending) {
+        return <Skeleton className="w-full h-10" />;
+    }
     return (
-        <div>
-            <p>AttendanceView</p>
-            <p>isAdmin: {isAdmin ? "true" : "false"}</p>
-            <div>
-                attendanceRecordsResult:{" "}
-                {JSON.stringify(attendanceRecordsResult, null, 2)}
-            </div>
+        <div className="container mx-auto">
+            <DataTable columns={columns} data={attendanceRecords} />
         </div>
     );
 };
