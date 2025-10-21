@@ -54,6 +54,7 @@ const ActionsCell = ({ payment }: { payment: AttendanceRecordsResultType }) => {
                     <DropdownMenuItem onSelect={handleViewNote}>
                         View Note
                     </DropdownMenuItem>
+                    {/* TODO: Edit record system*/}
                 </DropdownMenuContent>
             </DropdownMenu>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
