@@ -25,6 +25,51 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 
+// Actionsコンポーネントを分離
+const ActionsCell = ({ payment }: { payment: AttendanceRecordsResultType }) => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const handleViewNote = () => {
+        setIsDropdownOpen(false);
+        // 少し遅延させてDropdownMenuの閉じる処理を待つ
+        setTimeout(() => {
+            setIsDialogOpen(true);
+        }, 100);
+    };
+
+    return (
+        <>
+            <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={setIsDropdownOpen}
+            >
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={handleViewNote}>
+                        View Note
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Note</DialogTitle>
+                        <DialogDescription>
+                            {payment.log.note ?? "-"}
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+};
+
 export const columns: ColumnDef<AttendanceRecordsResultType>[] = [
     {
         accessorKey: "user.fullName",
@@ -189,47 +234,7 @@ export const columns: ColumnDef<AttendanceRecordsResultType>[] = [
         id: "actions",
         cell: ({ row }) => {
             const payment = row.original;
-            const [isDialogOpen, setIsDialogOpen] = useState(false);
-            const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-            const handleViewNote = () => {
-                setIsDropdownOpen(false);
-                // 少し遅延させてDropdownMenuの閉じる処理を待つ
-                setTimeout(() => {
-                    setIsDialogOpen(true);
-                }, 100);
-            };
-
-            return (
-                <>
-                    <DropdownMenu
-                        open={isDropdownOpen}
-                        onOpenChange={setIsDropdownOpen}
-                    >
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={handleViewNote}>
-                                View Note
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Note</DialogTitle>
-                                <DialogDescription>
-                                    {payment.log.note ?? "-"}
-                                </DialogDescription>
-                            </DialogHeader>
-                        </DialogContent>
-                    </Dialog>
-                </>
-            );
+            return <ActionsCell payment={payment} />;
         },
     },
 ];
