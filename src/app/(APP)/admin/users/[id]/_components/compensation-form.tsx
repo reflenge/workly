@@ -158,8 +158,8 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="JPY">JPY</SelectItem>
-                                <SelectItem value="USD">USD</SelectItem>
-                                <SelectItem value="EUR">EUR</SelectItem>
+                                {/* <SelectItem value="USD">USD</SelectItem>
+                                <SelectItem value="EUR">EUR</SelectItem> */}
                             </SelectContent>
                         </Select>
                     </div>
