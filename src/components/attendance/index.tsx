@@ -10,6 +10,7 @@ import { parseYearMonthParams, filterRecordsByYearMonth } from "./util";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import YearMonthPagination from "./year-month-pagination";
+import DataDashboard from "./data-dashboard";
 
 interface AttendanceViewProps {
     isAdmin: boolean;
@@ -29,7 +30,6 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     const [attendanceRecords, setAttendanceRecords] = useState<
         AttendanceRecordsResultType[]
     >([]); // 元データを格納する配列
-    const [monthList, setMonthList] = useState(null);
 
     useEffect(() => {
         const fetchAttendanceRecords = async () => {
@@ -61,6 +61,7 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     return (
         <div className="container mx-auto">
             <YearMonthPagination />
+            <DataDashboard isAdmin={isAdmin} data={attendanceRecords} />
             <DataTable
                 isAdmin={isAdmin}
                 columns={columns}

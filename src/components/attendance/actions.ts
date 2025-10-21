@@ -18,6 +18,51 @@ import Decimal from "decimal.js";
 const startSource = alias(attendanceLogSource, "start_source");
 const endSource = alias(attendanceLogSource, "end_source");
 
+/**
+ * 勤務記録の結果型
+ *
+    ```typescript
+    log: {
+        id: string;
+        startedAt: Date;
+        endedAt: Date | null;
+        note: string | null;
+    };
+    user: {
+        id: string;
+        isAdmin: boolean;
+        lastName: string;
+        firstName: string;
+        fullName: string;
+    };
+    status: {
+        id: number;
+        label: string;
+    } | null;
+    startedSource: {
+        id: number;
+        label: string;
+    } | null;
+    endedSource: {
+        id: number;
+        label: string;
+    } | null;
+    compensation: {
+        id: string;
+        isHourly: boolean;
+        hourlyRate: string | null;
+        effectiveFrom: Date;
+        effectiveTo: Date | null;
+    } | null;
+    calculatedPay?: {
+        workingTimeMs: number;
+        hourlyPay: number; // 時給計算結果 暫定支給額
+    };
+    ```
+ *
+ * @export
+ * @interface AttendanceRecordsResultType
+ */
 export interface AttendanceRecordsResultType {
     log: {
         id: string;
@@ -208,7 +253,7 @@ const getAttendanceRecordsData = async (): Promise<
             };
         });
 
-        console.log(resultWithCalculatedPay);
+        // console.log(resultWithCalculatedPay);
         return resultWithCalculatedPay;
     } catch (error) {
         throw new Error(

@@ -1,4 +1,6 @@
-import { toZonedTime } from "date-fns-tz";
+import { eachDayOfInterval } from "date-fns";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
+import { AttendanceRecordsResultType } from "./actions";
 
 /**
  * カンマ区切りの文字列を整数配列に変換します。オプションでmin/maxの範囲フィルタも可能です。
@@ -259,4 +261,41 @@ export const filterRecordsByYearMonth = <
             jstDate.getFullYear() === year && jstDate.getMonth() + 1 === month // JavaScriptの月は0から始まるため+1
         );
     });
+};
+
+/**
+ * 指定された出勤記録配列からユニークな勤務日数（カレンダー日単位、タイムゾーンJST基準）をカウントします。
+ *
+ * 各レコードはlog.startedAtおよび（あれば）log.endedAtを持つ必要があります。
+ * 各レコードの勤務日（在席が跨いだ場合もすべてのカレンダー日をカウントする）を抽出してユニークな日付数を返します。
+ * 日付は"Asia/Tokyo"タイムゾーンを基準にyyyy-MM-dd形式で算出します。
+ *
+ * @param {AttendanceRecordsResultType[]} records - 出勤記録配列
+ * @returns {number} カレンダー日ベースでのユニークな勤務日数
+ */
+export const getWorkingDaysCount = (
+    records: AttendanceRecordsResultType[]
+): number => {
+    const uniqueDays = new Set<string>();
+    const tz = "Asia/Tokyo";
+
+    records.forEach((record) => {
+        // JSTタイムゾーンを基準に、各勤務の開始・終了をDateに変換
+        const startUtc = fromZonedTime(record.log.startedAt, tz);
+        const endUtc = record.log.endedAt
+            ? fromZonedTime(record.log.endedAt, tz)
+            : startUtc; // endedAtがなければ開始日のみ
+
+        // start～endまでのすべてのカレンダー日リストを作成
+        const days = eachDayOfInterval({ start: startUtc, end: endUtc });
+        // それぞれのカレンダー日を"yyyy-MM-dd"（JST）で文字列化
+        const formatDays = days.map((day) =>
+            formatInTimeZone(day, tz, "yyyy-MM-dd")
+        );
+        // 重複なくセットに追加
+        formatDays.forEach((day) => {
+            uniqueDays.add(day);
+        });
+    });
+    return uniqueDays.size;
 };
