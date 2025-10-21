@@ -13,6 +13,7 @@ import {
 import { eq, and, isNull } from "drizzle-orm";
 // Supabaseクライアント（サーバーサイド用）
 import { createClient } from "@/lib/supabase/server";
+import { revalidateAttendanceRecords } from "@/components/attendance/actions";
 
 /**
  * 勤務打刻のアクション種別
@@ -157,6 +158,7 @@ export async function recordAttendance(
 
         // 現在時刻を取得（UTC基準）
         const now = new Date();
+        revalidateAttendanceRecords();
 
         // ===== 状態遷移チェック =====
         // 現在の状態に基づいて許可されるアクションをチェック

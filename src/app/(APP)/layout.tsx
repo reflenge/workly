@@ -12,12 +12,14 @@ export default async function Layout({ children }: { children: ReactNode }) {
     // Client側のグローバルステートへ"初期値"として渡す
     return (
         <UserProvider initialUser={user}>
-            <SidebarProvider>
+            <SidebarProvider defaultOpen={false}>
                 <AppSidebar />
-                <SidebarInset className="h-[calc(100dvh-1rem)] overflow-y-auto overflow-x-hidden">
+                <SidebarInset className="h-[calc(100dvh-1rem)] overflow-y-hidden overflow-x-hidden">
                     <PageHeaderProvider>
                         <PageHeader />
-                        <main className="pt-0 p-4">{children}</main>
+                        <main className="h-[calc(100dvh-1rem-60px)] overflow-y-auto overflow-x-hidden pt-0 p-4">
+                            {children}
+                        </main>
                     </PageHeaderProvider>
                 </SidebarInset>
             </SidebarProvider>
