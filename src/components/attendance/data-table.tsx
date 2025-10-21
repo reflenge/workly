@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({
         startedSource_label: false,
         endedSource_label: false,
         calculatedPay_workingTimeMs: false,
-        compensation_hourlyRate: true,
+        compensation_hourlyRate: false,
     });
     const table = useReactTable({
         data: filteredData,

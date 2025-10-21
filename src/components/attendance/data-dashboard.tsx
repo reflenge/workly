@@ -2,7 +2,13 @@
 
 import React, { useMemo } from "react";
 import { AttendanceRecordsResultType } from "./actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import {
     Table,
     TableBody,
@@ -182,6 +188,9 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
             <Card>
                 <CardHeader className="">
                     <CardTitle className="text-lg">全体の集計</CardTitle>
+                    <CardDescription>
+                        ※「総支給額」は正しい計算ルール（端数処理など）に基づいて算出された値です。各勤務記録の暫定支給額の合計とは異なる場合があります。
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-0">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
