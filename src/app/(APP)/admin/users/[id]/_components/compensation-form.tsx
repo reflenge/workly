@@ -94,14 +94,14 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                             <Checkbox
                                 id="isHourly"
                                 checked={isHourly}
-                                onCheckedChange={(checked) => {
-                                    setIsHourly(checked as boolean);
-                                    if (checked) setIsMonthly(false);
-                                }}
+                                // onCheckedChange={(checked) => {
+                                //     setIsHourly(checked as boolean);
+                                //     if (checked) setIsMonthly(false);
+                                // }}
                             />
                             <Label htmlFor="isHourly">時給制</Label>
                         </div>
-                        <div className="flex items-center gap-2">
+                        {/* <div className="flex items-center gap-2">
                             <Checkbox
                                 id="isMonthly"
                                 checked={isMonthly}
@@ -111,7 +111,7 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                                 }}
                             />
                             <Label htmlFor="isMonthly">月給制</Label>
-                        </div>
+                        </div> */}
                     </div>
 
                     {isHourly && (
