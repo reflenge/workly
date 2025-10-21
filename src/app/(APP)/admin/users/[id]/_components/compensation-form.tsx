@@ -30,9 +30,10 @@ const CompensationForm = ({ userId }: { userId: string }) => {
     const [hourlyRate, setHourlyRate] = useState("");
     const [monthlySalary, setMonthlySalary] = useState("");
     const [currency, setCurrency] = useState("JPY");
-    const [effectiveFrom, setEffectiveFrom] = useState<Date | undefined>(
-        new Date()
-    );
+    const [effectiveFrom, setEffectiveFrom] = useState<Date | undefined>(() => {
+        const today = new Date();
+        return new Date(today.getFullYear(), today.getMonth(), 1);
+    });
     const [effectiveTo, setEffectiveTo] = useState<Date | undefined>(undefined);
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -65,7 +66,10 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                     // フォームリセット
                     setHourlyRate("");
                     setMonthlySalary("");
-                    setEffectiveFrom(new Date());
+                    const today = new Date();
+                    setEffectiveFrom(
+                        new Date(today.getFullYear(), today.getMonth(), 1)
+                    );
                     setEffectiveTo(undefined);
                     router.refresh();
                 })
@@ -161,22 +165,23 @@ const CompensationForm = ({ userId }: { userId: string }) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="effectiveFrom">適用開始日</Label>
+                        <Label htmlFor="effectiveFrom">適用開始月</Label>
                         <DatePicker
                             value={effectiveFrom}
                             onChange={setEffectiveFrom}
-                            placeholder="適用開始日を選択"
+                            placeholder="適用開始月を選択"
+                            monthOnly={true}
                         />
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="effectiveTo">適用終了日（任意）</Label>
+                    {/* <div className="flex flex-col gap-2">
+                        <Label htmlFor="effectiveTo">適用終了月（任意）</Label>
                         <DatePicker
                             value={effectiveTo}
                             onChange={setEffectiveTo}
-                            placeholder="適用終了日を選択（任意）"
+                            placeholder="適用終了月を選択（任意）"
                         />
-                    </div>
+                    </div> */}
 
                     <Button
                         type="submit"
