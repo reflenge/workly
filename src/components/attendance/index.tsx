@@ -82,7 +82,11 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     }
     return (
         <div className="container mx-auto">
-            <DataTable columns={columns} data={attendanceRecords} />
+            <DataTable
+                isAdmin={isAdmin}
+                columns={columns}
+                data={attendanceRecords}
+            />
         </div>
     );
 };
