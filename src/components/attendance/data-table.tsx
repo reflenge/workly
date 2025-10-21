@@ -29,14 +29,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTableFilters } from "./data-table-filters";
+import { AttendanceRecordsResultType } from "./actions";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends AttendanceRecordsResultType, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     isAdmin: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends AttendanceRecordsResultType, TValue>({
     columns,
     data,
     isAdmin,
@@ -68,9 +69,12 @@ export function DataTable<TData, TValue>({
     });
     // console.log(data);
 
-    const handleFilteredDataChange = useCallback((filtered: TData[]) => {
-        setFilteredData(filtered);
-    }, []);
+    const handleFilteredDataChange = useCallback(
+        (filtered: AttendanceRecordsResultType[]) => {
+            setFilteredData(filtered as TData[]);
+        },
+        []
+    );
 
     return (
         <div>
@@ -175,8 +179,9 @@ export function DataTable<TData, TValue>({
 
                                             /** 時給の非表示条件 */
                                             if (
-                                                (row.original as any)?.status
-                                                    ?.id !== 2 &&
+                                                (
+                                                    row.original as AttendanceRecordsResultType
+                                                )?.status?.id !== 2 &&
                                                 cell.column.id ===
                                                     "compensation_hourlyRate"
                                             ) {
@@ -192,8 +197,9 @@ export function DataTable<TData, TValue>({
                                             /** 暫定支給額の非表示条件 */
                                             if (
                                                 // 'status' が存在しない場合や 'label' が "勤務中" でない場合
-                                                (row.original as any)?.status
-                                                    ?.id !== 2 &&
+                                                (
+                                                    row.original as AttendanceRecordsResultType
+                                                )?.status?.id !== 2 &&
                                                 cell.column.id ===
                                                     "calculatedPay_hourlyPay"
                                             ) {

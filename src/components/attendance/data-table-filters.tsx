@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { AttendanceRecordsResultType } from "./actions";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -27,9 +28,9 @@ interface StatusFilterItem {
 }
 
 interface DataTableFiltersProps {
-    data: any[];
+    data: AttendanceRecordsResultType[];
     isAdmin: boolean;
-    onFilteredDataChange: (filteredData: any[]) => void;
+    onFilteredDataChange: (filteredData: AttendanceRecordsResultType[]) => void;
 }
 
 export function DataTableFilters({
@@ -51,7 +52,7 @@ export function DataTableFilters({
      */
     useEffect(() => {
         const uniqueUsersMap = new Map<string, UserFilterItem>();
-        data.forEach((item: any) => {
+        data.forEach((item: AttendanceRecordsResultType) => {
             const id = item.user?.id ?? "";
             const label = item.user?.fullName ?? "";
             if (id && !uniqueUsersMap.has(id)) {
@@ -63,9 +64,9 @@ export function DataTableFilters({
         const uniqueStatusMap = new Map<number, StatusFilterItem>();
 
         // まず全てのステータスを非選択状態で収集
-        data.forEach((item: any) => {
-            const id = item.status.id ?? 0;
-            const label = item.status.label ?? "";
+        data.forEach((item: AttendanceRecordsResultType) => {
+            const id = item.status?.id ?? 0;
+            const label = item.status?.label ?? "";
             if (id && !uniqueStatusMap.has(id)) {
                 uniqueStatusMap.set(id, { id, label, checked: false });
             }
@@ -107,7 +108,7 @@ export function DataTableFilters({
             const checkedUsers = userList
                 .filter((user) => user.checked)
                 .map((user) => user.id);
-            filtered = filtered.filter((item: any) =>
+            filtered = filtered.filter((item: AttendanceRecordsResultType) =>
                 checkedUsers.includes(item.user?.id ?? "")
             );
         }
@@ -117,7 +118,7 @@ export function DataTableFilters({
             const checkedStatuses = statusList
                 .filter((status) => status.checked)
                 .map((status) => status.id);
-            filtered = filtered.filter((item: any) =>
+            filtered = filtered.filter((item: AttendanceRecordsResultType) =>
                 checkedStatuses.includes(item.status?.id ?? 0)
             );
         }
