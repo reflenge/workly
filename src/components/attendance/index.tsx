@@ -6,42 +6,24 @@ import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AttendanceRecordsResultType } from "./actions";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { parseNumberArrayParam, parseUuidV4ArrayParam } from "./util";
-import { format, toZonedTime } from "date-fns-tz";
+import { parseYearMonthParams, filterRecordsByYearMonth } from "./util";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import YearMonthPagination from "./year-month-pagination";
 
 interface AttendanceViewProps {
     isAdmin: boolean;
     userId: string;
 }
 
-interface AttendanceFilter {
-    userIdFilter: string[] | null;
-    statusIdFilter: number[] | null;
-    startedSourceIdFilter: number[] | null;
-    endedSourceIdFilter: number[] | null;
-}
-
 const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     const searchParams = useSearchParams();
 
-    const filters: AttendanceFilter = {
-        userIdFilter: parseUuidV4ArrayParam(searchParams.get("u")),
-        statusIdFilter: parseNumberArrayParam(searchParams.get("s"), {
-            min: 1,
-            max: 4,
-        }),
-        startedSourceIdFilter: parseNumberArrayParam(searchParams.get("ss"), {
-            min: 1,
-            max: 3,
-        }),
-        endedSourceIdFilter: parseNumberArrayParam(searchParams.get("es"), {
-            min: 1,
-            max: 3,
-        }),
-    };
+    // 年月の検索パラメータをバリデーション
+    const { year, month } = parseYearMonthParams(
+        searchParams.get("y"),
+        searchParams.get("m")
+    );
 
     const [isPending, startTransition] = useTransition(); // データ取得中かどうかを管理する状態
     const [attendanceRecords, setAttendanceRecords] = useState<
@@ -55,33 +37,30 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
                 const result: AttendanceRecordsResultType[] =
                     await AttendanceRecordsResult();
 
-                // TODO: 実装手順
                 // 1. adminか?trueなら全ユーザーのレコードを表示、falseなら自分のレコードを表示
-                // 2. レコードを月で分ける
-                // 3. 月ごとにレコードを表示
+                const userFilteredData = isAdmin
+                    ? result
+                    : result.filter((record) => record.user.id === userId);
 
-                const yesAdmin = () => {
-                    const data = result;
-                    return data;
-                };
-                const noAdmin = () => {
-                    const data = result.filter(
-                        (record) => record.user.id === userId
-                    );
-                    return data;
-                };
-                const view = isAdmin ? yesAdmin() : noAdmin();
-                setAttendanceRecords(view);
+                // 2. 年月でフィルタリング（startedAtでJSTの年月と比較）
+                const filteredData = filterRecordsByYearMonth(
+                    userFilteredData,
+                    year,
+                    month
+                );
+
+                setAttendanceRecords(filteredData);
             });
         };
         fetchAttendanceRecords();
-    }, []);
+    }, [isAdmin, userId, year, month]);
 
     if (isPending) {
         return <Skeleton className="w-full h-10" />;
     }
     return (
         <div className="container mx-auto">
+            <YearMonthPagination />
             <DataTable
                 isAdmin={isAdmin}
                 columns={columns}

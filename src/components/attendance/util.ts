@@ -1,3 +1,5 @@
+import { toZonedTime } from "date-fns-tz";
+
 /**
  * カンマ区切りの文字列を整数配列に変換します。オプションでmin/maxの範囲フィルタも可能です。
  * 無効な値や範囲外の値は除外されます。
@@ -53,4 +55,208 @@ export const parseUuidV4ArrayParam = (
         .map((s) => s.trim())
         .filter(isUUIDv4);
     return uuids.length > 0 ? uuids : null;
+};
+
+/**
+ * 年月の検索パラメータをバリデーションして返します。
+ * 2025年8月から今月の範囲でバリデーションし、不正な値や値がない場合は今月を返します。
+ *
+ * @param {string | null} yearParam - 年パラメータ (y)
+ * @param {string | null} monthParam - 月パラメータ (m)
+ * @returns {{ year: number; month: number }} バリデーションされた年月
+ */
+export const parseYearMonthParams = (
+    yearParam: string | null,
+    monthParam: string | null
+): { year: number; month: number } => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // JavaScriptの月は0から始まるため+1
+
+    const minYear = 2025;
+    const minMonth = 8; // 2025年8月
+
+    // 年をパース
+    let year: number;
+    if (!yearParam || !/^\d{4}$/.test(yearParam.trim())) {
+        year = currentYear;
+    } else {
+        const parsedYear = parseInt(yearParam.trim(), 10);
+        if (parsedYear < minYear || parsedYear > currentYear) {
+            year = currentYear;
+        } else {
+            year = parsedYear;
+        }
+    }
+
+    // 月をパース
+    let month: number;
+    if (!monthParam || !/^\d{1,2}$/.test(monthParam.trim())) {
+        month = currentMonth;
+    } else {
+        const parsedMonth = parseInt(monthParam.trim(), 10);
+        if (parsedMonth < 1 || parsedMonth > 12) {
+            month = currentMonth;
+        } else {
+            month = parsedMonth;
+        }
+    }
+
+    // 年と月の組み合わせをチェック（2025年8月以降、今月以前）
+    const targetDate = new Date(year, month - 1); // JavaScriptの月は0から始まるため-1
+    const minDate = new Date(minYear, minMonth - 1);
+    const currentDate = new Date(currentYear, currentMonth - 1);
+
+    if (targetDate < minDate || targetDate > currentDate) {
+        return { year: currentYear, month: currentMonth };
+    }
+
+    return { year, month };
+};
+
+/**
+ * 年月を前後移動するヘルパー関数
+ */
+const adjustMonth = (year: number, month: number, delta: number) => {
+    const date = new Date(year, month - 1 + delta);
+    return {
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+    };
+};
+
+/**
+ * 年月が有効範囲内かチェックする関数
+ */
+const isDateInRange = (
+    year: number,
+    month: number,
+    minYear: number,
+    minMonth: number,
+    currentYear: number,
+    currentMonth: number
+) => {
+    const targetDate = new Date(year, month - 1);
+    const minDate = new Date(minYear, minMonth - 1);
+    const currentDate = new Date(currentYear, currentMonth - 1);
+
+    return targetDate >= minDate && targetDate <= currentDate;
+};
+
+export const getYearMonthPagination = (year: number, month: number) => {
+    const minYear = 2025;
+    const minMonth = 8;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    // 前の月を計算
+    const prevMonth1 = adjustMonth(year, month, -1);
+    const prevMonth2 = adjustMonth(year, month, -2);
+    const nextMonth1 = adjustMonth(year, month, 1);
+    const nextMonth2 = adjustMonth(year, month, 2);
+
+    // 各月が有効かチェック
+    const hasPrevMonth1 = isDateInRange(
+        prevMonth1.year,
+        prevMonth1.month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+    const hasPrevMonth2 = isDateInRange(
+        prevMonth2.year,
+        prevMonth2.month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+    const hasNextMonth1 = isDateInRange(
+        nextMonth1.year,
+        nextMonth1.month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+    const hasNextMonth2 = isDateInRange(
+        nextMonth2.year,
+        nextMonth2.month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+
+    // さらに前後があるかチェック
+    const hasPrev3 = isDateInRange(
+        adjustMonth(year, month, -3).year,
+        adjustMonth(year, month, -3).month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+    const hasNext3 = isDateInRange(
+        adjustMonth(year, month, 3).year,
+        adjustMonth(year, month, 3).month,
+        minYear,
+        minMonth,
+        currentYear,
+        currentMonth
+    );
+
+    return {
+        prevYear: prevMonth1.year,
+        prevMonth: prevMonth1.month,
+        nextYear: nextMonth1.year,
+        nextMonth: nextMonth1.month,
+        hasPrev: hasPrevMonth1,
+        hasNext: hasNextMonth1,
+
+        // ±1月の情報
+        prevMonth1: hasPrevMonth1 ? prevMonth1 : null,
+        nextMonth1: hasNextMonth1 ? nextMonth1 : null,
+
+        // ±2月の情報
+        prevMonth2: hasPrevMonth2 ? prevMonth2 : null,
+        nextMonth2: hasNextMonth2 ? nextMonth2 : null,
+
+        // さらに先があるか
+        hasMorePrev: hasPrev3,
+        hasMoreNext: hasNext3,
+    };
+};
+
+/**
+ * 指定された年月でstartedAtをフィルタリングします。
+ * URLパラメータはJST、データはUTCで比較します。
+ *
+ * @param records - 出勤記録の配列
+ * @param year - フィルタリングする年
+ * @param month - フィルタリングする月
+ * @returns フィルタリングされた配列
+ */
+export const filterRecordsByYearMonth = <
+    T extends { log: { startedAt: Date } }
+>(
+    records: T[],
+    year: number,
+    month: number
+): T[] => {
+    const timeZone = "Asia/Tokyo";
+
+    return records.filter((record) => {
+        const startedAtUtc = record.log.startedAt;
+
+        // UTCのstartedAtをJSTに変換
+        const jstDate = toZonedTime(startedAtUtc, timeZone);
+
+        // JSTで年月が一致するかチェック
+        return (
+            jstDate.getFullYear() === year && jstDate.getMonth() + 1 === month // JavaScriptの月は0から始まるため+1
+        );
+    });
 };
