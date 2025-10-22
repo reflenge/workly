@@ -5,14 +5,24 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LogOutIcon } from "lucide-react";
 import { SidebarMenuButton } from "./ui/sidebar";
+import { useUser } from "@/components/providers/user-provider";
+import { bypassLogout } from "@/lib/auth/bypass-actions";
 
 export function LogoutButton() {
     const router = useRouter();
+    const user = useUser();
+    const isBypassUser = user?.id === "bypass-user";
 
     const logout = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        router.push("/");
+        if (isBypassUser) {
+            // バイパスユーザーの場合は、Cookieをクリア
+            await bypassLogout();
+        } else {
+            // 通常のユーザーの場合は、Supabaseからサインアウト
+            const supabase = createClient();
+            await supabase.auth.signOut();
+            router.push("/");
+        }
     };
 
     return (
