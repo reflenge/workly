@@ -61,7 +61,7 @@ export const parseUuidV4ArrayParam = (
 
 /**
  * 年月の検索パラメータをバリデーションして返します。
- * 2025年8月から今月の範囲でバリデーションし、不正な値や値がない場合は今月を返します。
+ * 2025年6月から今月の範囲でバリデーションし、不正な値や値がない場合は今月を返します。
  *
  * @param {string | null} yearParam - 年パラメータ (y)
  * @param {string | null} monthParam - 月パラメータ (m)
@@ -76,7 +76,7 @@ export const parseYearMonthParams = (
     const currentMonth = now.getMonth() + 1; // JavaScriptの月は0から始まるため+1
 
     const minYear = 2025;
-    const minMonth = 8; // 2025年8月
+    const minMonth = 6; // 2025年6月
 
     // 年をパース
     let year: number;
@@ -104,7 +104,7 @@ export const parseYearMonthParams = (
         }
     }
 
-    // 年と月の組み合わせをチェック（2025年8月以降、今月以前）
+    // 年と月の組み合わせをチェック（2025年6月以降、今月以前）
     const targetDate = new Date(year, month - 1); // JavaScriptの月は0から始まるため-1
     const minDate = new Date(minYear, minMonth - 1);
     const currentDate = new Date(currentYear, currentMonth - 1);
@@ -147,7 +147,7 @@ const isDateInRange = (
 
 export const getYearMonthPagination = (year: number, month: number) => {
     const minYear = 2025;
-    const minMonth = 8;
+    const minMonth = 6;
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
