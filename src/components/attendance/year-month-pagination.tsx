@@ -11,7 +11,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsSmallMobile } from "@/hooks/use-mobile";
 
 interface YearMonthPaginationProps {
     className?: string;
@@ -20,6 +20,7 @@ interface YearMonthPaginationProps {
 const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
     const searchParams = useSearchParams();
     const isMobile = useIsMobile();
+    const isSmallMobile = useIsSmallMobile();
 
     // 年月の検索パラメータをバリデーション
     const { year, month } = parseYearMonthParams(
@@ -61,7 +62,7 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
     };
 
     // パディングクラス（モバイルでは小さく）
-    const linkPadding = isMobile ? "px-1" : "px-1.5";
+    const linkPadding = isMobile ? "px-0.5" : "px-1";
 
     return (
         <Pagination className={className}>
@@ -87,8 +88,8 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                     </PaginationItem>
                 )}
 
-                {/* -2月 (もしあれば表示) */}
-                {prevMonth2 && (
+                {/* -2月 (もしあれば表示、小さい画面では非表示) */}
+                {prevMonth2 && !isSmallMobile && (
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(prevMonth2.year, prevMonth2.month)}
@@ -134,8 +135,8 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                     </PaginationItem>
                 )}
 
-                {/* +2月 (もしあれば表示) */}
-                {nextMonth2 && (
+                {/* +2月 (もしあれば表示、小さい画面では非表示) */}
+                {nextMonth2 && !isSmallMobile && (
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(nextMonth2.year, nextMonth2.month)}
