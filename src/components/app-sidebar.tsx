@@ -38,7 +38,7 @@ export async function AppSidebar() {
                                     <SidebarMenuButton asChild>
                                         <Link href="/" prefetch={true}>
                                             <HomeIcon />
-                                            <span>トップ</span>
+                                            <span>打刻</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -49,7 +49,7 @@ export async function AppSidebar() {
                                             prefetch={true}
                                         >
                                             <ClockIcon />
-                                            <span>勤怠</span>
+                                            <span>勤怠記録</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -65,7 +65,7 @@ export async function AppSidebar() {
                                     <SidebarMenuButton asChild>
                                         <Link href="/list" prefetch={true}>
                                             <UsersIcon />
-                                            <span>一覧</span>
+                                            <span>ステータス一覧</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

@@ -22,8 +22,8 @@ export default async function page() {
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
-                title="NFC Card 登録・管理"
-                description="NFCカードの登録・編集・管理を行えます"
+                title="カード管理"
+                description="勤怠打刻に使用するNFCカードの新規登録、カードUID（固有識別番号）の編集、有効化・無効化の切り替え、無効化理由の記録など、カード情報を総合的に管理します。"
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 <NewItem />
