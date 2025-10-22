@@ -11,6 +11,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface YearMonthPaginationProps {
     className?: string;
@@ -18,6 +19,7 @@ interface YearMonthPaginationProps {
 
 const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
     const searchParams = useSearchParams();
+    const isMobile = useIsMobile();
 
     // 年月の検索パラメータをバリデーション
     const { year, month } = parseYearMonthParams(
@@ -49,6 +51,18 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
         return `?${current.toString()}`;
     };
 
+    // 年月を表示する関数（モバイルでは年を短縮）
+    const formatYearMonth = (year: number, month: number) => {
+        const yearStr = isMobile
+            ? year.toString().slice(2, 4)
+            : year.toString();
+        const monthStr = month.toString().padStart(2, "0");
+        return `${yearStr}/${monthStr}`;
+    };
+
+    // パディングクラス（モバイルでは小さく）
+    const linkPadding = isMobile ? "px-1" : "px-1.5";
+
     return (
         <Pagination className={className}>
             <PaginationContent>
@@ -67,21 +81,20 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                 </PaginationItem>
 
                 {/* さらに前がある場合のEllipsis */}
-                {/* {hasMorePrev && (
+                {hasMorePrev && (
                     <PaginationItem>
                         <PaginationEllipsis />
                     </PaginationItem>
-                )} */}
+                )}
 
                 {/* -2月 (もしあれば表示) */}
                 {prevMonth2 && (
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(prevMonth2.year, prevMonth2.month)}
-                            className="w-fit px-1"
+                            className={`w-fit ${linkPadding}`}
                         >
-                            {prevMonth2.year}/
-                            {prevMonth2.month.toString().padStart(2, "0")}
+                            {formatYearMonth(prevMonth2.year, prevMonth2.month)}
                         </PaginationLink>
                     </PaginationItem>
                 )}
@@ -91,18 +104,21 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(prevMonth1.year, prevMonth1.month)}
-                            className="w-fit px-1"
+                            className={`w-fit ${linkPadding}`}
                         >
-                            {prevMonth1.year}/
-                            {prevMonth1.month.toString().padStart(2, "0")}
+                            {formatYearMonth(prevMonth1.year, prevMonth1.month)}
                         </PaginationLink>
                     </PaginationItem>
                 )}
 
                 {/* 現在の月 */}
                 <PaginationItem>
-                    <PaginationLink href="#" isActive className="w-fit px-1">
-                        {year}/{month.toString().padStart(2, "0")}
+                    <PaginationLink
+                        href="#"
+                        isActive
+                        className={`w-fit ${linkPadding}`}
+                    >
+                        {formatYearMonth(year, month)}
                     </PaginationLink>
                 </PaginationItem>
 
@@ -111,10 +127,9 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(nextMonth1.year, nextMonth1.month)}
-                            className="w-fit px-1"
+                            className={`w-fit ${linkPadding}`}
                         >
-                            {nextMonth1.year}/
-                            {nextMonth1.month.toString().padStart(2, "0")}
+                            {formatYearMonth(nextMonth1.year, nextMonth1.month)}
                         </PaginationLink>
                     </PaginationItem>
                 )}
@@ -124,20 +139,19 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                     <PaginationItem>
                         <PaginationLink
                             href={createUrl(nextMonth2.year, nextMonth2.month)}
-                            className="w-fit px-1"
+                            className={`w-fit ${linkPadding}`}
                         >
-                            {nextMonth2.year}/
-                            {nextMonth2.month.toString().padStart(2, "0")}
+                            {formatYearMonth(nextMonth2.year, nextMonth2.month)}
                         </PaginationLink>
                     </PaginationItem>
                 )}
 
                 {/* さらに後がある場合のEllipsis */}
-                {/* {hasMoreNext && (
+                {hasMoreNext && (
                     <PaginationItem>
                         <PaginationEllipsis />
                     </PaginationItem>
-                )} */}
+                )}
 
                 {/* Next button */}
                 <PaginationItem>
