@@ -686,6 +686,78 @@ ON CONFLICT (id) DO NOTHING;
 
 * **給与締め**: 期間作成 → 勤怠集計して `payroll_item` 更新 → period を `is_closed=true`（以後はRLSやアプリで編集禁止）
 
+---
+
+## 環境変数の設定
+
+`.env.local` ファイルを作成し、以下の環境変数を設定してください：
+
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your-supabase-anon-key
+
+# Database Configuration
+DATABASE_URL=your-database-url
+
+# Admin Bypass (税理士向け特別アクセス)
+# ADMIN_BYPASS_PASSWORD: URLに含まれる公開パスワード
+# ADMIN_BYPASS_SECRET: URLの署名生成に使用する秘密鍵（ランダムな長い文字列を推奨）
+ADMIN_BYPASS_PASSWORD=your-secure-password-here
+ADMIN_BYPASS_SECRET=your-very-long-random-secret-string-here
+```
+
+### 税理士向け特別アクセス機能
+
+税理士など外部の方が一時的に管理画面にアクセスする必要がある場合、管理者が一時アクセスURLを発行できます。
+
+#### URL発行方法
+
+1. 管理者として `/admin/generate-url` ページにアクセス（サイドバーの「税理士用URL生成」をクリック）
+2. 「URLを生成」ボタンをクリック
+3. 生成されたURLをコピーして税理士に共有
+
+#### セキュリティの仕組み
+
+* URLには以下のパラメータが含まれます：
+  * `p`: 公開パスワード（`ADMIN_BYPASS_PASSWORD`）
+  * `t`: 発行時のタイムスタンプ（Unix秒）
+  * `h`: SHA-256署名（`PASSWORD` + `SECRET` + `TIMESTAMP`）
+
+**生成されるURLの例:**
+
+```text
+https://your-domain.com/admin?p=TaxAccountant2024&t=1735689600&h=a3f5e8d9c2b1...
+```
+
+* サーバー側で以下を検証：
+  1. パスワードが正しいか（`p` が `ADMIN_BYPASS_PASSWORD` と一致）
+  2. 発行から7日以内か（現在時刻 - `t` ≤ 7日）
+  3. 署名が正しいか（`h` が再計算した値と一致、改ざん検知）
+* 検証成功後、残り有効期限分のCookieが設定されます（最大7日間）
+* URLのパラメータを改ざんすると署名が一致せず、アクセスが拒否されます
+
+#### アクセス範囲
+
+* アクセス可能: `/admin` ページ（管理者ダッシュボード・勤怠一覧）のみ
+* アクセス不可: `/admin/users` などのサブページ
+* サイドバーのナビゲーションは自動的に調整され、アクセスできないページのリンクは非表示になります
+* ログアウトボタンで税理士用のセッション（Cookie）をクリアできます
+
+#### 環境変数
+
+* `ADMIN_BYPASS_PASSWORD`: URLに含まれる公開パスワード（例: `TaxAccountant2024`）
+* `ADMIN_BYPASS_SECRET`: URL署名の秘密鍵（64文字以上のランダムな文字列を推奨）
+
+**SECRET の生成例:**
+
+```bash
+# Node.js を使用
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# OpenSSL を使用
+openssl rand -hex 32
+```
 
 ---
 
@@ -715,8 +787,8 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+* [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
