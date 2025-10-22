@@ -17,6 +17,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Info } from "lucide-react";
 import { getWorkingDaysCount } from "./util";
 import Decimal from "decimal.js";
 
@@ -187,10 +196,27 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
             {/* 全体の集計 */}
             <Card>
                 <CardHeader className="">
-                    <CardTitle className="text-lg">全体の集計</CardTitle>
-                    <CardDescription>
-                        ※「総支給額」は正しい計算ルール（端数処理など）に基づいて算出された値です。各勤務記録の暫定支給額の合計とは異なる場合があります。
-                    </CardDescription>
+                    <div className="flex items-center gap-2">
+                        <CardTitle className="text-lg">全体の集計</CardTitle>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <button
+                                    className="text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label="詳細情報"
+                                >
+                                    <Info className="h-4 w-4" />
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>総支給額について</DialogTitle>
+                                    <DialogDescription className="pt-2">
+                                        ※「総支給額」は正しい計算ルール（端数処理など）に基づいて算出された値です。各勤務記録の暫定支給額の合計とは異なる場合があります。
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </CardHeader>
                 <CardContent className="pt-0">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
