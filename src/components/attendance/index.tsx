@@ -56,7 +56,75 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     }, [isAdmin, userId, year, month]);
 
     if (isPending) {
-        return <Skeleton className="w-full h-10" />;
+        return (
+            <div className="container mx-auto space-y-6">
+                {/* ローディングインジケータ - 上部に配置 */}
+                <div className="flex items-center justify-center gap-2 py-4">
+                    <Spinner className="size-5 text-primary" />
+                    <span className="text-sm text-muted-foreground animate-pulse">
+                        読み込み中...
+                    </span>
+                </div>
+
+                {/* ページネーション想定のスケルトン */}
+                <div className="flex justify-center gap-2">
+                    <Skeleton className="h-9 w-24" />
+                    <Skeleton className="h-9 w-9" />
+                    <Skeleton className="h-9 w-9" />
+                    <Skeleton className="h-9 w-24" />
+                </div>
+
+                {/* 上部: 年月ナビゲーション想定のスケルトン */}
+                <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                        <Skeleton className="h-9 w-20 rounded-md" />
+                        <Skeleton className="h-9 w-20 rounded-md" />
+                    </div>
+                    <Skeleton className="h-9 w-40" />
+                </div>
+
+                {/* ダッシュボードカード想定のスケルトン */}
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-lg border">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="p-6 rounded-lg bg-card space-y-3"
+                        >
+                            <Skeleton className="h-4 w-28" />
+                            <Skeleton className="h-9 w-24" />
+                            <Skeleton className="h-3 w-32" />
+                        </div>
+                    ))}
+                </div>
+
+                {/* テーブル想定のスケルトン */}
+                <div className="rounded-lg border overflow-hidden bg-card">
+                    {/* テーブルヘッダー */}
+                    <div className="p-4 border-b bg-muted/50">
+                        <div className="flex gap-4">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-4 w-28" />
+                        </div>
+                    </div>
+                    {/* テーブル行 */}
+                    <div className="divide-y">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="p-4">
+                                <div className="flex gap-4 items-center">
+                                    <Skeleton className="h-5 w-24" />
+                                    <Skeleton className="h-5 w-32" />
+                                    <Skeleton className="h-5 w-20" />
+                                    <Skeleton className="h-5 w-28" />
+                                    <Skeleton className="h-5 w-16 ml-auto" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
     }
     return (
         <div className="container mx-auto">
