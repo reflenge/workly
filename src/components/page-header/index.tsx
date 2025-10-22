@@ -13,8 +13,11 @@ export function PageHeader() {
             <h1 className="text-2xl font-bold whitespace-nowrap px-2">
                 {title}
             </h1>
-            <div className="flex-1 min-w-0 overflow-clip whitespace-nowrap">
-                {description}
+            <div className="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+                <div className="inline-block animate-marquee">
+                    <span className="inline-block pr-20">{description}</span>
+                    <span className="inline-block pr-20">{description}</span>
+                </div>
             </div>
         </header>
     );

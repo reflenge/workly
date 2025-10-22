@@ -36,7 +36,7 @@ export function AppSidebarClient() {
                         <SidebarMenuButton asChild>
                             <Link href="/admin" prefetch={true}>
                                 <HomeIcon />
-                                <span>管理者トップ</span>
+                                <span>管理画面</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -47,7 +47,7 @@ export function AppSidebarClient() {
                                 <SidebarMenuButton asChild>
                                     <Link href="/admin/users" prefetch={true}>
                                         <UsersIcon />
-                                        <span>従業員作成・編集・給与</span>
+                                        <span>ユーザー管理</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -55,7 +55,7 @@ export function AppSidebarClient() {
                                 <SidebarMenuButton asChild>
                                     <Link href="/admin/cards" prefetch={true}>
                                         <IdCardIcon />
-                                        <span>カード作成・編集</span>
+                                        <span>カード管理</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -63,7 +63,7 @@ export function AppSidebarClient() {
                                 <SidebarMenuButton asChild>
                                     <Link href="/admin/links" prefetch={true}>
                                         <Link2Icon />
-                                        <span>カード紐づけ・管理</span>
+                                        <span>カード紐付け</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -74,7 +74,7 @@ export function AppSidebarClient() {
                                         prefetch={true}
                                     >
                                         <KeyIcon />
-                                        <span>バイパス用URL生成</span>
+                                        <span>URL生成</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

@@ -35,10 +35,12 @@ export default async function UserDetailPage({
     return (
         <div className="container mx-auto p-6">
             <PageHeaderMeta
-                title={`${user.lastName} ${user.firstName} の給与設定`}
-                description={`${user.isActive ? "有効" : "無効"} | ${
-                    user.isAdmin ? "管理者" : "一般ユーザー"
-                }`}
+                title="給与設定"
+                description={`${user.lastName} ${
+                    user.firstName
+                }の給与設定を管理します。時給・基本給の設定、適用開始日の指定、給与変更履歴の確認が可能です。現在のステータス：${
+                    user.isActive ? "有効" : "無効"
+                } | 権限：${user.isAdmin ? "管理者" : "一般ユーザー"}`}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
