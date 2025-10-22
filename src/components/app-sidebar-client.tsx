@@ -16,6 +16,7 @@ import {
     UsersIcon,
     IdCardIcon,
     Link2Icon,
+    KeyIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/components/providers/user-provider";
@@ -23,6 +24,8 @@ import { useUser } from "@/components/providers/user-provider";
 // Adminメニュー部分
 export function AppSidebarClient() {
     const user = useUser();
+    // バイパスユーザーかどうかを判定
+    const isBypassUser = user?.id === "bypass-user";
 
     return user?.isAdmin ? (
         <SidebarGroup>
@@ -33,34 +36,50 @@ export function AppSidebarClient() {
                         <SidebarMenuButton asChild>
                             <Link href="/admin" prefetch={true}>
                                 <HomeIcon />
-                                <span>管理者トップ</span>
+                                <span>管理画面</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/admin/users" prefetch={true}>
-                                <UsersIcon />
-                                <span>従業員作成・編集・給与</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/admin/cards" prefetch={true}>
-                                <IdCardIcon />
-                                <span>カード作成・編集</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link href="/admin/links" prefetch={true}>
-                                <Link2Icon />
-                                <span>カード紐づけ・管理</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    {/* バイパスユーザーの場合は以下のメニューを非表示 */}
+                    {!isBypassUser && (
+                        <>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/admin/users" prefetch={true}>
+                                        <UsersIcon />
+                                        <span>ユーザー管理</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/admin/cards" prefetch={true}>
+                                        <IdCardIcon />
+                                        <span>カード管理</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/admin/links" prefetch={true}>
+                                        <Link2Icon />
+                                        <span>カード紐付け</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link
+                                        href="/admin/generate-url"
+                                        prefetch={true}
+                                    >
+                                        <KeyIcon />
+                                        <span>URL生成</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </>
+                    )}
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>

@@ -91,8 +91,8 @@ export default async function Page() {
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
-                title="ユーザーとカードのリンク管理"
-                description="ユーザーとNFCカードの紐づけ・管理を行えます"
+                title="カード紐付け"
+                description="従業員とNFCカードの割り当て・解除を管理します。誰がいつどのカードを使用しているか、割り当て・解除の履歴、理由などを記録し、カード利用状況を完全にトレースできます。"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem users={dropdownUsers} cards={dropdownCards} />

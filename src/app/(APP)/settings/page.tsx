@@ -55,7 +55,7 @@ export default async function SettingsPage() {
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
                 title="設定"
-                description="アカウント情報とカード設定を管理できます"
+                description="プロフィール情報（氏名・連絡先など）の編集と、割り当てられたNFCカードの状態確認ができます。カードIDや有効性、割り当て日などの詳細情報を表示します。"
             />
             <div className="max-w-2xl mx-auto space-y-6">
                 {/* カード情報表示 */}

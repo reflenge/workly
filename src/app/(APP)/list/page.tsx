@@ -55,8 +55,8 @@ export default async function UsersCurrentStatusPage() {
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
-                title="ユーザー現在ステータス"
-                description="全ユーザーの進行中の勤怠状態"
+                title="ステータス一覧"
+                description="全従業員の現在の勤務状態（勤務中・休憩中・退勤済み）をリアルタイムで一覧表示します。各ユーザーの最新ステータスと開始時刻、アクティブ状態を確認できます。"
             />
 
             <div className="rounded-md border">

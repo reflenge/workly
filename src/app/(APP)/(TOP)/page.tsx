@@ -16,7 +16,7 @@ export default async function TopPage() {
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
                 title="打刻"
-                description="勤務開始・休憩・退勤の打刻を行えます"
+                description="勤務開始・休憩開始・休憩終了・退勤の打刻を行い、作業ログを記録できます。日々の勤務状況をリアルタイムで管理します。"
             />
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 {/* メインコンテンツエリア */}

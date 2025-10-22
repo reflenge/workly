@@ -17,12 +17,29 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Download, Info } from "lucide-react";
 import { getWorkingDaysCount } from "./util";
 import Decimal from "decimal.js";
+import { Button } from "../ui/button";
+import {
+    exportUserWorkTimeCSV,
+    exportUserDetailRecordsCSV,
+} from "./csv-export";
+import { formatTime, formatCurrency } from "./format-utils";
 
 interface DataDashboardProps {
     data: AttendanceRecordsResultType[];
     isAdmin: boolean;
+    year: number;
+    month: number;
 }
 
 interface SummaryData {
@@ -40,7 +57,7 @@ interface SummaryData {
     }[];
 }
 
-const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
+const DataDashboard = ({ data, isAdmin, year, month }: DataDashboardProps) => {
     // 勤務中（id:2）のレコードのみをフィルタリング
     const workData = useMemo(() => {
         return data
@@ -160,26 +177,19 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
         };
     }, [workData]);
 
-    // 時間（ミリ秒→「○時間△分」形式）で表示するためのユーティリティ関数
-    // 例: 8600000ms →「2時間23分」
-    const formatTime = (milliseconds: number): string => {
-        // ミリ秒から時間部分を算出
-        const hours = Math.floor(milliseconds / (1000 * 60 * 60));
-        // 残りミリ秒から分部分を算出
-        const minutes = Math.floor(
-            (milliseconds % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        return `${hours}時間${minutes}分`;
+    // CSV出力ハンドラー（全体）
+    const handleExportCSV = () => {
+        exportUserWorkTimeCSV(year, month, summaryData.userSummary);
     };
 
-    // 金額（数値→日本円表示）で表示するためのヘルパー関数
-    // 例: 41234 →「￥41,234」
-    const formatCurrency = (amount: number): string => {
-        return new Intl.NumberFormat("ja-JP", {
-            style: "currency",
-            currency: "JPY",
-            maximumFractionDigits: 0,
-        }).format(amount);
+    // CSV出力ハンドラー（個別ユーザーの詳細レコード）
+    const handleExportUserDetail = (userId: string, userName: string) => {
+        // 該当ユーザーのレコードをフィルタリング
+        const userRecords = workData.filter(
+            (record) => record.user.id === userId
+        );
+
+        exportUserDetailRecordsCSV(year, month, userName, userRecords);
     };
 
     return (
@@ -187,10 +197,32 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
             {/* 全体の集計 */}
             <Card>
                 <CardHeader className="">
-                    <CardTitle className="text-lg">全体の集計</CardTitle>
-                    <CardDescription>
-                        ※「総支給額」は正しい計算ルール（端数処理など）に基づいて算出された値です。各勤務記録の暫定支給額の合計とは異なる場合があります。
-                    </CardDescription>
+                    <div className="flex items-center gap-2">
+                        <CardTitle className="text-lg">
+                            全体の集計 {year}
+                            <span className="text-xs ">年</span>
+                            {month}
+                            <span className="text-xs ">月</span>
+                        </CardTitle>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <button
+                                    className="text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label="詳細情報"
+                                >
+                                    <Info className="h-4 w-4" />
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>総支給額について</DialogTitle>
+                                    <DialogDescription className="pt-2">
+                                        ※「総支給額」は正しい計算ルール（端数処理など）に基づいて算出された値です。各勤務記録の暫定支給額の合計とは異なる場合があります。
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </CardHeader>
                 <CardContent className="pt-0">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
@@ -204,7 +236,10 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
                         </div>
                         <div className="p-1 bg-muted/30 rounded-lg">
                             <div className="text-xl font-bold">
-                                {formatTime(summaryData.totalWorkingTimeMs)}
+                                {formatTime(summaryData.totalWorkingTimeMs, {
+                                    showSeconds: true,
+                                    showMilliseconds: false,
+                                })}
                             </div>
                             <div className="text-xs text-muted-foreground mt-1">
                                 総時間
@@ -212,7 +247,10 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
                         </div>
                         <div className="p-1 bg-muted/30 rounded-lg">
                             <div className="text-xl font-bold">
-                                {formatTime(summaryData.averageWorkingTimeMs)}
+                                {formatTime(summaryData.averageWorkingTimeMs, {
+                                    showSeconds: true,
+                                    showMilliseconds: false,
+                                })}
                             </div>
                             <div className="text-xs text-muted-foreground mt-1">
                                 平均時間
@@ -235,7 +273,19 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
                 <Card>
                     <CardHeader className="">
                         <CardTitle className="text-lg">
-                            ユーザー別の集計
+                            ユーザー別の集計 {year}
+                            <span className="text-xs">年</span>
+                            {month}
+                            <span className="text-xs">月</span>
+                            <div className="text-xs float-right ml-auto inline-block">
+                                <Button
+                                    variant="default"
+                                    onClick={handleExportCSV}
+                                >
+                                    勤務集計出力
+                                    <Download className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
@@ -256,6 +306,9 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
                                         <TableHead className="text-center">
                                             支給額
                                         </TableHead>
+                                        <TableHead className="text-center">
+                                            詳細
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -269,16 +322,41 @@ const DataDashboard = ({ data, isAdmin }: DataDashboardProps) => {
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {formatTime(
-                                                    user.totalWorkingTimeMs
+                                                    user.totalWorkingTimeMs,
+                                                    {
+                                                        showSeconds: true,
+                                                        showMilliseconds: false,
+                                                    }
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {formatTime(
-                                                    user.averageWorkingTimeMs
+                                                    user.averageWorkingTimeMs,
+                                                    {
+                                                        showSeconds: true,
+                                                        showMilliseconds: false,
+                                                    }
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-center font-medium">
                                                 {formatCurrency(user.totalPay)}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0"
+                                                    onClick={() =>
+                                                        handleExportUserDetail(
+                                                            user.userId,
+                                                            user.userName
+                                                        )
+                                                    }
+                                                >
+                                                    <span className="sr-only">
+                                                        Download CSV
+                                                    </span>
+                                                    <Download className="h-4 w-4" />
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
