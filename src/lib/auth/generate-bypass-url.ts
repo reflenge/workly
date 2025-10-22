@@ -20,7 +20,7 @@ async function generateHash(input: string): Promise<string> {
 }
 
 /**
- * 税理士向けの一時アクセスURLを生成
+ * バイパス用の一時アクセスURLを生成
  * @param baseUrl - ベースURL（例: https://your-domain.com）
  * @returns 生成されたURL
  */
@@ -81,7 +81,6 @@ export async function verifyBypassUrl(
     timestamp: string,
     hash: string
 ): Promise<{ valid: boolean; reason?: string }> {
-
     if (!ADMIN_BYPASS_PASSWORD || !ADMIN_BYPASS_SECRET) {
         return { valid: false, reason: "サーバー設定エラー" };
     }

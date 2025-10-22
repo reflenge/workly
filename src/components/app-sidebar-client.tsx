@@ -24,7 +24,7 @@ import { useUser } from "@/components/providers/user-provider";
 // Adminメニュー部分
 export function AppSidebarClient() {
     const user = useUser();
-    // 税理士ユーザー（バイパスユーザー）かどうかを判定
+    // バイパスユーザーかどうかを判定
     const isBypassUser = user?.id === "bypass-user";
 
     return user?.isAdmin ? (
@@ -40,7 +40,7 @@ export function AppSidebarClient() {
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    {/* 税理士ユーザー（バイパスユーザー）の場合は以下のメニューを非表示 */}
+                    {/* バイパスユーザーの場合は以下のメニューを非表示 */}
                     {!isBypassUser && (
                         <>
                             <SidebarMenuItem>
@@ -74,7 +74,7 @@ export function AppSidebarClient() {
                                         prefetch={true}
                                     >
                                         <KeyIcon />
-                                        <span>税理士用URL生成</span>
+                                        <span>バイパス用URL生成</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

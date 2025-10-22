@@ -9,7 +9,7 @@ export async function updateSession(request: NextRequest) {
         request,
     });
 
-    // 税理士向け: /admin (トップページのみ) で ?p=パスワード&t=タイムスタンプ&h=ハッシュ の場合、Cookieを設定してリダイレクト
+    // バイパス: /admin (トップページのみ) で ?p=パスワード&t=タイムスタンプ&h=ハッシュ の場合、Cookieを設定してリダイレクト
     if (request.nextUrl.pathname === "/admin") {
         const password = request.nextUrl.searchParams.get("p");
         const timestamp = request.nextUrl.searchParams.get("t");
@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
         }
     }
 
-    // 税理士向けバイパス: Cookieがある場合は /admin ページのみ認証をスキップ
+    // バイパス: Cookieがある場合は /admin ページのみ認証をスキップ
     const bypassToken = request.cookies.get(ADMIN_BYPASS_COOKIE)?.value;
     let hasBypassAccess = false;
 

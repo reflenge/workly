@@ -15,7 +15,7 @@ export function LogoutButton() {
 
     const logout = async () => {
         if (isBypassUser) {
-            // 税理士ユーザー（バイパスユーザー）の場合は、Cookieをクリア
+            // バイパスユーザーの場合は、Cookieをクリア
             await bypassLogout();
         } else {
             // 通常のユーザーの場合は、Supabaseからサインアウト

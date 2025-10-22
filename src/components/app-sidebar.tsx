@@ -22,13 +22,13 @@ import { requireUser } from "@/lib/auth/requireUser";
 
 export async function AppSidebar() {
     const user = await requireUser();
-    // 税理士ユーザー（バイパスユーザー）かどうかを判定
+    // バイパスユーザーかどうかを判定
     const isBypassUser = user.id === "bypass-user";
 
     return (
         <Sidebar variant="inset" collapsible="icon">
             <SidebarContent>
-                {/* 税理士ユーザーの場合は一般ユーザーメニューを非表示 */}
+                {/* バイパスユーザーの場合は一般ユーザーメニューを非表示 */}
                 {!isBypassUser && (
                     <SidebarGroup>
                         <SidebarGroupLabel>User</SidebarGroupLabel>

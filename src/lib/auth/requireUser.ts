@@ -37,7 +37,7 @@ const toPublicUser = (u: {
 
 // 同一リクエスト内での重複DBアクセスを避ける
 export const requireUser = cache(async (): Promise<PublicUser> => {
-    // 税理士向けバイパス: Cookieがある場合はダミーの管理者ユーザーを返す
+    // バイパス: Cookieがある場合はダミーの管理者ユーザーを返す
     const cookieStore = await cookies();
     const bypassToken = cookieStore.get(ADMIN_BYPASS_COOKIE)?.value;
 
@@ -53,8 +53,8 @@ export const requireUser = cache(async (): Promise<PublicUser> => {
                 return {
                     id: "bypass-user",
                     authId: "bypass-auth-id",
-                    firstName: "税理士",
-                    lastName: "ユーザー",
+                    firstName: "バイパス",
+                    lastName: "ユーザ",
                     iconUrl: null,
                     isAdmin: true,
                 };

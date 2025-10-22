@@ -26,7 +26,7 @@ export function GenerateBypassUrlButton() {
                 const result = await generateBypassUrl(baseUrl);
                 setGeneratedUrl(result.url);
                 setExpiresAt(result.expiresAt);
-                toast.success("税理士用URLを生成しました");
+                toast.success("バイパス用URLを生成しました");
             } catch (error) {
                 toast.error("URL生成に失敗しました", {
                     description:
@@ -52,10 +52,10 @@ export function GenerateBypassUrlButton() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <KeyIcon className="size-5" />
-                    税理士用アクセスURL生成
+                    バイパス用アクセスURL生成
                 </CardTitle>
                 <CardDescription>
-                    税理士など外部の方が一時的に管理画面にアクセスするためのURLを生成します
+                    外部の方が一時的に管理画面にアクセスするためのURLを生成します
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -109,7 +109,9 @@ export function GenerateBypassUrlButton() {
                                 <strong>注意事項:</strong>
                             </p>
                             <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-blue-700">
-                                <li>このURLは税理士の方に共有してください</li>
+                                <li>
+                                    このURLは外部の方(税理士等)に共有してください
+                                </li>
                                 <li>
                                     アクセスできるのは管理者トップページ（勤怠一覧）のみです
                                 </li>
