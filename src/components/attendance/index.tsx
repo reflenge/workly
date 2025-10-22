@@ -129,7 +129,7 @@ const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
     return (
         <div className="container mx-auto">
             <YearMonthPagination />
-            <DataDashboard isAdmin={isAdmin} data={attendanceRecords} />
+            <DataDashboard isAdmin={isAdmin} data={attendanceRecords} year={year} month={month} />
             <DataTable
                 isAdmin={isAdmin}
                 columns={columns}
