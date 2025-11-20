@@ -8,7 +8,6 @@ import { AttendanceEditList } from "./_components/attendance-edit-list";
 export default async function AttendanceEditListPage() {
     const user = await requireUser();
 
-    // 直近のログをいくつか取得して表示する（デバッグ・利便性のため）
     const recentLogs = await db
         .select({
             id: attendanceLogs.id,
@@ -25,7 +24,7 @@ export default async function AttendanceEditListPage() {
         )
         .where(eq(attendanceLogs.userId, user.id))
         .orderBy(desc(attendanceLogs.startedAt))
-        .limit(5);
+        .limit(6);
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">

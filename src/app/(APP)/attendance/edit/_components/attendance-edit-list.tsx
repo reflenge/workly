@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MessageSquareText } from "lucide-react";
+import { MessageSquareText, Info } from "lucide-react";
 
 export interface AttendanceLog {
     id: string;
@@ -119,10 +119,21 @@ export function AttendanceEditList({ logs }: AttendanceEditListProps) {
 
     return (
         <>
-            <div className="mb-4 text-sm text-muted-foreground space-y-1">
-                <p>・最新の5件まで編集可</p>
-                <p>・時間を押下して編集する</p>
-                <p>・現在のレコードは修正不可</p>
+            <div className="mb-6 rounded-md bg-muted/50 p-4">
+                <div className="flex items-start gap-3">
+                    <Info className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                        <p className="font-medium text-foreground">編集時の注意点</p>
+                        <ul className="list-disc pl-4 space-y-1">
+                            <li>最新の5件まで編集可能です</li>
+                            <li>時間をクリックして編集してください</li>
+                            <li>現在のレコードは修正できません</li>
+                        </ul>
+                        <p className="text-xs pt-1">
+                            ※ 前の月のレコードを編集する場合は、管理者に連絡して許可を得てから実行してください
+                        </p>
+                    </div>
+                </div>
             </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
@@ -217,21 +228,6 @@ export function AttendanceEditList({ logs }: AttendanceEditListProps) {
                                     required
                                 />
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="note">メモ</Label>
-                                <Textarea
-                                    id="note"
-                                    value={note}
-                                    onChange={(e) => setNote(e.target.value)}
-                                    placeholder="メモを入力..."
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="status">状態</Label>
-                                <div className="flex items-center h-10 px-3 border rounded-md bg-muted text-muted-foreground">
-                                    {selectedLog.statusLabel}
-                                </div>
-                            </div>
                             <div className="flex items-center space-x-2 py-2">
                                 <Checkbox
                                     id="adjustAdjacent"
@@ -247,6 +243,29 @@ export function AttendanceEditList({ logs }: AttendanceEditListProps) {
                                     前後のレコードも自動調整する
                                 </Label>
                             </div>
+                            {(() => {
+                                const current = new Date();
+                                const logDate = new Date(selectedLog.startedAt);
+                                // UTC timestamp + 9 hours to get JST time components via getUTC* methods
+                                const currentJst = new Date(current.getTime() + 9 * 60 * 60 * 1000);
+                                const logJst = new Date(logDate.getTime() + 9 * 60 * 60 * 1000);
+
+                                const isDifferentMonth =
+                                    currentJst.getUTCFullYear() !== logJst.getUTCFullYear() ||
+                                    currentJst.getUTCMonth() !== logJst.getUTCMonth();
+
+                                if (isDifferentMonth) {
+                                    return (
+                                        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                                            <p className="font-medium">
+                                                注意: このレコードは現在の月と異なります。
+                                            </p>
+                                            <p>管理者に連絡して許可を得ましたか？</p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
                             <div className="grid gap-2">
                                 <Label htmlFor="startedAt">開始時刻</Label>
                                 <Input
