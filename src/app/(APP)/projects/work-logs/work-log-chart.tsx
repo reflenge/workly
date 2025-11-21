@@ -11,7 +11,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
-type ChartData = {
+export type ChartData = {
     name: string; // Project Name
     [key: string]: string | number; // User Name -> Duration
 };
