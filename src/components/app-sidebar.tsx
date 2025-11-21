@@ -73,6 +73,15 @@ export async function AppSidebar() {
                                             <span>プロジェクト</span>
                                         </Link>
                                     </SidebarMenuButton>
+                                    <SidebarMenuSub>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton asChild>
+                                                <Link href="/projects/work-logs">
+                                                    <span>作業ログ</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    </SidebarMenuSub>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>
