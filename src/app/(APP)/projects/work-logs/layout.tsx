@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { attendanceLogs, projects, users, workLogs } from "@/db/schema";
 import { requireUser } from "@/lib/auth/requireUser";
 import { eq } from "drizzle-orm";
-import { WorkLogChart } from "./work-log-chart";
+import { WorkLogChart, ChartData } from "./work-log-chart";
 
 export default async function WorkLogsLayout({
     children,
@@ -79,7 +79,7 @@ export default async function WorkLogsLayout({
     });
 
     const chartData = Array.from(projectMap.values()).map((p) => {
-        const entry: any = { name: p.name };
+        const entry: ChartData = { name: p.name };
         p.users.forEach((duration, user) => {
             entry[user] = Math.round(duration * 100) / 100; // Round to 2 decimals
         });
