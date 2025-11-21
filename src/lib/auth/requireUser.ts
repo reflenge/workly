@@ -10,15 +10,30 @@ import { cookies } from "next/headers";
 const ADMIN_BYPASS_COOKIE = "admin_bypass_token";
 
 // アプリ内でクライアントへ渡してOKな型（必要に応じて調整）
+/**
+ * アプリケーション内で公開されるユーザー情報の型定義
+ * クライアントサイドで使用されることを想定しています
+ */
 export type PublicUser = {
+    /** ユーザーの一意なID (UUID) */
     id: string;
+    /** 認証プロバイダー(Supabase)のID */
     authId: string;
+    /** 名 */
     firstName: string;
+    /** 姓 */
     lastName: string;
+    /** アイコン画像のURL (nullの場合はデフォルトアイコンを表示) */
     iconUrl: string | null;
+    /** 管理者権限を持っているかどうか */
     isAdmin: boolean;
 };
 
+/**
+ * 内部ユーザー型を公開ユーザー型に変換するヘルパー関数
+ * @param u データベースから取得したユーザー情報
+ * @returns クライアント向けに整形されたユーザー情報
+ */
 const toPublicUser = (u: {
     id: string;
     authId: string;
@@ -35,7 +50,19 @@ const toPublicUser = (u: {
     isAdmin: u.isAdmin,
 });
 
-// 同一リクエスト内での重複DBアクセスを避ける
+/**
+ * 認証済みユーザーを取得するサーバーサイド関数
+ * ページやAPIルートの先頭で呼び出すことで、認証ガードとして機能します。
+ *
+ * @remarks
+ * - Supabase Authを使用して現在のユーザーを取得します
+ * - ユーザーが未認証の場合はログインページへリダイレクトします
+ * - 特定のCookieが存在する場合は、管理者権限を持つバイパスユーザーを返します（開発・テスト用）
+ * - Reactの`cache`機能により、同一リクエスト内での重複実行を防ぎます
+ *
+ * @returns 認証済みユーザーの公開情報 {@link PublicUser}
+ * @throws 未認証またはユーザーが存在しない場合は `/auth/login` へリダイレクトするため、戻り値は返りません
+ */
 export const requireUser = cache(async (): Promise<PublicUser> => {
     // バイパス: Cookieがある場合はダミーの管理者ユーザーを返す
     const cookieStore = await cookies();

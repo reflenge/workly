@@ -1,0 +1,782 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>workly</title><meta name="description" content="Documentation for workly"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">workly</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>workly</h1></div><div class="tsd-panel tsd-typography"><h1 id="workly-（work-friendly）" class="tsd-anchor-link">Workly （Work + Friendly）<a href="#workly-（work-friendly）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><h1 id="reflenge-勤怠管理" class="tsd-anchor-link">Reflenge 勤怠管理+<a href="#reflenge-勤怠管理" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><div style="display: flex; justify-content: center;">
+  <img src="logo.png" width="200px" />
+</div>
+<h2 id="1-アプリケーションの概要" class="tsd-anchor-link">1. アプリケーションの概要<a href="#1-アプリケーションの概要" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><strong>コンセプト</strong>: 自由な働き方を採用するベンチャー企業向けの、<strong>シンプルで本質的な勤怠・業務管理ツール</strong>。</li>
+<li><strong>目的</strong>: 「いつ、誰が、どれくらい働き、何をしたか」を正確に記録し、透明性を確保することで、公正な評価とスムーズな給与計算を実現する。</li>
+<li><strong>ターゲットユーザー</strong>:
+<ul>
+<li><strong>一般従業員</strong>: 好きな時間に働く時給・月給制のメンバー。</li>
+<li><strong>管理者</strong>: メンバーの稼働状況と業務内容を把握し、給与計算を行う担当者。</li>
+</ul>
+</li>
+<li><strong>システム概要</strong>: Reflenge 勤怠管理+は、従来の勤怠管理システムを超えた「勤怠管理+」システムです。開発メンバーの技術力向上、組織のノウハウ蓄積、正確な工数見積もりを実現します。</li>
+</ul>
+<h3 id="実現したいこと" class="tsd-anchor-link">実現したいこと<a href="#実現したいこと" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ol>
+<li>シンプルな勤怠管理
+<ol>
+<li>出退勤を記録する</li>
+<li>休憩開始・休憩終了を記録する</li>
+<li>色んな方法で記録できる</li>
+<li>その給与計算</li>
+</ol>
+</li>
+<li>プロジェクトの記録
+<ol>
+<li>その勤怠記録のときにどのプロジェクトで何をやったかを記録することだけ実現できれば良い</li>
+<li>誰がなんのプロジェクトにjoinして...とか複雑なものは不要</li>
+</ol>
+</li>
+</ol>
+<h2 id="2-要件定義" class="tsd-anchor-link">2. 要件定義<a href="#2-要件定義" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><h2 id="勤怠（attendance-logs）" class="tsd-anchor-link">勤怠（Attendance Logs）<a href="#勤怠（attendance-logs）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User:自分</th>
+<th>User:他人</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（CSV/PDF等で勤務時間をまとめる）</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（自分の全ログ、他人は状態のみ）</td>
+<td>✅</td>
+<td>✅ ※状態のみ</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（出勤・退勤・休憩打刻）</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（打刻時刻や内容の変更）</td>
+<td>✅ ※作成から72h以内</td>
+<td>❌</td>
+<td>✅ ※期限なし</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（誤登録を消す）</td>
+<td>✅ ※作成から72h以内</td>
+<td>❌</td>
+<td>✅ ※期限なし</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（削除した勤怠を戻す）</td>
+<td>✅ ※作成から72h以内</td>
+<td>❌</td>
+<td>✅ ※期限なし</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="プロジェクト（projects）" class="tsd-anchor-link">プロジェクト（Projects）<a href="#プロジェクト（projects）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="プロジェクト自体" class="tsd-anchor-link">プロジェクト自体<a href="#プロジェクト自体" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User:自分</th>
+<th>User:他人</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（プロジェクト単位の時間/工数）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（プロジェクト情報を見る）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（新しいプロジェクトを立てる）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（プロジェクト名や説明を変更）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（不要になったプロジェクトを無効化）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（削除済みプロジェクトを再有効化）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="記録（作業ログ）" class="tsd-anchor-link">記録（作業ログ）<a href="#記録（作業ログ）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User:自分</th>
+<th>User:他人</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（各人の作業内容をまとめる）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（作業ログを読む）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（作業記録を追加）</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（作業内容の変更）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（作業ログを無効化）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（削除済み作業ログを戻す）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="給与（payroll）" class="tsd-anchor-link">給与（Payroll）<a href="#給与（payroll）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User:自分</th>
+<th>User:他人</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（給与明細、月次レポート）</td>
+<td>✅（自分のみ）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（給与明細を見る）</td>
+<td>✅（自分のみ）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（給与レコード登録）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（給与額や控除の編集）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（誤登録を無効化）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（削除済み給与を戻す）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="ユーザ（users）" class="tsd-anchor-link">ユーザ（Users）<a href="#ユーザ（users）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User:自分</th>
+<th>User:他人</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（ユーザ一覧や在籍リスト）</td>
+<td>✅（自分関連）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（プロフィールや状態を参照）</td>
+<td>✅</td>
+<td>✅（公開範囲のみ）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（ユーザーアカウント登録）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（自分のプロフィール編集）</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（アカウント停止）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（停止アカウント再有効化）</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="システム-カード（nfc-cards）" class="tsd-anchor-link">システム / カード（NFC Cards）<a href="#システム-カード（nfc-cards）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><table>
+<thead>
+<tr>
+<th>アクション</th>
+<th>説明</th>
+<th>User</th>
+<th>Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>report</td>
+<td>集計・出力（カード発行状況一覧）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>read</td>
+<td>閲覧（カードのUIDや割当状況）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>create</td>
+<td>新規作成（カードを登録）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>update</td>
+<td>修正（カードの再割当や状態変更）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>論理削除（カード無効化）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>restore</td>
+<td>復元（無効化カードを再有効化）</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="勤怠記録フロー" class="tsd-anchor-link">勤怠記録フロー<a href="#勤怠記録フロー" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="mermaid">stateDiagram
+  direction TB
+
+  state "勤務外" as Off
+  state "勤務中" as Working
+  state "休憩中" as Break
+
+  %% --- 勤務外 → 勤務中 ---
+  Off --> Working: UI 出勤ボタン<br>Discord /in<br>NFC端末 カード
+
+  %% --- 勤務中 → 勤務外 ---
+  Working --> Off: UI 退勤ボタン<br>Discord /out<br>NFC端末 カード
+
+  %% --- 勤務中 → 休憩中 ---
+  Working --> Break: UI 休憩開始ボタン<br>Discord /break_in<br>NFC端末 ボタン + カード
+
+  %% --- 休憩中 → 勤務中 ---
+  Break --> Working: UI 休憩終了ボタン<br>Discord /break_out<br>NFC端末 カード
+
+  %% --- 休憩中 → 勤務外 ---
+  Break --> Off: UI 退勤ボタン<br>Discord /out<br>NFC端末 ボタン + カード
+
+</code><button type="button">Copy</button></pre>
+
+<h3 id="user-sign-up" class="tsd-anchor-link">User Sign Up<a href="#user-sign-up" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="mermaid">sequenceDiagram
+  participant 管理者
+  participant ユーザー
+  participant システム
+
+  管理者->>システム: アカウント作成 (DBに保存)
+  管理者->>システム: NFC UIDを登録 (DBに保存)
+  管理者->>ユーザー: NFCカードを配布
+
+  ユーザー->>システム: Googleでログイン (Auth)
+  ユーザー->>システム: NFC UIDを入力 (初期セットアップ)
+  システム->>システム: GoogleユーザとDBユーザを突合 (NFC UIDで照合)
+  システム-->>ユーザー: アカウント紐付け完了
+</code><button type="button">Copy</button></pre>
+
+<h2 id="db設計" class="tsd-anchor-link">DB設計<a href="#db設計" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="mermaid">erDiagram
+  direction TB
+
+  %% ===== テーブル定義 =====
+  User {
+    uuid id PK "ユーザーID // PK: 全システムの基準キー"
+    uuid auth_id "Supabase Auth ID // Supabase認証と紐付けるため"
+    boolean is_admin "管理者フラグ // 管理者権限を持つかどうか"
+
+    string last_name "名字 // 表示や検索用。給与明細などに必要"
+    string first_name "名前 // 同上"
+    string last_name_kana "みょうじ // フリガナ検索・帳票用"
+    string first_name_kana "なまえ // 同上"
+    string bio "自己紹介 // 任意。Slack連携やプロフィールに使う"
+    string icon_url "アイコン画像URL // UI用"
+
+    boolean is_active "有効フラグ // 退職・休職でfalseにしてアカウント停止"
+    %% ▲ current_card_id は削除。CardAssignmentから導出する（単一情報源の原則）
+
+    timestamptz setuped_at "セットアップ日時(UTC) // 初回Googleログイン完了タイミング"
+    timestamptz created_at "作成日時(UTC) // 管理者がアカウントを作った時刻"
+    timestamptz updated_at "更新日時(UTC) // 自動更新トリガ推奨"
+  }
+
+  Card {
+    uuid id PK "カードID（システム内の識別子） // DB管理用のキー"
+    string uid "物理NFC UID // 実カードの固有ID。不変（UNIQUE推奨）"
+
+    boolean is_active "有効フラグ // 利用可能かどうか（在庫/回収でfalse）"
+    string inactive_reason "無効理由 // 紛失・破損・回収など。空なら現役"
+
+    timestamptz created_at "作成日時(UTC) // 発行・登録時刻"
+    timestamptz updated_at "更新日時(UTC) // 更新履歴"
+  }
+
+  CardAssignment {
+    uuid id PK "割当履歴ID"
+    uuid user_id FK "誰に渡したか // User.id"
+    uuid card_id FK "どのカードか // Card.id"
+    timestamptz assigned_at "割当開始(UTC)"
+    timestamptz unassigned_at "割当終了(UTC) // NULL=割当中"
+    string reason "理由 // replace/return/lost等（任意）"
+    uuid assigned_by_user_id "割当実施者（任意）"
+    uuid unassigned_by_user_id "解除実施者（任意）"
+    timestamptz created_at "作成(UTC)"
+    %% NOTE: DBレベルで (card_id, unassigned_at) にUNIQUE制約を検討（unassigned_atがNULLのレコードはcard_id毎に1つ）
+  }
+
+  AttendanceLog {
+    uuid id PK "勤怠区間ID // 1レコード=1つの連続状態（区間ログ）"
+    uuid user_id FK "ユーザーID // 誰の勤怠か"
+    smallint status_id FK "勤怠状態 // AttendanceStatus.id を参照"
+    timestamptz started_at "開始時刻(UTC) // in / break_in で確定"
+    timestamptz ended_at "終了時刻(UTC, NULL可) // out / break_out で確定。未確定はNULL"
+    smallint started_source FK "開始の起点 // AttendanceLogSource.id を参照"
+    smallint ended_source FK "終了の起点 // AttendanceLogSource.id を参照 (NULL可)"
+    text note "メモ(任意) // 付随情報や一時メモなど"
+    timestamptz created_at "作成時刻(UTC) // 最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 最小監査"
+  }
+
+  AttendanceStatus {
+    smallint id PK "ステータスID // 固定シード（enum代替）。1,2,3..."
+    string code "機械用コード(UNIQUE推奨) // 'OFF','WORKING','BREAK' 等。変更しない"
+    string label "表示名 // '勤務外','勤務中','休憩中' 等UI表示"
+    boolean is_active "有効フラグ // 将来の追加/廃止に備えて残す"
+    integer sort_no "表示順 // 一覧の並びを安定させるため"
+    timestamptz created_at "作成時刻(UTC) // 運用トラブル時の最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 同上"
+  }
+
+  AttendanceLogSource {
+    smallint id PK "起点ID // 1,2,3,4"
+    string code "機械用コード(UNIQUE推奨) // 'ADMIN','WEB','DISCORD','NFC' 等。変更しない"
+    string label "表示名 // 'ADMIN','WEB','DISCORD','NFC' 等UI表示"
+    boolean is_active "有効フラグ // 将来の追加/廃止に備えて残す"
+    integer sort_no "表示順 // 一覧の並びを安定させるため"
+    timestamptz created_at "作成時刻(UTC) // 最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 同上"
+  }
+
+  WorkLog {
+    uuid id PK "作業記録ID // 主キー（1レコード=1つの作業記述）"
+    uuid user_id FK "ユーザーID // 誰の作業か（作成者）"
+    uuid attendance_log_id FK "勤怠区間ID // どの勤怠区間に属すか"
+    uuid project_id FK "プロジェクトID // どのPJで作業したか"
+    text content "作業内容 // 何をしたか（自由記述）"
+    timestamptz created_at "作成時刻(UTC) // 最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 最小監査"
+  }
+
+  Project {
+    uuid id PK "プロジェクトID // 主キー"
+    string name "プロジェクト名 // UI表示・検索用"
+    text description "説明 // 任意。目的やメモ"
+    boolean is_active "有効フラグ // アーカイブ/休止= false"
+    string inactive_reason "無効理由 // 'アーカイブ'等。空なら現役"
+    timestamptz created_at "作成時刻(UTC) // 最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 最小監査"
+  }
+
+  UserCompensation {
+    uuid id PK "給与設定ID // 人ごとのレート設定履歴"
+    uuid user_id FK "ユーザーID"
+    boolean is_hourly "時給フラグ // 時給で支給するか"
+    boolean is_monthly "月給フラグ // 月給で支給するか（併用可想定なら両方trueも可）"
+    numeric hourly_rate "時給（JPYなど、is_hourly=trueの場合のみ）"
+    numeric monthly_salary "月給（JPYなど、is_monthly=trueの場合のみ）"
+    string currency "通貨 // 'JPY' 等"
+    timestamptz effective_from "適用開始(UTC)"
+    timestamptz effective_to "適用終了(UTC, NULL可)"
+    boolean is_active "現行設定フラグ（任意）"
+    timestamptz created_at "作成時刻(UTC)"
+    timestamptz updated_at "更新時刻(UTC)"
+  }
+
+  PayrollPeriod {
+    uuid id PK "給与期間ID（締め） // 月次などの締め単位"
+    date start_date "開始日（含む）"
+    date end_date "終了日（含む）"
+    boolean is_closed "締め済 // trueで以後編集不可"
+    timestamptz closed_at "締め日時(UTC)"
+    uuid closed_by_user_id "締め実行者（任意）"
+    timestamptz created_at "作成時刻(UTC)"
+    timestamptz updated_at "更新時刻(UTC)"
+  }
+
+  PayrollItem {
+    uuid id PK "給与明細ID // 期間×ユーザー"
+    uuid period_id FK "PayrollPeriod.id"
+    uuid user_id FK "User.id"
+
+    %% ▼ 月給・時給両対応できるよう拡張
+    numeric base_monthly_salary "基本月給（スナップショット）"
+    numeric hourly_rate "時給（スナップショット）"
+    integer worked_minutes "労働分（休憩を除く集計結果）"
+    numeric hourly_pay "時給計算での支給額 // (worked_minutes/60 * hourly_rate)"
+
+    numeric total_allowance "各種手当（合計）"
+    numeric total_deduction "各種控除（合計）"
+
+    numeric gross_pay "総支給額 // (base_monthly_salary + hourly_pay + total_allowance)"
+    numeric net_pay "差引支給額 // (gross_pay - total_deduction)"
+    string currency "通貨 // 'JPY' 等"
+
+    boolean is_locked "個別ロック（任意）"
+    timestamptz created_at "作成時刻(UTC)"
+    timestamptz updated_at "更新時刻(UTC)"
+
+    %% NOTE: DBレベルで (period_id, user_id) にUNIQUE制約をかけること
+  }
+
+  %% ===== リレーション =====
+  %% User ||--|| Card : "current_card_id" ← 削除
+  User ||--o{ CardAssignment : "カード割当履歴（再利用可）"
+  Card ||--o{ CardAssignment : ""
+
+  User ||--o{ AttendanceLog : "user_id で従業員→勤怠区間"
+  AttendanceStatus ||--o{ AttendanceLog : "status_id で区間の状態を指す"
+  AttendanceLogSource ||--o{ AttendanceLog : "started_source で起点を指す"
+  AttendanceLogSource ||--o{ AttendanceLog : "ended_source で起点を指す"
+
+  User ||--o{ WorkLog : "user_id（誰が書いたか）"
+  Project ||--o{ WorkLog : "project_id（どのPJか）"
+  AttendanceLog ||--o{ WorkLog : "attendance_log_id（どの区間に紐づくか）"
+
+  User ||--o{ UserCompensation : "時給/月給レートの履歴"
+  PayrollPeriod ||--o{ PayrollItem : "期間×ユーザーの確定明細"
+  User ||--o{ PayrollItem : "user_id"
+
+</code><button type="button">Copy</button></pre>
+
+<h2 id="データベース設計書" class="tsd-anchor-link">データベース設計書<a href="#データベース設計書" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>スキーマ：<code>schema.ts</code>（<code>pgTable</code> 等で主要制約を表現）</li>
+<li>追加制約/トリガ/ビュー：SQLマイグレーション（部分ユニーク・EXCLUDE・updated_at）</li>
+</ul>
+<blockquote>
+<p>前提: <code>drizzle-orm</code>, <code>drizzle-kit</code>, <code>pg</code> を使用。DBはPostgreSQL（Supabase含む）。</p>
+</blockquote>
+<hr>
+<h1 id="1-（drizzleスキーマ）" class="tsd-anchor-link">1) <code>schema.ts</code>（Drizzleスキーマ）<a href="#1-（drizzleスキーマ）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><pre><code class="ts"><span class="hl-0">// src/db/schema.ts</span><br/><span class="hl-1">import</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-3">pgTable</span><span class="hl-2">, </span><span class="hl-3">uuid</span><span class="hl-2">, </span><span class="hl-3">boolean</span><span class="hl-2">, </span><span class="hl-3">text</span><span class="hl-2">, </span><span class="hl-3">varchar</span><span class="hl-2">, </span><span class="hl-3">smallint</span><span class="hl-2">, </span><span class="hl-3">integer</span><span class="hl-2">, </span><span class="hl-3">timestamp</span><span class="hl-2">, </span><span class="hl-3">numeric</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-3">primaryKey</span><span class="hl-2">, </span><span class="hl-3">uniqueIndex</span><span class="hl-2">, </span><span class="hl-3">index</span><span class="hl-2">, </span><span class="hl-3">foreignKey</span><br/><span class="hl-2">} </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&quot;drizzle-orm/pg-core&quot;</span><span class="hl-2">;</span><br/><span class="hl-1">import</span><span class="hl-2"> { </span><span class="hl-3">sql</span><span class="hl-2"> } </span><span class="hl-1">from</span><span class="hl-2"> </span><span class="hl-4">&quot;drizzle-orm&quot;</span><span class="hl-2">;</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">users</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;user&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">authId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;auth_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">isAdmin:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_admin&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">false</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">lastName:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;last_name&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">firstName:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;first_name&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">lastNameKana:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;last_name_kana&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">firstNameKana:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;first_name_kana&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">bio:</span><span class="hl-2"> </span><span class="hl-7">text</span><span class="hl-2">(</span><span class="hl-4">&quot;bio&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">iconUrl:</span><span class="hl-2"> </span><span class="hl-7">text</span><span class="hl-2">(</span><span class="hl-4">&quot;icon_url&quot;</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">setupedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;setuped_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">authIdx:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_user_auth&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">authId</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">cards</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;card&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">uid:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;uid&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(), </span><span class="hl-0">// 物理UID</span><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">inactiveReason:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;inactive_reason&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">uidUnique:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_card_uid&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">uid</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">cardAssignments</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;card_assignment&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">userId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;user_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">users</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">cardId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;card_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">cards</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">assignedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;assigned_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">unassignedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;unassigned_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }), </span><span class="hl-0">// NULL=割当中</span><br/><span class="hl-2">  </span><span class="hl-3">reason:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;reason&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">assignedByUserId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;assigned_by_user_id&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">unassignedByUserId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;unassigned_by_user_id&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-0">// 部分ユニークは Drizzle の .where(sql``) で作れる（Postgres）</span><br/><span class="hl-2">  </span><span class="hl-3">uniqActivePerCard:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_active_assignment_per_card&quot;</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">cardId</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">where</span><span class="hl-2">(</span><span class="hl-7">sql</span><span class="hl-4">`&quot;unassigned_at&quot; IS NULL`</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">uniqActivePerUser:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_active_assignment_per_user&quot;</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">where</span><span class="hl-2">(</span><span class="hl-7">sql</span><span class="hl-4">`&quot;unassigned_at&quot; IS NULL`</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">idxUser:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_ca_user&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">idxCard:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_ca_card&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">cardId</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">attendanceStatus</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;attendance_status&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">smallint</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">(),                   </span><span class="hl-0">// 固定シード</span><br/><span class="hl-2">  </span><span class="hl-3">code:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;code&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">64</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),   </span><span class="hl-0">// &#39;OFF&#39;,&#39;WORKING&#39;,&#39;BREAK&#39;</span><br/><span class="hl-2">  </span><span class="hl-3">label:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;label&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">64</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">sortNo:</span><span class="hl-2"> </span><span class="hl-7">integer</span><span class="hl-2">(</span><span class="hl-4">&quot;sort_no&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-8">0</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">codeUnique:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_att_status_code&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">code</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">attendanceLogSource</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;attendance_log_source&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">smallint</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">(),                   </span><span class="hl-0">// 固定シード 1.. WEB/DISCORD/NFC/ADMIN</span><br/><span class="hl-2">  </span><span class="hl-3">label:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;label&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">64</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">sortNo:</span><span class="hl-2"> </span><span class="hl-7">integer</span><span class="hl-2">(</span><span class="hl-4">&quot;sort_no&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-8">0</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">});</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">attendanceLogs</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;attendance_log&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">userId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;user_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">users</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">statusId:</span><span class="hl-2"> </span><span class="hl-7">smallint</span><span class="hl-2">(</span><span class="hl-4">&quot;status_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">attendanceStatus</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">startedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;started_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">endedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;ended_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }), </span><span class="hl-0">// 未終了=Null</span><br/><span class="hl-2">  </span><span class="hl-3">startedSource:</span><span class="hl-2"> </span><span class="hl-7">smallint</span><span class="hl-2">(</span><span class="hl-4">&quot;started_source&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">attendanceLogSource</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">endedSource:</span><span class="hl-2"> </span><span class="hl-7">smallint</span><span class="hl-2">(</span><span class="hl-4">&quot;ended_source&quot;</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">attendanceLogSource</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">note:</span><span class="hl-2"> </span><span class="hl-7">text</span><span class="hl-2">(</span><span class="hl-4">&quot;note&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-0">// “未終了1本”の部分ユニーク</span><br/><span class="hl-2">  </span><span class="hl-3">uniqActiveAttendancePerUser:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_active_attendance_per_user&quot;</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">)</span><br/><span class="hl-2">    .</span><span class="hl-7">where</span><span class="hl-2">(</span><span class="hl-7">sql</span><span class="hl-4">`&quot;ended_at&quot; IS NULL`</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-0">// 妥当性チェック（Drizzle: check constraint は raw SQL で追加が無難）</span><br/><span class="hl-2">  </span><span class="hl-3">idxUserStarted:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_att_user_started&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">startedAt</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">projects</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;project&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">name:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;name&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">description:</span><span class="hl-2"> </span><span class="hl-7">text</span><span class="hl-2">(</span><span class="hl-4">&quot;description&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">inactiveReason:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;inactive_reason&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">191</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">idxActiveName:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_project_active_name&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">isActive</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">name</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">workLogs</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;work_log&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">userId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;user_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">users</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">attendanceLogId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;attendance_log_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">attendanceLogs</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">projectId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;project_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">projects</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">content:</span><span class="hl-2"> </span><span class="hl-7">text</span><span class="hl-2">(</span><span class="hl-4">&quot;content&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">idxWorkUser:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_work_user&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">createdAt</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">idxWorkProject:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_work_project&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">projectId</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">createdAt</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">userCompensation</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;user_compensation&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">userId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;user_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">users</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">isHourly:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_hourly&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">isMonthly:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_monthly&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">false</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">hourlyRate:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;hourly_rate&quot;</span><span class="hl-2">),            </span><span class="hl-0">// is_hourly=true のとき使用</span><br/><span class="hl-2">  </span><span class="hl-3">monthlySalary:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;monthly_salary&quot;</span><span class="hl-2">),      </span><span class="hl-0">// is_monthly=true のとき使用</span><br/><span class="hl-2">  </span><span class="hl-3">currency:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;currency&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">16</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;JPY&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">effectiveFrom:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;effective_from&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">effectiveTo:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;effective_to&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">isActive:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_active&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">true</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">idxCompUserFrom:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_uc_user_from&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">effectiveFrom</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-0">// 期間重複禁止は EXCLUDE で raw SQL（下のマイグレーションで）</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">payrollPeriod</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;payroll_period&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">startDate:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;start_date&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">(), </span><span class="hl-0">// date でもOK（ここは好み）</span><br/><span class="hl-2">  </span><span class="hl-3">endDate:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;end_date&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">isClosed:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_closed&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">false</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">closedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;closed_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">closedByUserId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;closed_by_user_id&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">idxPeriod:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_payroll_period&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">startDate</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">endDate</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span><br/><br/><span class="hl-1">export</span><span class="hl-2"> </span><span class="hl-5">const</span><span class="hl-2"> </span><span class="hl-6">payrollItem</span><span class="hl-2"> = </span><span class="hl-7">pgTable</span><span class="hl-2">(</span><span class="hl-4">&quot;payroll_item&quot;</span><span class="hl-2">, {</span><br/><span class="hl-2">  </span><span class="hl-3">id:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;id&quot;</span><span class="hl-2">).</span><span class="hl-7">primaryKey</span><span class="hl-2">().</span><span class="hl-7">defaultRandom</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">periodId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;period_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">payrollPeriod</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><span class="hl-2">  </span><span class="hl-3">userId:</span><span class="hl-2"> </span><span class="hl-7">uuid</span><span class="hl-2">(</span><span class="hl-4">&quot;user_id&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">()</span><br/><span class="hl-2">    .</span><span class="hl-7">references</span><span class="hl-2">(() </span><span class="hl-5">=&gt;</span><span class="hl-2"> </span><span class="hl-3">users</span><span class="hl-2">.</span><span class="hl-3">id</span><span class="hl-2">, { </span><span class="hl-3">onDelete:</span><span class="hl-2"> </span><span class="hl-4">&quot;restrict&quot;</span><span class="hl-2">, </span><span class="hl-3">onUpdate:</span><span class="hl-2"> </span><span class="hl-4">&quot;cascade&quot;</span><span class="hl-2"> }),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">baseMonthlySalary:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;base_monthly_salary&quot;</span><span class="hl-2">), </span><span class="hl-0">// スナップショット</span><br/><span class="hl-2">  </span><span class="hl-3">hourlyRate:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;hourly_rate&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">workedMinutes:</span><span class="hl-2"> </span><span class="hl-7">integer</span><span class="hl-2">(</span><span class="hl-4">&quot;worked_minutes&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-8">0</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">hourlyPay:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;hourly_pay&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;0&quot;</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">totalAllowance:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;total_allowance&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;0&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">totalDeduction:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;total_deduction&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;0&quot;</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">grossPay:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;gross_pay&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;0&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">netPay:</span><span class="hl-2"> </span><span class="hl-7">numeric</span><span class="hl-2">(</span><span class="hl-4">&quot;net_pay&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;0&quot;</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">currency:</span><span class="hl-2"> </span><span class="hl-7">varchar</span><span class="hl-2">(</span><span class="hl-4">&quot;currency&quot;</span><span class="hl-2">, { </span><span class="hl-3">length:</span><span class="hl-2"> </span><span class="hl-8">16</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-4">&quot;JPY&quot;</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">isLocked:</span><span class="hl-2"> </span><span class="hl-7">boolean</span><span class="hl-2">(</span><span class="hl-4">&quot;is_locked&quot;</span><span class="hl-2">).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">default</span><span class="hl-2">(</span><span class="hl-5">false</span><span class="hl-2">),</span><br/><br/><span class="hl-2">  </span><span class="hl-3">createdAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;created_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">  </span><span class="hl-3">updatedAt:</span><span class="hl-2"> </span><span class="hl-7">timestamp</span><span class="hl-2">(</span><span class="hl-4">&quot;updated_at&quot;</span><span class="hl-2">, { </span><span class="hl-3">withTimezone:</span><span class="hl-2"> </span><span class="hl-5">true</span><span class="hl-2"> }).</span><span class="hl-7">notNull</span><span class="hl-2">().</span><span class="hl-7">defaultNow</span><span class="hl-2">(),</span><br/><span class="hl-2">}, (</span><span class="hl-3">t</span><span class="hl-2">) </span><span class="hl-5">=&gt;</span><span class="hl-2"> ({</span><br/><span class="hl-2">  </span><span class="hl-3">uniqPeriodUser:</span><span class="hl-2"> </span><span class="hl-7">uniqueIndex</span><span class="hl-2">(</span><span class="hl-4">&quot;uniq_payroll_item_period_user&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">periodId</span><span class="hl-2">, </span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">),</span><br/><span class="hl-2">  </span><span class="hl-3">idxPayrollUser:</span><span class="hl-2"> </span><span class="hl-7">index</span><span class="hl-2">(</span><span class="hl-4">&quot;idx_payroll_user&quot;</span><span class="hl-2">).</span><span class="hl-7">on</span><span class="hl-2">(</span><span class="hl-3">t</span><span class="hl-2">.</span><span class="hl-3">userId</span><span class="hl-2">),</span><br/><span class="hl-2">}));</span>
+</code><button type="button">Copy</button></pre>
+
+<blockquote>
+<p><strong>ポイント</strong></p>
+<ul>
+<li><strong>部分ユニーク</strong>（未終了1本/割当1:1）は <code>uniqueIndex(...).where(sql\</code>...`)` でOK。</li>
+<li><strong>外部キー</strong>は <code>references()</code> で定義。</li>
+<li><strong>EXCLUDE</strong> 制約や <strong>トリガ</strong> は raw SQL マイグレーションで追加します。</li>
+</ul>
+</blockquote>
+<hr>
+<h1 id="2-追加マイグレーション（sql）" class="tsd-anchor-link">2) 追加マイグレーション（SQL）<a href="#2-追加マイグレーション（sql）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p>Drizzle は<strong>任意SQLをマイグレーション</strong>に書けるので、以下を分けて置くと楽です。</p>
+<h3 id="a-区間重複禁止・チェック制約" class="tsd-anchor-link">a) 区間重複禁止・チェック制約<a href="#a-区間重複禁止・チェック制約" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="sql">-- 2025xxxx_attendance_constraints.sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+ALTER TABLE attendance_log
+  ADD CONSTRAINT chk_att_time
+  CHECK (ended_at IS NULL OR started_at < ended_at);
+
+ALTER TABLE attendance_log
+  ADD CONSTRAINT attendance_no_overlap
+  EXCLUDE USING gist (
+    user_id WITH =,
+    tstzrange(started_at, COALESCE(ended_at, 'infinity')) WITH &&
+  );
+</code><button type="button">Copy</button></pre>
+
+<h3 id="b-期間の妥当性・給与itemのチェック" class="tsd-anchor-link">b) 期間の妥当性・給与itemのチェック<a href="#b-期間の妥当性・給与itemのチェック" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="sql">-- 2025xxxx_payroll_constraints.sql
+ALTER TABLE payroll_period
+  ADD CONSTRAINT chk_period_range CHECK (start_date <= end_date);
+
+ALTER TABLE payroll_item
+  ADD CONSTRAINT chk_worked_minutes_nonneg CHECK (worked_minutes >= 0);
+</code><button type="button">Copy</button></pre>
+
+<p>※ レート履歴（<code>user_compensation</code>）の<strong>期間重複禁止</strong>をDBで厳密にやるなら：</p>
+<pre><code class="sql">-- 2025xxxx_compensation_exclude.sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+ALTER TABLE user_compensation
+  ADD CONSTRAINT no_overlap_rate
+  EXCLUDE USING gist (
+    user_id WITH =,
+    tstzrange(effective_from, COALESCE(effective_to, 'infinity')) WITH &&
+  );
+</code><button type="button">Copy</button></pre>
+
+<h3 id="c-自動更新トリガ" class="tsd-anchor-link">c) <code>updated_at</code> 自動更新トリガ<a href="#c-自動更新トリガ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="sql">-- 2025xxxx_updated_at_trigger.sql
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.updated_at := now();
+  RETURN NEW;
+END $$;
+
+-- 必要テーブルに付与（例）
+CREATE TRIGGER trg_user_updated BEFORE UPDATE ON "user"
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_card_updated BEFORE UPDATE ON card
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_card_assignment_updated BEFORE UPDATE ON card_assignment
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_attendance_log_updated BEFORE UPDATE ON attendance_log
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_attendance_status_updated BEFORE UPDATE ON attendance_status
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_attendance_log_source_updated BEFORE UPDATE ON attendance_log_source
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_work_log_updated BEFORE UPDATE ON work_log
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_project_updated BEFORE UPDATE ON project
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_user_compensation_updated BEFORE UPDATE ON user_compensation
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_payroll_period_updated BEFORE UPDATE ON payroll_period
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_payroll_item_updated BEFORE UPDATE ON payroll_item
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+</code><button type="button">Copy</button></pre>
+
+<h3 id="d-現役カードの導出ビュー（current_card_id-の代替）" class="tsd-anchor-link">d) “現役カード”の導出ビュー（current_card_id の代替）<a href="#d-現役カードの導出ビュー（current_card_id-の代替）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="sql">-- 2025xxxx_views.sql
+CREATE OR REPLACE VIEW v_current_card_assignment AS
+SELECT user_id, card_id
+FROM card_assignment
+WHERE unassigned_at IS NULL;
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<h1 id="3-シード（固定テーブル）" class="tsd-anchor-link">3) シード（固定テーブル）<a href="#3-シード（固定テーブル）" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p><code>attendance_status</code> と <code>attendance_log_source</code> は <strong>enum代替の固定行</strong>。
+Drizzle の「seedスクリプト」や SQL マイグレーションで入れてください。</p>
+<pre><code class="sql">-- 2025xxxx_seed_status_and_source.sql
+INSERT INTO attendance_status (id, code, label, is_active, sort_no)
+VALUES
+  (1,'OFF','勤務外',true,1),
+  (2,'WORKING','勤務中',true,2),
+  (3,'BREAK','休憩中',true,3)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO attendance_log_source (id, label, is_active, sort_no)
+VALUES
+  (1,'WEB',true,1),
+  (2,'DISCORD',true,2),
+  (3,'NFC',true,3),
+  (4,'ADMIN',true,4)
+ON CONFLICT (id) DO NOTHING;
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<h2 id="使い方メモ" class="tsd-anchor-link">使い方メモ<a href="#使い方メモ" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>
+<p><strong>“出勤”</strong>: <code>attendance_log</code> に <code>ended_at = NULL</code> の行が無いことを確認 → <code>WORKING</code> で <code>started_at=now()</code> をINSERT</p>
+</li>
+<li>
+<p><strong>“退勤”</strong>: 直近 <code>ended_at IS NULL</code> の行を <code>ended_at=now()</code> でUPDATE</p>
+</li>
+<li>
+<p><strong>休憩</strong>: <code>WORKING</code>を閉じて <code>BREAK</code> を開く → 終了で <code>WORKING</code> を新規開始（順序で“未終了2本”を避ける）</p>
+</li>
+<li>
+<p><strong>カード差し替え</strong>: トランザクションで</p>
+<ol>
+<li>旧 <code>card_assignment.unassigned_at=now()</code></li>
+<li>新 <code>card_assignment</code> をINSERT（同時割当は禁止制約が守ってくれる）</li>
+</ol>
+</li>
+<li>
+<p><strong>給与締め</strong>: 期間作成 → 勤怠集計して <code>payroll_item</code> 更新 → period を <code>is_closed=true</code>（以後はRLSやアプリで編集禁止）</p>
+</li>
+</ul>
+<hr>
+<h2 id="環境変数の設定" class="tsd-anchor-link">環境変数の設定<a href="#環境変数の設定" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p><code>.env.local</code> ファイルを作成し、以下の環境変数を設定してください：</p>
+<pre><code class="bash"><span class="hl-0"># Supabase Configuration</span><br/><span class="hl-3">NEXT_PUBLIC_SUPABASE_URL</span><span class="hl-2">=</span><span class="hl-4">your-supabase-url</span><br/><span class="hl-3">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY</span><span class="hl-2">=</span><span class="hl-4">your-supabase-anon-key</span><br/><br/><span class="hl-0"># Database Configuration</span><br/><span class="hl-3">DATABASE_URL</span><span class="hl-2">=</span><span class="hl-4">your-database-url</span><br/><br/><span class="hl-0"># Admin Bypass (税理士向け特別アクセス)</span><br/><span class="hl-0"># ADMIN_BYPASS_PASSWORD: URLに含まれる公開パスワード</span><br/><span class="hl-0"># ADMIN_BYPASS_SECRET: URLの署名生成に使用する秘密鍵（ランダムな長い文字列を推奨）</span><br/><span class="hl-3">ADMIN_BYPASS_PASSWORD</span><span class="hl-2">=</span><span class="hl-4">your-secure-password-here</span><br/><span class="hl-3">ADMIN_BYPASS_SECRET</span><span class="hl-2">=</span><span class="hl-4">your-very-long-random-secret-string-here</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="税理士向け特別アクセス機能" class="tsd-anchor-link">税理士向け特別アクセス機能<a href="#税理士向け特別アクセス機能" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>税理士など外部の方が一時的に管理画面にアクセスする必要がある場合、管理者が一時アクセスURLを発行できます。</p>
+<h4 id="url発行方法" class="tsd-anchor-link">URL発行方法<a href="#url発行方法" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ol>
+<li>管理者として <code>/admin/generate-url</code> ページにアクセス（サイドバーの「税理士用URL生成」をクリック）</li>
+<li>「URLを生成」ボタンをクリック</li>
+<li>生成されたURLをコピーして税理士に共有</li>
+</ol>
+<h4 id="セキュリティの仕組み" class="tsd-anchor-link">セキュリティの仕組み<a href="#セキュリティの仕組み" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>URLには以下のパラメータが含まれます：
+<ul>
+<li><code>p</code>: 公開パスワード（<code>ADMIN_BYPASS_PASSWORD</code>）</li>
+<li><code>t</code>: 発行時のタイムスタンプ（Unix秒）</li>
+<li><code>h</code>: SHA-256署名（<code>PASSWORD</code> + <code>SECRET</code> + <code>TIMESTAMP</code>）</li>
+</ul>
+</li>
+</ul>
+<p><strong>生成されるURLの例:</strong></p>
+<pre><code class="text">https://your-domain.com/admin?p=TaxAccountant2024&amp;t=1735689600&amp;h=a3f5e8d9c2b1...
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>サーバー側で以下を検証：
+<ol>
+<li>パスワードが正しいか（<code>p</code> が <code>ADMIN_BYPASS_PASSWORD</code> と一致）</li>
+<li>発行から7日以内か（現在時刻 - <code>t</code> ≤ 7日）</li>
+<li>署名が正しいか（<code>h</code> が再計算した値と一致、改ざん検知）</li>
+</ol>
+</li>
+<li>検証成功後、残り有効期限分のCookieが設定されます（最大7日間）</li>
+<li>URLのパラメータを改ざんすると署名が一致せず、アクセスが拒否されます</li>
+</ul>
+<h4 id="アクセス範囲" class="tsd-anchor-link">アクセス範囲<a href="#アクセス範囲" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>アクセス可能: <code>/admin</code> ページ（管理者ダッシュボード・勤怠一覧）のみ</li>
+<li>アクセス不可: <code>/admin/users</code> などのサブページ</li>
+<li>サイドバーのナビゲーションは自動的に調整され、アクセスできないページのリンクは非表示になります</li>
+<li>ログアウトボタンで税理士用のセッション（Cookie）をクリアできます</li>
+</ul>
+<h4 id="環境変数" class="tsd-anchor-link">環境変数<a href="#環境変数" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li><code>ADMIN_BYPASS_PASSWORD</code>: URLに含まれる公開パスワード（例: <code>TaxAccountant2024</code>）</li>
+<li><code>ADMIN_BYPASS_SECRET</code>: URL署名の秘密鍵（64文字以上のランダムな文字列を推奨）</li>
+</ul>
+<p><strong>SECRET の生成例:</strong></p>
+<pre><code class="bash"><span class="hl-0"># Node.js を使用</span><br/><span class="hl-7">node</span><span class="hl-2"> </span><span class="hl-5">-e</span><span class="hl-2"> </span><span class="hl-4">&quot;console.log(require(&#39;crypto&#39;).randomBytes(32).toString(&#39;hex&#39;))&quot;</span><br/><br/><span class="hl-0"># OpenSSL を使用</span><br/><span class="hl-7">openssl</span><span class="hl-2"> </span><span class="hl-4">rand</span><span class="hl-2"> </span><span class="hl-5">-hex</span><span class="hl-2"> </span><span class="hl-8">32</span>
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<p>This is a <a href="https://nextjs.org">Next.js</a> project bootstrapped with <a href="https://nextjs.org/docs/app/api-reference/cli/create-next-app"><code>create-next-app</code></a>.</p>
+<h2 id="getting-started" class="tsd-anchor-link">Getting Started<a href="#getting-started" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>First, run the development server:</p>
+<pre><code class="bash"><span class="hl-7">npm</span><span class="hl-2"> </span><span class="hl-4">run</span><span class="hl-2"> </span><span class="hl-4">dev</span><br/><span class="hl-0"># or</span><br/><span class="hl-7">yarn</span><span class="hl-2"> </span><span class="hl-4">dev</span><br/><span class="hl-0"># or</span><br/><span class="hl-7">pnpm</span><span class="hl-2"> </span><span class="hl-4">dev</span><br/><span class="hl-0"># or</span><br/><span class="hl-7">bun</span><span class="hl-2"> </span><span class="hl-4">dev</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Open <a href="http://localhost:3000">http://localhost:3000</a> with your browser to see the result.</p>
+<p>You can start editing the page by modifying <code>app/page.tsx</code>. The page auto-updates as you edit the file.</p>
+<p>This project uses <a href="https://nextjs.org/docs/app/building-your-application/optimizing/fonts"><code>next/font</code></a> to automatically optimize and load <a href="https://vercel.com/font">Geist</a>, a new font family for Vercel.</p>
+<h2 id="learn-more" class="tsd-anchor-link">Learn More<a href="#learn-more" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>To learn more about Next.js, take a look at the following resources:</p>
+<ul>
+<li><a href="https://nextjs.org/docs">Next.js Documentation</a> - learn about Next.js features and API.</li>
+<li><a href="https://nextjs.org/learn">Learn Next.js</a> - an interactive Next.js tutorial.</li>
+</ul>
+<p>You can check out <a href="https://github.com/vercel/next.js">the Next.js GitHub repository</a> - your feedback and contributions are welcome!</p>
+<h2 id="deploy-on-vercel" class="tsd-anchor-link">Deploy on Vercel<a href="#deploy-on-vercel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The easiest way to deploy your Next.js app is to use the <a href="https://vercel.com/new?utm_medium=default-template&amp;filter=next.js&amp;utm_source=create-next-app&amp;utm_campaign=create-next-app-readme">Vercel Platform</a> from the creators of Next.js.</p>
+<p>Check out our <a href="https://nextjs.org/docs/app/building-your-application/deploying">Next.js deployment documentation</a> for more details.</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#workly-（work-friendly）"><span>Workly （<wbr/>Work + <wbr/>Friendly）</span></a><a href="#reflenge-勤怠管理"><span>Reflenge 勤怠管理+</span></a><ul><li><a href="#1-アプリケーションの概要"><span>1. アプリケーションの概要</span></a></li><li><ul><li><a href="#実現したいこと"><span>実現したいこと</span></a></li></ul></li><li><a href="#2-要件定義"><span>2. 要件定義</span></a></li><li><a href="#勤怠（attendance-logs）"><span>勤怠（<wbr/>Attendance <wbr/>Logs）</span></a></li><li><a href="#プロジェクト（projects）"><span>プロジェクト（<wbr/>Projects）</span></a></li><li><ul><li><a href="#プロジェクト自体"><span>プロジェクト自体</span></a></li><li><a href="#記録（作業ログ）"><span>記録（作業ログ）</span></a></li></ul></li><li><a href="#給与（payroll）"><span>給与（<wbr/>Payroll）</span></a></li><li><a href="#ユーザ（users）"><span>ユーザ（<wbr/>Users）</span></a></li><li><a href="#システム-カード（nfc-cards）"><span>システム / カード（<wbr/>NFC <wbr/>Cards）</span></a></li><li><ul><li><a href="#勤怠記録フロー"><span>勤怠記録フロー</span></a></li><li><a href="#user-sign-up"><span>User <wbr/>Sign <wbr/>Up</span></a></li></ul></li><li><a href="#db設計"><span>DB設計</span></a></li><li><a href="#データベース設計書"><span>データベース設計書</span></a></li></ul><a href="#1-（drizzleスキーマ）"><span>1) （<wbr/>Drizzleスキーマ）</span></a><a href="#2-追加マイグレーション（sql）"><span>2) 追加マイグレーション（<wbr/>SQL）</span></a><ul><li><ul><li><a href="#a-区間重複禁止・チェック制約"><span>a) 区間重複禁止・チェック制約</span></a></li><li><a href="#b-期間の妥当性・給与itemのチェック"><span>b) 期間の妥当性・給与itemのチェック</span></a></li><li><a href="#c-自動更新トリガ"><span>c)  自動更新トリガ</span></a></li><li><a href="#d-現役カードの導出ビュー（current_card_id-の代替）"><span>d) “現役カード”の導出ビュー（current_<wbr/>card_<wbr/>id の代替）</span></a></li></ul></li></ul><a href="#3-シード（固定テーブル）"><span>3) シード（固定テーブル）</span></a><ul><li><a href="#使い方メモ"><span>使い方メモ</span></a></li><li><a href="#環境変数の設定"><span>環境変数の設定</span></a></li><li><ul><li><a href="#税理士向け特別アクセス機能"><span>税理士向け特別アクセス機能</span></a></li><li><ul><li><a href="#url発行方法"><span>URL発行方法</span></a></li><li><a href="#セキュリティの仕組み"><span>セキュリティの仕組み</span></a></li><li><a href="#アクセス範囲"><span>アクセス範囲</span></a></li><li><a href="#環境変数"><span>環境変数</span></a></li></ul></li></ul></li><li><a href="#getting-started"><span>Getting <wbr/>Started</span></a></li><li><a href="#learn-more"><span>Learn <wbr/>More</span></a></li><li><a href="#deploy-on-vercel"><span>Deploy on <wbr/>Vercel</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">workly</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

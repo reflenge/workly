@@ -17,9 +17,9 @@ import { revalidateAttendanceRecords } from "@/components/attendance/actions";
 
 /**
  * 勤務打刻のアクション種別
- * WORKING: 勤務開始/再開
- * BREAK: 休憩開始
- * OFF: 退勤
+ * - `WORKING`: 勤務開始/再開
+ * - `BREAK`: 休憩開始
+ * - `OFF`: 退勤
  */
 export type AttendanceAction = "WORKING" | "BREAK" | "OFF";
 
@@ -27,33 +27,50 @@ export type AttendanceAction = "WORKING" | "BREAK" | "OFF";
  * 勤務打刻記録の入力パラメータ
  */
 export interface AttendanceRecordInput {
-    userId: string; // ユーザーID
-    action: AttendanceAction; // 打刻アクション
-    source: "WEB" | "DISCORD" | "NFC" | "ADMIN"; // 打刻ソース（どこから打刻されたか）
-    note?: string; // メモ（オプション）
+    /** 打刻を行うユーザーのID */
+    userId: string;
+    /** 実行するアクション (勤務開始、休憩、退勤) */
+    action: AttendanceAction;
+    /** 打刻の発生源 (WEB, DISCORD, NFC, ADMIN) */
+    source: "WEB" | "DISCORD" | "NFC" | "ADMIN";
+    /** 任意のメモ (遅刻理由など) */
+    note?: string;
 }
 
 /**
- * 勤務打刻記録の結果
+ * 勤務打刻記録の結果オブジェクト
  */
 export interface AttendanceRecordResult {
-    success: boolean; // 成功フラグ
-    message: string; // 結果メッセージ
+    /** 処理が成功したかどうか */
+    success: boolean;
+    /** ユーザー向けのメッセージ (成功時またはエラー時) */
+    message: string;
+    /** 成功時の詳細データ */
     data?: {
-        // 成功時のデータ（オプション）
-        logId: string; // 作成されたログのID
-        status: string; // ステータス
-        startedAt: Date; // 開始時刻
-        endedAt?: Date; // 終了時刻（オプション）
+        /** 作成されたログのID */
+        logId: string;
+        /** 記録されたステータス */
+        status: string;
+        /** 開始時刻 */
+        startedAt: Date;
+        /** 終了時刻 (あれば) */
+        endedAt?: Date;
     };
 }
 
 /**
- * 勤務打刻の核となる関数
- * 別環境（Discord、NFC、管理画面など）からも呼び出し可能
+ * 勤務打刻を記録するメイン関数
  *
- * @param input 打刻記録の入力パラメータ
- * @returns 打刻結果（成功/失敗とメッセージ）
+ * @remarks
+ * この関数はサーバーアクションとして実行され、以下の処理を行います：
+ * 1. 実行ユーザーの認証と権限チェック
+ * 2. 入力されたアクションとソースの妥当性検証
+ * 3. 現在の打刻状態との整合性チェック（状態遷移バリデーション）
+ * 4. データベースへのトランザクション書き込み
+ *    - 日を跨ぐ場合や月を跨ぐ場合の自動分割処理もここで行われます
+ *
+ * @param input - 打刻に必要な情報 {@link AttendanceRecordInput}
+ * @returns 処理結果 {@link AttendanceRecordResult}
  */
 export async function recordAttendance(
     input: AttendanceRecordInput

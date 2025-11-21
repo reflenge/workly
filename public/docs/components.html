@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コンポーネントドキュメント</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
+        h1 { border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 30px; }
+        .component-section { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 30px; padding: 24px; }
+        .component-title { font-size: 1.5em; font-weight: bold; margin-top: 0; color: #111827; display: flex; align-items: center; gap: 10px; }
+        .file-path { font-size: 0.8em; font-weight: normal; color: #6b7280; font-family: monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+        .description { margin-bottom: 20px; color: #4b5563; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f9fafb; font-weight: 600; color: #374151; }
+        tr:last-child td { border-bottom: none; }
+        .prop-name { font-family: monospace; font-weight: 600; color: #2563eb; }
+        .prop-type { font-family: monospace; color: #db2777; font-size: 0.9em; }
+        .prop-default { font-family: monospace; color: #059669; }
+        .required { color: #dc2626; font-size: 0.8em; font-weight: bold; margin-left: 4px; }
+        .empty-message { color: #9ca3af; font-style: italic; }
+        .nav { margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav-link { text-decoration: none; color: #4b5563; background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #e5e7eb; font-size: 0.9em; transition: all 0.2s; }
+        .nav-link:hover { border-color: #2563eb; color: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>コンポーネントドキュメント</h1>
+    <div class="nav">
+<a href="#attendancepunch" class="nav-link">attendancepunch</a><a href="#attendance" class="nav-link">attendance</a><a href="#pageheadermeta" class="nav-link">PageHeaderMeta</a><a href="#button" class="nav-link">Button</a><a href="#card" class="nav-link">Card</a><a href="#cardheader" class="nav-link">CardHeader</a><a href="#cardfooter" class="nav-link">CardFooter</a><a href="#cardtitle" class="nav-link">CardTitle</a><a href="#cardaction" class="nav-link">CardAction</a><a href="#carddescription" class="nav-link">CardDescription</a><a href="#cardcontent" class="nav-link">CardContent</a></div>
+            <div id="attendancepunch" class="component-section">
+                <h2 class="component-title">
+                    attendancepunch
+                    <span class="file-path">src/app/(APP)/(TOP)/_components/attendance-punch.tsx</span>
+                </h2>
+                <div class="description">勤務打刻コンポーネント
+勤務開始、休憩、退勤の打刻機能を提供</div>
+
+                <h3>Props</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Name</th>
+                            <th style="width: 25%">Type</th>
+                            <th style="width: 15%">Default</th>
+                            <th style="width: 40%">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">userId</span>
+                                <span class="required">*</span>
+                            </td>
+                            <td><span class="prop-type">string</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+            
+            <div id="attendance" class="component-section">
+                <h2 class="component-title">
+                    attendance
+                    <span class="file-path">src/components/attendance/index.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Name</th>
+                            <th style="width: 25%">Type</th>
+                            <th style="width: 15%">Default</th>
+                            <th style="width: 40%">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">isAdmin</span>
+                                <span class="required">*</span>
+                            </td>
+                            <td><span class="prop-type">boolean</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">userId</span>
+                                <span class="required">*</span>
+                            </td>
+                            <td><span class="prop-type">string</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+            
+            <div id="pageheadermeta" class="component-section">
+                <h2 class="component-title">
+                    PageHeaderMeta
+                    <span class="file-path">src/components/page-header/page-header-meta.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Name</th>
+                            <th style="width: 25%">Type</th>
+                            <th style="width: 15%">Default</th>
+                            <th style="width: 40%">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">title</span>
+                                
+                            </td>
+                            <td><span class="prop-type">string</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">description</span>
+                                
+                            </td>
+                            <td><span class="prop-type">string</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+            
+            <div id="button" class="component-section">
+                <h2 class="component-title">
+                    Button
+                    <span class="file-path">src/components/ui/button.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Name</th>
+                            <th style="width: 25%">Type</th>
+                            <th style="width: 15%">Default</th>
+                            <th style="width: 40%">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">variant</span>
+                                
+                            </td>
+                            <td><span class="prop-type">enum</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">size</span>
+                                
+                            </td>
+                            <td><span class="prop-type">enum</span></td>
+                            <td><span class="prop-default">-</span></td>
+                            <td></td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <span class="prop-name">asChild</span>
+                                
+                            </td>
+                            <td><span class="prop-type">boolean</span></td>
+                            <td><span class="prop-default">false</span></td>
+                            <td></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+            
+            <div id="card" class="component-section">
+                <h2 class="component-title">
+                    Card
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="cardheader" class="component-section">
+                <h2 class="component-title">
+                    CardHeader
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="cardfooter" class="component-section">
+                <h2 class="component-title">
+                    CardFooter
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="cardtitle" class="component-section">
+                <h2 class="component-title">
+                    CardTitle
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="cardaction" class="component-section">
+                <h2 class="component-title">
+                    CardAction
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="carddescription" class="component-section">
+                <h2 class="component-title">
+                    CardDescription
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+            <div id="cardcontent" class="component-section">
+                <h2 class="component-title">
+                    CardContent
+                    <span class="file-path">src/components/ui/card.tsx</span>
+                </h2>
+                <div class="description">説明はありません</div>
+
+                <h3>Props</h3>
+                <p class="empty-message">Propsはありません</p>
+            </div>
+            
+    </div>
+</body>
+</html>

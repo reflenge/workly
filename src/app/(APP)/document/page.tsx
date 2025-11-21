@@ -519,6 +519,87 @@ export default function DocumentPage() {
                     </div>
                 </div>
             </section>
+
+            <Separator />
+
+            <section className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight">
+                    7. 自動生成ドキュメント
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <a
+                        href="/docs/dependency-report.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                    >
+                        <Card className="h-full hover:bg-muted/50 transition-colors">
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <CardTitle className="text-lg">
+                                        依存関係グラフ
+                                    </CardTitle>
+                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        dependency-cruiser
+                                    </span>
+                                </div>
+                                <CardDescription>
+                                    プロジェクト内のファイル間の依存関係を可視化したインタラクティブなグラフです。
+                                    モジュール間の結合度や循環参照を確認できます。
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </a>
+
+                    <a
+                        href="/docs/api/index.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                    >
+                        <Card className="h-full hover:bg-muted/50 transition-colors">
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <CardTitle className="text-lg">
+                                        API リファレンス
+                                    </CardTitle>
+                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        TypeDoc
+                                    </span>
+                                </div>
+                                <CardDescription>
+                                    TypeScriptの型定義とJSDocコメントから生成された詳細なAPIドキュメントです。
+                                    各関数のシグネチャやインターフェースの定義を確認できます。
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </a>
+
+                    <a
+                        href="/docs/components.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                    >
+                        <Card className="h-full hover:bg-muted/50 transition-colors">
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <CardTitle className="text-lg">
+                                        コンポーネント仕様書
+                                    </CardTitle>
+                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        React Docgen
+                                    </span>
+                                </div>
+                                <CardDescription>
+                                    主要なReactコンポーネントのProps定義と説明をまとめたドキュメントです。
+                                    各コンポーネントの使い方やパラメータを確認できます。
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </a>
+                </div>
+            </section>
         </div >
     );
 }
