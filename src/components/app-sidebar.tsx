@@ -18,6 +18,7 @@ import {
     BriefcaseBusinessIcon,
     SettingsIcon,
     ClockIcon,
+    BookOpenIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { AppSidebarClient, AppSidebarFooter } from "./app-sidebar-client";
@@ -94,6 +95,23 @@ export async function AppSidebar() {
                     </SidebarGroup>
                 )}
                 <AppSidebarClient />
+                {!isBypassUser && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Other</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href="/document" prefetch={true}>
+                                            <BookOpenIcon />
+                                            <span>ドキュメント</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
             <SidebarFooter>
                 <AppSidebarFooter />
