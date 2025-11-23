@@ -7,6 +7,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { LogoutButton } from "./logout-button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -58,14 +61,18 @@ export function AppSidebarClient() {
                                         <span>カード管理</span>
                                     </Link>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <Link href="/admin/links" prefetch={true}>
-                                        <Link2Icon />
-                                        <span>カード紐付け</span>
-                                    </Link>
-                                </SidebarMenuButton>
+                                <SidebarMenuSub>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton asChild>
+                                            <Link
+                                                href="/admin/cards/link"
+                                                prefetch={true}
+                                            >
+                                                <span>カード紐付け</span>
+                                            </Link>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                </SidebarMenuSub>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
