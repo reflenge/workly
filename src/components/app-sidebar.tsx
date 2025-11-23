@@ -118,7 +118,8 @@ export async function AppSidebar() {
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                                {user.isAdmin && (
+                                {/* 開発環境でのみ表示 */}
+                                {process.env.NODE_ENV === 'development' && user.isAdmin && (
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild>
                                             <Link

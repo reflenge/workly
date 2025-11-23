@@ -203,6 +203,11 @@ export async function generateTestData(
 
 export async function registerTestData(data: TestDataRecord[]) {
     try {
+        // 開発環境でのみ実行可能
+        if (process.env.NODE_ENV !== 'development') {
+            throw new Error("This operation is only available in development environment");
+        }
+
         const user = await requireUser();
         if (!user.isAdmin) {
             throw new Error("Unauthorized");
@@ -233,6 +238,11 @@ export async function registerTestData(data: TestDataRecord[]) {
 
 export async function clearTestData(userId: string) {
     try {
+        // 開発環境でのみ実行可能（本番環境でのデータ削除を防止）
+        if (process.env.NODE_ENV !== 'development') {
+            throw new Error("This operation is only available in development environment");
+        }
+
         const user = await requireUser();
         if (!user.isAdmin) {
             throw new Error("Unauthorized");
