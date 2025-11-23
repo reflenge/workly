@@ -10,10 +10,10 @@ import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 export default async function Page() {
     const user = await requireUser();
 
-    // admin 権限のユーザーのみアクセス可能
-    if (!user.isAdmin) {
-        redirect("/");
-    }
+    // 管理者じゃなくても入れる
+    // if (!user.isAdmin) {
+    //     redirect("/");
+    // }
 
     const list = await db
         .select()
