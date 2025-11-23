@@ -1,8 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationPrevious,
+    PaginationNext,
+} from "@/components/ui/pagination";
 import { format, addMonths, subMonths, parse } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 
@@ -30,13 +35,15 @@ export function MonthSelector({ minDate, maxDate }: MonthSelectorProps) {
     const currentDate = parse(month, "yyyyMM", new Date());
 
     // 前月へ移動
-    const handlePrevious = () => {
+    const handlePrevious = (e: React.MouseEvent) => {
+        e.preventDefault();
         const newDate = subMonths(currentDate, 1);
         setMonth(format(newDate, "yyyyMM"));
     };
 
     // 次月へ移動
-    const handleNext = () => {
+    const handleNext = (e: React.MouseEvent) => {
+        e.preventDefault();
         const newDate = addMonths(currentDate, 1);
         setMonth(format(newDate, "yyyyMM"));
     };
@@ -50,26 +57,30 @@ export function MonthSelector({ minDate, maxDate }: MonthSelectorProps) {
         : false;
 
     return (
-        <div className="flex items-center gap-4">
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={handlePrevious}
-                disabled={isPreviousDisabled}
-            >
-                <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-lg font-medium">
-                {format(currentDate, "yyyy年MM月")}
-            </span>
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={handleNext}
-                disabled={isNextDisabled}
-            >
-                <ChevronRight className="h-4 w-4" />
-            </Button>
-        </div>
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious
+                        href="#"
+                        onClick={handlePrevious}
+                        className={isPreviousDisabled ? "pointer-events-none opacity-50" : ""}
+                        aria-disabled={isPreviousDisabled}
+                    />
+                </PaginationItem>
+                <PaginationItem>
+                    <span className="text-lg font-medium px-4">
+                        {format(currentDate, "yyyy年MM月")}
+                    </span>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationNext
+                        href="#"
+                        onClick={handleNext}
+                        className={isNextDisabled ? "pointer-events-none opacity-50" : ""}
+                        aria-disabled={isNextDisabled}
+                    />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
     );
 }
