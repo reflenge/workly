@@ -19,6 +19,7 @@ import {
     SettingsIcon,
     ClockIcon,
     BookOpenIcon,
+    CodeIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { AppSidebarClient, AppSidebarFooter } from "./app-sidebar-client";
@@ -117,6 +118,20 @@ export async function AppSidebar() {
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
+                                {/* 開発環境でのみ表示 */}
+                                {process.env.NODE_ENV === 'development' && user.isAdmin && (
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton asChild>
+                                            <Link
+                                                href="/development"
+                                                prefetch={true}
+                                            >
+                                                <CodeIcon />
+                                                <span>開発</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )}
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
