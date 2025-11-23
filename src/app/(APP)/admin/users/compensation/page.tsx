@@ -5,6 +5,15 @@ import { redirect } from "next/navigation";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 import { and, eq, or, isNull, lte, gte, sql } from "drizzle-orm";
 import CompensationList from "./_components/compensation-list";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default async function CompensationPage() {
     const user = await requireUser();
@@ -48,6 +57,25 @@ export default async function CompensationPage() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin">管理画面</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin/users">ユーザー管理</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>給与設定</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <PageHeaderMeta
                 title="給与設定"
                 description="各アカウントの現在の給与設定を確認し、設定を変更できます。"

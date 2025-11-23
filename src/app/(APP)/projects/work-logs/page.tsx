@@ -14,6 +14,15 @@ import { WorkLogRow } from "./work-log-row";
 import { MonthSelector } from "./month-selector";
 import { startOfMonth, endOfMonth, parse, format } from "date-fns";
 import { WorkLogChart, ChartData } from "./work-log-chart";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default async function WorkLogsPage({
     searchParams,
@@ -145,6 +154,19 @@ export default async function WorkLogsPage({
 
     return (
         <div className="space-y-4">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/projects">プロジェクト</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>作業ログ</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <div className="flex items-center justify-between">
                 <MonthSelector
                     minDate={minDate ? new Date(minDate) : undefined}
