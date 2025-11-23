@@ -11,16 +11,20 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
+// チャートデータの型定義
+// name: プロジェクト名 (X軸のキー)
+// [key: string]: ユーザー名ごとの作業時間 (動的なキー)
 export type ChartData = {
-    name: string; // Project Name
-    [key: string]: string | number; // User Name -> Duration
+    name: string;
+    [key: string]: string | number;
 };
 
 interface WorkLogChartProps {
     data: ChartData[];
-    users: string[]; // List of user names for keys
+    users: string[]; // 凡例と積み上げバーの生成に使用するユーザー名のリスト
 }
 
+// チャートの色定義 (ユーザーごとに異なる色を割り当てるため)
 const COLORS = [
     "#8884d8",
     "#82ca9d",
@@ -52,12 +56,13 @@ export function WorkLogChart({ data, users }: WorkLogChartProps) {
                     <YAxis label={{ value: '時間 (h)', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Legend />
+                    {/* ユーザーごとに積み上げ棒グラフ(Bar)を生成 */}
                     {users.map((user, index) => (
                         <Bar
                             key={user}
                             dataKey={user}
-                            stackId="a"
-                            fill={COLORS[index % COLORS.length]}
+                            stackId="a" // 同じstackIdを指定することで積み上げグラフになります
+                            fill={COLORS[index % COLORS.length]} // 色を循環して割り当て
                         />
                     ))}
                 </BarChart>
