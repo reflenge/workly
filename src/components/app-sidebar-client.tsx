@@ -53,6 +53,18 @@ export function AppSidebarClient() {
                                         <span>ユーザー管理</span>
                                     </Link>
                                 </SidebarMenuButton>
+                                <SidebarMenuSub>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton asChild>
+                                            <Link
+                                                href="/admin/users/compensation"
+                                                prefetch={true}
+                                            >
+                                                <span>給与設定</span>
+                                            </Link>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                </SidebarMenuSub>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
