@@ -1,32 +1,29 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useQueryStates, parseAsString } from "nuqs";
 import { parseYearMonthParams, getYearMonthPagination } from "./util";
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
-    PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useIsMobile, useIsSmallMobile } from "@/hooks/use-mobile";
 
 interface YearMonthPaginationProps {
     className?: string;
 }
 
-const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
-    const searchParams = useSearchParams();
-    const isMobile = useIsMobile();
-    const isSmallMobile = useIsSmallMobile();
+export const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
+    // URLパラメータの状態管理
+    const [params, setParams] = useQueryStates({
+        month: parseAsString,
+        users: parseAsString,
+        statuses: parseAsString,
+    });
 
     // 年月の検索パラメータをバリデーション
-    const { year, month } = parseYearMonthParams(
-        searchParams.get("y"),
-        searchParams.get("m")
-    );
+    const { year, month } = parseYearMonthParams(params.month);
 
     // 年月のページネーション情報を取得
     const {
@@ -36,33 +33,20 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
         nextMonth,
         hasPrev,
         hasNext,
-        prevMonth1,
-        nextMonth1,
-        prevMonth2,
-        nextMonth2,
-        hasMorePrev,
-        hasMoreNext,
     } = getYearMonthPagination(year, month);
 
-    // URLを生成する関数
-    const createUrl = (targetYear: number, targetMonth: number) => {
-        const current = new URLSearchParams(searchParams.toString());
-        current.set("y", targetYear.toString());
-        current.set("m", targetMonth.toString());
-        return `?${current.toString()}`;
+    // URLを生成する関数（nuqsを使った状態更新）
+    const createNavigationHandler = (targetYear: number, targetMonth: number) => {
+        return (e: React.MouseEvent) => {
+            e.preventDefault();
+            const monthStr = `${targetYear}${targetMonth.toString().padStart(2, "0")}`;
+            setParams({
+                month: monthStr,
+                users: null,
+                statuses: null,
+            });
+        };
     };
-
-    // 年月を表示する関数（モバイルでは年を短縮）
-    const formatYearMonth = (year: number, month: number) => {
-        const yearStr = isMobile
-            ? year.toString().slice(2, 4)
-            : year.toString();
-        const monthStr = month.toString().padStart(2, "0");
-        return `${yearStr}/${monthStr}`;
-    };
-
-    // パディングクラス（モバイルでは小さく）
-    const linkPadding = isMobile ? "px-0.5" : "px-1";
 
     return (
         <Pagination className={className}>
@@ -71,97 +55,37 @@ const YearMonthPagination = ({ className }: YearMonthPaginationProps) => {
                 <PaginationItem>
                     {hasPrev ? (
                         <PaginationPrevious
-                            href={createUrl(prevYear, prevMonth)}
+                            href="#"
+                            onClick={createNavigationHandler(prevYear, prevMonth)}
                         />
                     ) : (
                         <PaginationPrevious
                             href="#"
                             className="pointer-events-none opacity-50"
+                            onClick={(e) => e.preventDefault()}
                         />
                     )}
                 </PaginationItem>
 
-                {/* さらに前がある場合のEllipsis */}
-                {hasMorePrev && (
-                    <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem>
-                )}
-
-                {/* -2月 (もしあれば表示、小さい画面では非表示) */}
-                {prevMonth2 && !isSmallMobile && (
-                    <PaginationItem>
-                        <PaginationLink
-                            href={createUrl(prevMonth2.year, prevMonth2.month)}
-                            className={`w-fit ${linkPadding}`}
-                        >
-                            {formatYearMonth(prevMonth2.year, prevMonth2.month)}
-                        </PaginationLink>
-                    </PaginationItem>
-                )}
-
-                {/* -1月 (もしあれば表示) */}
-                {prevMonth1 && (
-                    <PaginationItem>
-                        <PaginationLink
-                            href={createUrl(prevMonth1.year, prevMonth1.month)}
-                            className={`w-fit ${linkPadding}`}
-                        >
-                            {formatYearMonth(prevMonth1.year, prevMonth1.month)}
-                        </PaginationLink>
-                    </PaginationItem>
-                )}
-
                 {/* 現在の月 */}
                 <PaginationItem>
-                    <PaginationLink
-                        href="#"
-                        isActive
-                        className={`w-fit ${linkPadding}`}
-                    >
-                        {formatYearMonth(year, month)}
-                    </PaginationLink>
+                    <div className="px-4 font-semibold text-base">
+                        {year}年{month.toString().padStart(2, "0")}月
+                    </div>
                 </PaginationItem>
-
-                {/* +1月 (もしあれば表示) */}
-                {nextMonth1 && (
-                    <PaginationItem>
-                        <PaginationLink
-                            href={createUrl(nextMonth1.year, nextMonth1.month)}
-                            className={`w-fit ${linkPadding}`}
-                        >
-                            {formatYearMonth(nextMonth1.year, nextMonth1.month)}
-                        </PaginationLink>
-                    </PaginationItem>
-                )}
-
-                {/* +2月 (もしあれば表示、小さい画面では非表示) */}
-                {nextMonth2 && !isSmallMobile && (
-                    <PaginationItem>
-                        <PaginationLink
-                            href={createUrl(nextMonth2.year, nextMonth2.month)}
-                            className={`w-fit ${linkPadding}`}
-                        >
-                            {formatYearMonth(nextMonth2.year, nextMonth2.month)}
-                        </PaginationLink>
-                    </PaginationItem>
-                )}
-
-                {/* さらに後がある場合のEllipsis */}
-                {hasMoreNext && (
-                    <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem>
-                )}
 
                 {/* Next button */}
                 <PaginationItem>
                     {hasNext ? (
-                        <PaginationNext href={createUrl(nextYear, nextMonth)} />
+                        <PaginationNext
+                            href="#"
+                            onClick={createNavigationHandler(nextYear, nextMonth)}
+                        />
                     ) : (
                         <PaginationNext
                             href="#"
                             className="pointer-events-none opacity-50"
+                            onClick={(e) => e.preventDefault()}
                         />
                     )}
                 </PaginationItem>

@@ -63,12 +63,10 @@ export const parseUuidV4ArrayParam = (
  * 年月の検索パラメータをバリデーションして返します。
  * 2025年6月から今月の範囲でバリデーションし、不正な値や値がない場合は今月を返します。
  *
- * @param {string | null} yearParam - 年パラメータ (y)
- * @param {string | null} monthParam - 月パラメータ (m)
+ * @param {string | null} monthParam - 年月パラメータ (yyyyMM形式)
  * @returns {{ year: number; month: number }} バリデーションされた年月
  */
 export const parseYearMonthParams = (
-    yearParam: string | null,
     monthParam: string | null
 ): { year: number; month: number } => {
     const now = new Date();
@@ -78,30 +76,23 @@ export const parseYearMonthParams = (
     const minYear = 2025;
     const minMonth = 6; // 2025年6月
 
-    // 年をパース
-    let year: number;
-    if (!yearParam || !/^\d{4}$/.test(yearParam.trim())) {
-        year = currentYear;
-    } else {
-        const parsedYear = parseInt(yearParam.trim(), 10);
-        if (parsedYear < minYear || parsedYear > currentYear) {
-            year = currentYear;
-        } else {
-            year = parsedYear;
-        }
+    // monthParamがない場合は現在の年月を返す
+    if (!monthParam || !/^\d{6}$/.test(monthParam.trim())) {
+        return { year: currentYear, month: currentMonth };
     }
 
-    // 月をパース
-    let month: number;
-    if (!monthParam || !/^\d{1,2}$/.test(monthParam.trim())) {
-        month = currentMonth;
-    } else {
-        const parsedMonth = parseInt(monthParam.trim(), 10);
-        if (parsedMonth < 1 || parsedMonth > 12) {
-            month = currentMonth;
-        } else {
-            month = parsedMonth;
-        }
+    const trimmed = monthParam.trim();
+    const year = parseInt(trimmed.substring(0, 4), 10);
+    const month = parseInt(trimmed.substring(4, 6), 10);
+
+    // 年の範囲チェック
+    if (year < minYear || year > currentYear) {
+        return { year: currentYear, month: currentMonth };
+    }
+
+    // 月の範囲チェック
+    if (month < 1 || month > 12) {
+        return { year: currentYear, month: currentMonth };
     }
 
     // 年と月の組み合わせをチェック（2025年6月以降、今月以前）
