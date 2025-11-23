@@ -5,7 +5,7 @@ import { AttendanceRecordsResult } from "./actions";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AttendanceRecordsResultType } from "./actions";
-import { useSearchParams } from "next/navigation";
+import { useQueryStates, parseAsString } from "nuqs";
 import { parseYearMonthParams, filterRecordsByYearMonth } from "./util";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
@@ -18,13 +18,15 @@ interface AttendanceViewProps {
 }
 
 const AttendanceView = ({ isAdmin, userId }: AttendanceViewProps) => {
-    const searchParams = useSearchParams();
+    // nuqsを使用してURLパラメータを管理
+    const [params] = useQueryStates({
+        month: parseAsString,
+        users: parseAsString,
+        statuses: parseAsString,
+    });
 
     // 年月の検索パラメータをバリデーション
-    const { year, month } = parseYearMonthParams(
-        searchParams.get("y"),
-        searchParams.get("m")
-    );
+    const { year, month } = parseYearMonthParams(params.month);
 
     const [isPending, startTransition] = useTransition(); // データ取得中かどうかを管理する状態
     const [attendanceRecords, setAttendanceRecords] = useState<
