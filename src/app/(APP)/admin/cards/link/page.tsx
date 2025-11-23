@@ -6,6 +6,15 @@ import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import LinkItems from "./_components/link-items";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default async function Page() {
     const user = await requireUser();
@@ -67,10 +76,10 @@ export default async function Page() {
     )
         ? (assignedRaw as unknown as { userId: string; cardId: string }[])
         : (((
-              assignedRaw as unknown as {
-                  rows?: { userId: string; cardId: string }[];
-              }
-          ).rows ?? []) as { userId: string; cardId: string }[]);
+            assignedRaw as unknown as {
+                rows?: { userId: string; cardId: string }[];
+            }
+        ).rows ?? []) as { userId: string; cardId: string }[]);
     const assignedCardIds = new Set(assignedRows.map((r) => r.cardId));
     const assignedUserIds = new Set(assignedRows.map((r) => r.userId));
     const availableCards = activeCards.filter(
@@ -90,6 +99,25 @@ export default async function Page() {
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin">管理画面</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin/cards">カード管理</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>カード紐付け</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <PageHeaderMeta
                 title="カード紐付け"
                 description="従業員とNFCカードの割り当て・解除を管理します。誰がいつどのカードを使用しているか、割り当て・解除の履歴、理由などを記録し、カード利用状況を完全にトレースできます。"

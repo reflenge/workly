@@ -6,6 +6,15 @@ import { redirect, notFound } from "next/navigation";
 import CompensationForm from "./_components/compensation-form";
 import CompensationList from "./_components/compensation-list";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default async function UserDetailPage({
     params,
@@ -34,13 +43,32 @@ export default async function UserDetailPage({
 
     return (
         <div className="container mx-auto p-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin">管理画面</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/admin/users">ユーザー管理</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>
+                            {user.lastName} {user.firstName}
+                        </BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <PageHeaderMeta
                 title="給与設定"
-                description={`${user.lastName} ${
-                    user.firstName
-                }の給与設定を管理します。時給・基本給の設定、適用開始日の指定、給与変更履歴の確認が可能です。現在のステータス：${
-                    user.isActive ? "有効" : "無効"
-                } | 権限：${user.isAdmin ? "管理者" : "一般ユーザー"}`}
+                description={`${user.lastName} ${user.firstName
+                    }の給与設定を管理します。時給・基本給の設定、適用開始日の指定、給与変更履歴の確認が可能です。現在のステータス：${user.isActive ? "有効" : "無効"
+                    } | 権限：${user.isAdmin ? "管理者" : "一般ユーザー"}`}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
