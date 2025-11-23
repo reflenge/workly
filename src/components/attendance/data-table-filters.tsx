@@ -47,52 +47,44 @@ export function DataTableFilters({
         onFilteredDataChangeRef.current = onFilteredDataChange;
     }, [onFilteredDataChange]);
 
-    /** 最初のマウント時に一度だけ実行
-     * その月に含まれるユーザと状態を取得
-     */
+    /** データからユーザーリストと状態リストを構築（初期状態：全ユーザー、勤務中のみ） */
     useEffect(() => {
+        if (data.length === 0) return;
+
+        // ユニークなユーザーを収集（全て選択状態）
         const uniqueUsersMap = new Map<string, UserFilterItem>();
         data.forEach((item: AttendanceRecordsResultType) => {
             const id = item.user?.id ?? "";
             const label = item.user?.fullName ?? "";
             if (id && !uniqueUsersMap.has(id)) {
-                uniqueUsersMap.set(id, { id, label, checked: false });
+                uniqueUsersMap.set(id, { id, label, checked: true });
             }
         });
         setUserList(Array.from(uniqueUsersMap.values()));
 
+        // ユニークな状態を収集（勤務中のみ選択状態）
         const uniqueStatusMap = new Map<number, StatusFilterItem>();
-
-        // まず全てのステータスを非選択状態で収集
         data.forEach((item: AttendanceRecordsResultType) => {
             const id = item.status?.id ?? 0;
             const label = item.status?.label ?? "";
             if (id && !uniqueStatusMap.has(id)) {
-                uniqueStatusMap.set(id, { id, label, checked: false });
+                uniqueStatusMap.set(id, {
+                    id,
+                    label,
+                    checked: id === 2 // 勤務中のみ選択
+                });
             }
         });
-
-        // 「勤務中」(id:2)が存在する場合は初期選択状態にする
-        const statusListValues = Array.from(uniqueStatusMap.values());
-        const hasWorkingStatus = statusListValues.some(
-            (status) => status.id === 2
-        );
-
-        if (hasWorkingStatus) {
-            // 「勤務中」のみ選択状態にして他は非選択
-            const updatedStatusList = statusListValues.map((status) => ({
-                ...status,
-                checked: status.id === 2,
-            }));
-            setStatusList(updatedStatusList);
-        } else {
-            // 「勤務中」がない場合は全て非選択状態（全部表示）
-            setStatusList(statusListValues);
-        }
+        setStatusList(Array.from(uniqueStatusMap.values()));
     }, [data]);
 
+    // フィルタリング処理
     useEffect(() => {
-        // 両リストが全部falseなら、data全体を表示 (フィルタしない)
+        if (userList.length === 0 || statusList.length === 0) {
+            return;
+        }
+
+        // 両リストが全部falseなら、data全体を表示
         if (
             userList.every((user) => user.checked === false) &&
             statusList.every((status) => status.checked === false)
@@ -103,28 +95,60 @@ export function DataTableFilters({
 
         let filtered = data;
 
-        // ユーザのどれかがチェックされていれば、そのユーザに限定
-        if (userList.some((user) => user.checked)) {
-            const checkedUsers = userList
-                .filter((user) => user.checked)
-                .map((user) => user.id);
+        // ユーザーフィルタ
+        const checkedUserIds = userList
+            .filter((user) => user.checked)
+            .map((user) => user.id);
+        if (checkedUserIds.length > 0 && checkedUserIds.length < userList.length) {
             filtered = filtered.filter((item: AttendanceRecordsResultType) =>
-                checkedUsers.includes(item.user?.id ?? "")
+                checkedUserIds.includes(item.user?.id ?? "")
             );
         }
 
-        // 状態のどれかがチェックされていれば、その状態に限定
-        if (statusList.some((status) => status.checked)) {
-            const checkedStatuses = statusList
-                .filter((status) => status.checked)
-                .map((status) => status.id);
+        // 状態フィルタ
+        const checkedStatusIds = statusList
+            .filter((status) => status.checked)
+            .map((status) => status.id);
+        if (checkedStatusIds.length > 0 && checkedStatusIds.length < statusList.length) {
             filtered = filtered.filter((item: AttendanceRecordsResultType) =>
-                checkedStatuses.includes(item.status?.id ?? 0)
+                checkedStatusIds.includes(item.status?.id ?? 0)
             );
         }
 
         onFilteredDataChangeRef.current(filtered);
     }, [userList, statusList, data]);
+
+    // 初期状態に戻す関数（ユーザー全選択、状態は勤務中のみ）
+    const resetToInitialState = () => {
+        setUserList(
+            userList.map((user) => ({
+                ...user,
+                checked: true,
+            }))
+        );
+        setStatusList(
+            statusList.map((status) => ({
+                ...status,
+                checked: status.id === 2,
+            }))
+        );
+    };
+
+    // すべて表示する関数
+    const showAll = () => {
+        setUserList(
+            userList.map((user) => ({
+                ...user,
+                checked: true,
+            }))
+        );
+        setStatusList(
+            statusList.map((status) => ({
+                ...status,
+                checked: true,
+            }))
+        );
+    };
 
     return (
         <div className="flex flex-wrap items-center py-4 gap-2">
@@ -135,14 +159,14 @@ export function DataTableFilters({
                             ユーザ
                             {userList.filter((user) => user.checked).length >
                                 0 && (
-                                <span className="ml-2 text-xs text-muted-foreground">
-                                    {
-                                        userList.filter((user) => user.checked)
-                                            .length
-                                    }
-                                    件選択中
-                                </span>
-                            )}
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                        {
+                                            userList.filter((user) => user.checked)
+                                                .length
+                                        }
+                                        件選択中
+                                    </span>
+                                )}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -158,9 +182,9 @@ export function DataTableFilters({
                                             userList.map((userChecked) =>
                                                 userChecked.id === user.id
                                                     ? {
-                                                          ...userChecked,
-                                                          checked: value,
-                                                      }
+                                                        ...userChecked,
+                                                        checked: value,
+                                                    }
                                                     : userChecked
                                             )
                                         )
@@ -175,7 +199,7 @@ export function DataTableFilters({
                                 setUserList(
                                     userList.map((userChecked) => ({
                                         ...userChecked,
-                                        checked: false,
+                                        checked: true,
                                     }))
                                 )
                             }
@@ -191,15 +215,15 @@ export function DataTableFilters({
                         状態
                         {statusList.filter((status) => status.checked).length >
                             0 && (
-                            <span className="ml-2 text-xs text-muted-foreground">
-                                {
-                                    statusList.filter(
-                                        (status) => status.checked
-                                    ).length
-                                }
-                                件選択中
-                            </span>
-                        )}
+                                <span className="ml-2 text-xs text-muted-foreground">
+                                    {
+                                        statusList.filter(
+                                            (status) => status.checked
+                                        ).length
+                                    }
+                                    件選択中
+                                </span>
+                            )}
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -215,9 +239,9 @@ export function DataTableFilters({
                                         statusList.map((statusChecked) =>
                                             statusChecked.id === status.id
                                                 ? {
-                                                      ...statusChecked,
-                                                      checked: value,
-                                                  }
+                                                    ...statusChecked,
+                                                    checked: value,
+                                                }
                                                 : statusChecked
                                         )
                                     )
@@ -232,7 +256,7 @@ export function DataTableFilters({
                             setStatusList(
                                 statusList.map((statusChecked) => ({
                                     ...statusChecked,
-                                    checked: false,
+                                    checked: true,
                                 }))
                             )
                         }
@@ -241,25 +265,11 @@ export function DataTableFilters({
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <Button
-                variant="ghost"
-                className=""
-                onClick={() => {
-                    setUserList(
-                        userList.map((user) => ({
-                            ...user,
-                            checked: false,
-                        }))
-                    );
-                    setStatusList(
-                        statusList.map((status) => ({
-                            ...status,
-                            checked: false,
-                        }))
-                    );
-                }}
-            >
-                クリア
+            <Button variant="outline" onClick={showAll}>
+                すべて表示
+            </Button>
+            <Button variant="ghost" onClick={resetToInitialState}>
+                初期表示に戻す
             </Button>
         </div>
     );
