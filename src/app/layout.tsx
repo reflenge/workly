@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import ClarityInit from "@/components/clarity-init";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const notoSansJP = Noto_Sans_JP({
     variable: "--font-noto-sans-jp",
@@ -27,7 +28,9 @@ export default function RootLayout({
     return (
         <html lang="ja">
             <body className={cn(notoSansJP.variable, "min-w-80 antialiased")}>
-                <Suspense fallback={null}>{children}</Suspense>
+                <NuqsAdapter>
+                    <Suspense fallback={null}>{children}</Suspense>
+                </NuqsAdapter>
                 <Toaster richColors closeButton />
                 <SpeedInsights />
                 <Analytics />

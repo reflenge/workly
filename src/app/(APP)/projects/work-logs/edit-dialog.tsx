@@ -44,11 +44,13 @@ export function WorkLogEditDialog({
     initialContent,
     projects,
 }: WorkLogEditDialogProps) {
+    // ダイアログ内のフォーム状態管理
     const [projectId, setProjectId] = useState(initialProjectId);
     const [content, setContent] = useState(initialContent);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
 
+    // ダイアログが開かれたときに初期値をリセット
     useEffect(() => {
         if (isOpen) {
             setProjectId(initialProjectId);
@@ -56,12 +58,15 @@ export function WorkLogEditDialog({
         }
     }, [isOpen, initialProjectId, initialContent]);
 
+    // 更新処理
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
+            // Server Actionを呼び出して更新
             await updateWorkLog(logId, projectId, content);
             toast.success("作業ログを更新しました");
             onOpenChange(false);
+            // データを再取得して画面を更新
             router.refresh();
         } catch (error) {
             toast.error("更新に失敗しました");
@@ -71,6 +76,7 @@ export function WorkLogEditDialog({
         }
     };
 
+    // 削除処理
     const handleDelete = async () => {
         if (!confirm("本当に削除しますか？")) {
             return;
@@ -78,9 +84,11 @@ export function WorkLogEditDialog({
 
         setIsSubmitting(true);
         try {
+            // Server Actionを呼び出して削除
             await deleteWorkLog(logId);
             toast.success("作業ログを削除しました");
             onOpenChange(false);
+            // データを再取得して画面を更新
             router.refresh();
         } catch (error) {
             toast.error("削除に失敗しました");
