@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, attendanceLogs, attendanceStatus } from "@/db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, and } from "drizzle-orm";
 import {
     Table,
     TableBody,
@@ -15,6 +15,7 @@ import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 
 export default async function UsersCurrentStatusPage() {
     // 全ユーザーと、進行中(ended_at IS NULL)の打刻を LEFT JOIN
+    // users.isActive = true のユーザーのみ対象
     const rows = await db
         .select({
             userId: users.id,
@@ -27,12 +28,18 @@ export default async function UsersCurrentStatusPage() {
             startedAt: attendanceLogs.startedAt,
         })
         .from(users)
-        .leftJoin(attendanceLogs, eq(attendanceLogs.userId, users.id))
+        .leftJoin(
+            attendanceLogs,
+            and(
+                eq(attendanceLogs.userId, users.id),
+                isNull(attendanceLogs.endedAt)
+            )
+        )
         .leftJoin(
             attendanceStatus,
             eq(attendanceStatus.id, attendanceLogs.statusId)
         )
-        .where(isNull(attendanceLogs.endedAt));
+        .where(eq(users.isActive, true));
 
     const getBadgeVariant = (code?: string | null) => {
         switch (code) {
@@ -56,7 +63,7 @@ export default async function UsersCurrentStatusPage() {
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
                 title="ステータス一覧"
-                description="全従業員の現在の勤務状態（勤務中・休憩中・退勤済み）をリアルタイムで一覧表示します。各ユーザーの最新ステータスと開始時刻、アクティブ状態を確認できます。"
+                description="全従業員の現在の勤務状態（勤務中・休憩中・退勤済み）をリアルタイムで一覧表示します。各ユーザーの最新ステータスと開始時刻を確認できます。"
             />
 
             <div className="rounded-md border">
@@ -70,14 +77,13 @@ export default async function UsersCurrentStatusPage() {
                             <TableHead className="font-bold">
                                 開始時刻
                             </TableHead>
-                            <TableHead>アクティブ</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {rows.length === 0 ? (
                             <TableRow>
                                 <TableCell
-                                    colSpan={4}
+                                    colSpan={3}
                                     className="text-center py-8 text-muted-foreground"
                                 >
                                     表示できるユーザーがいません
@@ -95,16 +101,13 @@ export default async function UsersCurrentStatusPage() {
                                                 r.statusCode
                                             )}
                                         >
-                                            {r.statusLabel ?? "未取得"}
+                                            {r.statusLabel ?? "退勤"}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-sm text-foreground">
                                         {formatDateTime(
                                             r.startedAt as unknown as Date
                                         )}
-                                    </TableCell>
-                                    <TableCell className="text-sm text-muted-foreground">
-                                        {r.isActive ? "Yes" : "No"}
                                     </TableCell>
                                 </TableRow>
                             ))

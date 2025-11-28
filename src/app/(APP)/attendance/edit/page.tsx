@@ -13,9 +13,14 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function AttendanceEditListPage() {
     const user = await requireUser();
+
+    if (!user.isActive) {
+        redirect("/account/stopped");
+    }
 
     const recentLogs = await db
         .select({

@@ -19,8 +19,9 @@ import {
     uniqueIndex,
     index,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 
+// ユーザー情報を管理するテーブル。Supabase Authとの紐付けやプロフィール情報を含みます。
 export const users = pgTable(
     "user",
     {
@@ -55,6 +56,7 @@ export const users = pgTable(
     })
 );
 
+// 物理カード（NFC等）の情報を管理するテーブル。
 export const cards = pgTable(
     "card",
     {
@@ -75,6 +77,7 @@ export const cards = pgTable(
     })
 );
 
+// カードの割り当て履歴を管理するテーブル。どのカードが誰にいつ割り当てられたかを記録します。
 export const cardAssignments = pgTable(
     "card_assignment",
     {
@@ -137,6 +140,7 @@ export const cardAssignments = pgTable(
     })
 );
 
+// 勤怠ステータス（勤務中、休憩中、オフなど）のマスターデータを管理するテーブル。
 export const attendanceStatus = pgTable(
     "attendance_status",
     {
@@ -157,6 +161,7 @@ export const attendanceStatus = pgTable(
     })
 );
 
+// 打刻ソース（Web、Discord、NFC、管理画面など）のマスターデータを管理するテーブル。
 export const attendanceLogSource = pgTable(
     "attendance_log_source",
     {
@@ -177,6 +182,7 @@ export const attendanceLogSource = pgTable(
     })
 );
 
+// 勤怠ログ（出退勤記録）を管理するテーブル。開始・終了時刻やステータスを記録します。
 export const attendanceLogs = pgTable(
     "attendance_log",
     {
@@ -225,6 +231,7 @@ export const attendanceLogs = pgTable(
     })
 );
 
+// プロジェクト情報を管理するテーブル。作業ログの紐付けに使用されます。
 export const projects = pgTable(
     "project",
     {
@@ -245,6 +252,7 @@ export const projects = pgTable(
     })
 );
 
+// 作業ログを管理するテーブル。勤怠ログやプロジェクトに紐づく具体的な作業内容を記録します。
 export const workLogs = pgTable(
     "work_log",
     {
@@ -281,6 +289,7 @@ export const workLogs = pgTable(
     })
 );
 
+// ユーザーの給与・報酬条件（時給、月給など）の履歴を管理するテーブル。
 export const userCompensation = pgTable(
     "user_compensation",
     {
@@ -316,7 +325,7 @@ export const userCompensation = pgTable(
         // 期間重複禁止は EXCLUDE で raw SQL（下のマイグレーションで）
     })
 );
-
+// 給与計算期間を管理するテーブル。給与計算の対象となる期間（例: 2023年1月1日〜2023年1月31日）を定義します。
 export const payrollPeriod = pgTable(
     "payroll_period",
     {
@@ -338,6 +347,7 @@ export const payrollPeriod = pgTable(
     })
 );
 
+// 各ユーザーの給与計算明細を管理するテーブル。特定の給与計算期間における個々のユーザーの給与詳細を記録します。
 export const payrollItem = pgTable(
     "payroll_item",
     {
@@ -384,3 +394,22 @@ export const payrollItem = pgTable(
         idxPayrollUser: index("idx_payroll_user").on(t.userId),
     })
 );
+
+export const payrollItemRelations = relations(payrollItem, ({ one }) => ({
+    period: one(payrollPeriod, {
+        fields: [payrollItem.periodId],
+        references: [payrollPeriod.id],
+    }),
+    user: one(users, {
+        fields: [payrollItem.userId],
+        references: [users.id],
+    }),
+}));
+
+export const payrollPeriodRelations = relations(payrollPeriod, ({ many }) => ({
+    items: many(payrollItem),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+    payrollItems: many(payrollItem),
+}));
