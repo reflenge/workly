@@ -133,19 +133,30 @@ const DataDashboard = ({ data, isAdmin, year, month }: DataDashboardProps) => {
 
                 // 総時間の秒以下を切り捨て 分以上を残す
                 // decimal.js で分単位に切り捨て
+                // 総労働時間（ミリ秒）を分単位に切り捨てて再計算
+                // 1. ミリ秒を分に変換 (div(60000))
+                // 2. 小数点以下を切り捨て (floor())
+                // 3. 分をミリ秒に再変換 (mul(60000))
                 const userTotalWorkingTimeMsMathFloor = new Decimal(
                     userTotalWorkingTimeMs
                 )
-                    .div(60000) // ミリ秒→分
-                    .floor()
-                    .mul(60000) // 分→ミリ秒
-                    .toNumber();
+                    .div(60000) // ミリ秒を分に変換
+                    .floor() // 小数点以下を切り捨て
+                    .mul(60000) // 分をミリ秒に再変換
+                    .toNumber(); // 結果を数値型で取得
+
+                // ユーザーごとの総支給額を計算
+                // 勤務記録配列の最初のレコードから時給を取得（compensation?.hourlyRate）
+                // 時給が存在する場合のみ計算
                 const userTotalPay = userRecords[0]?.compensation?.hourlyRate
                     ? new Decimal(userRecords[0]?.compensation?.hourlyRate)
-                          .mul(userTotalWorkingTimeMsMathFloor / 3_600_000)
-                          .floor()
-                          .toNumber()
-                    : 0;
+                        // 時給に切り捨て済みの労働時間（ミリ秒）を時間単位に変換して乗算
+                        // 1時間 = 3,600,000ミリ秒
+                        // 計算結果の小数点以下を切り捨て
+                        .mul(userTotalWorkingTimeMsMathFloor / 3_600_000)
+                        .floor() // 支給額の小数点以下を切り捨て
+                        .toNumber() // 結果を数値型で取得
+                    : 0; // 時給がない場合は0
                 console.log(
                     "🚀 => data-dashboard.tsx:112 => DataDashboard => userRecords:",
                     userRecords

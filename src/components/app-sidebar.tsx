@@ -20,6 +20,7 @@ import {
     ClockIcon,
     BookOpenIcon,
     CodeIcon,
+    BanknoteIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { AppSidebarClient, AppSidebarFooter } from "./app-sidebar-client";
@@ -66,6 +67,14 @@ export async function AppSidebar() {
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
                                     </SidebarMenuSub>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild>
+                                        <Link href="/payroll" prefetch={true}>
+                                            <BanknoteIcon />
+                                            <span>給与明細</span>
+                                        </Link>
+                                    </SidebarMenuButton>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem>
                                     <SidebarMenuButton asChild>

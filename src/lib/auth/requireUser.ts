@@ -27,6 +27,8 @@ export type PublicUser = {
     iconUrl: string | null;
     /** 管理者権限を持っているかどうか */
     isAdmin: boolean;
+    /** アカウントが有効かどうか */
+    isActive: boolean;
 };
 
 /**
@@ -41,6 +43,7 @@ const toPublicUser = (u: {
     lastName: string;
     iconUrl: string | null;
     isAdmin: boolean;
+    isActive: boolean;
 }): PublicUser => ({
     id: u.id,
     authId: u.authId,
@@ -48,6 +51,7 @@ const toPublicUser = (u: {
     lastName: u.lastName,
     iconUrl: u.iconUrl ?? null,
     isAdmin: u.isAdmin,
+    isActive: u.isActive,
 });
 
 /**
@@ -84,6 +88,7 @@ export const requireUser = cache(async (): Promise<PublicUser> => {
                     lastName: "ユーザ",
                     iconUrl: null,
                     isAdmin: true,
+                    isActive: true,
                 };
             }
         }
@@ -105,6 +110,7 @@ export const requireUser = cache(async (): Promise<PublicUser> => {
             lastName: true,
             iconUrl: true,
             isAdmin: true,
+            isActive: true,
         },
     });
 
