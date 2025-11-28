@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { requireUser } from "@/lib/auth/requireUser";
+import { redirect } from "next/navigation";
 import { UserProvider } from "@/components/providers/user-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -8,6 +9,10 @@ import { PageHeader } from "@/components/page-header";
 
 export default async function Layout({ children }: { children: ReactNode }) {
     const user = await requireUser(); // ログイン必須／未ログインはredirect
+
+    if (!user.isActive) {
+        redirect("/account/stopped");
+    }
 
     // Client側のグローバルステートへ"初期値"として渡す
     return (

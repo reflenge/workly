@@ -5,6 +5,7 @@ import { attendanceLogs, attendanceStatus } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { isPeriodClosed } from "@/lib/payroll/service";
 
 export interface UpdateAttendanceLogInput {
     id: string;
@@ -47,6 +48,23 @@ export async function updateAttendanceLog(
             // 変更前の値
             const oldStartedAt = currentLog.startedAt;
             const oldEndedAt = currentLog.endedAt;
+
+            // 給与計算期間の締め切りチェック
+            // 1. 変更前の日時がクローズ済み期間に含まれているか
+            if (await isPeriodClosed(oldStartedAt)) {
+                throw new Error("この期間の給与計算は既に締め切られているため、変更できません");
+            }
+            if (oldEndedAt && await isPeriodClosed(oldEndedAt)) {
+                throw new Error("この期間の給与計算は既に締め切られているため、変更できません");
+            }
+
+            // 2. 変更後の日時がクローズ済み期間に含まれているか
+            if (await isPeriodClosed(input.startedAt)) {
+                throw new Error("変更後の日時が締め切り済みの期間に含まれています");
+            }
+            if (input.endedAt && await isPeriodClosed(input.endedAt)) {
+                throw new Error("変更後の日時が締め切り済みの期間に含まれています");
+            }
 
             // 1. 開始時刻の変更処理
             if (input.startedAt.getTime() !== oldStartedAt.getTime()) {
