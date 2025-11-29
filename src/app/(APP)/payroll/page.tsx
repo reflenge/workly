@@ -12,6 +12,7 @@ import {
 import { formatCurrency } from "@/components/attendance/format-utils";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { ja } from "date-fns/locale/ja";
 
 export default async function UserPayrollPage() {
     const user = await requireUser();
@@ -42,7 +43,9 @@ export default async function UserPayrollPage() {
                             history.map(({ payrollItem: item, period }) => (
                                 <TableRow key={item.id}>
                                     <TableCell className="font-medium">
-                                        {format(period.startDate, "yyyy年MM月")}
+                                        {format(period.startDate, "yyyy年MM月", {
+                                            locale: ja,
+                                        })}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         {(item.workedMinutes / 60).toFixed(1)}時間
