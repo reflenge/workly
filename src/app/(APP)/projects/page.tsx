@@ -20,6 +20,9 @@ export default async function Page() {
         .from(projects)
         .orderBy(desc(projects.updatedAt));
 
+    const activeProjects = list.filter((p) => p.isActive);
+    const inactiveProjects = list.filter((p) => !p.isActive);
+
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
@@ -28,9 +31,22 @@ export default async function Page() {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <NewItem />
-                {list.map((p) => (
+                {activeProjects.map((p) => (
                     <ProjectItems key={p.id} project={p} />
                 ))}
+                {inactiveProjects.length > 0 && (
+                    <>
+                        <div className="col-span-full py-4">
+                            <hr className="border-t border-border" />
+                            <p className="text-sm text-muted-foreground mt-2">
+                                無効なプロジェクト
+                            </p>
+                        </div>
+                        {inactiveProjects.map((p) => (
+                            <ProjectItems key={p.id} project={p} />
+                        ))}
+                    </>
+                )}
             </div>
         </div>
     );
