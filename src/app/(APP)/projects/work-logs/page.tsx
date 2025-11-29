@@ -24,10 +24,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 
+import { ProjectSelector } from "./project-selector";
+
 export default async function WorkLogsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ month?: string }>;
+    searchParams: Promise<{ month?: string; projectId?: string }>;
 }) {
     // ユーザー認証: ログインしていない場合はリダイレクトされます
     const user = await requireUser();
@@ -36,6 +38,7 @@ export default async function WorkLogsPage({
     // URLパラメータから月を取得 (形式: yyyyMM)。指定がない場合は現在の月を使用
     const monthStr = params.month || format(new Date(), "yyyyMM");
     const currentMonth = parse(monthStr, "yyyyMM", new Date());
+    const projectId = params.projectId;
 
     // 選択された月の開始日と終了日を計算
     const start = startOfMonth(currentMonth);
@@ -45,7 +48,8 @@ export default async function WorkLogsPage({
     // 1. 選択された月の作業ログ (プロジェクト、ユーザー、勤怠ログ情報を結合)
     // 2. 編集ダイアログ用の有効なプロジェクト一覧
     // 3. ページネーション制御用の全作業ログの期間 (最小/最大日時)
-    const [logs, activeProjects, dateRangeResult] = await Promise.all([
+    // 4. フィルター用の全プロジェクト一覧
+    const [logs, activeProjects, dateRangeResult, allProjects] = await Promise.all([
         // Logs for the selected month
         db
             .select({
@@ -71,7 +75,8 @@ export default async function WorkLogsPage({
             .where(
                 and(
                     gte(workLogs.createdAt, start),
-                    lte(workLogs.createdAt, end)
+                    lte(workLogs.createdAt, end),
+                    projectId ? eq(workLogs.projectId, projectId) : undefined
                 )
             )
             .orderBy(desc(workLogs.createdAt)),
@@ -87,6 +92,17 @@ export default async function WorkLogsPage({
                 maxDate: max(workLogs.createdAt),
             })
             .from(workLogs),
+        // Projects with logs in the selected month
+        db
+            .selectDistinct({ id: projects.id, name: projects.name })
+            .from(workLogs)
+            .innerJoin(projects, eq(workLogs.projectId, projects.id))
+            .where(
+                and(
+                    gte(workLogs.createdAt, start),
+                    lte(workLogs.createdAt, end)
+                )
+            ),
     ]);
 
     const { minDate, maxDate } = dateRangeResult[0];
@@ -172,6 +188,7 @@ export default async function WorkLogsPage({
                     minDate={minDate ? new Date(minDate) : undefined}
                     maxDate={maxDate ? new Date(maxDate) : undefined}
                 />
+                <ProjectSelector projects={allProjects} />
             </div>
 
             <div className="rounded-md border p-4">
