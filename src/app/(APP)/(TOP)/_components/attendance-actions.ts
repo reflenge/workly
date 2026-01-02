@@ -203,7 +203,7 @@ export async function recordAttendance(
                 // 既存の打刻が進行中の場合：既存の打刻を終了してから新しい打刻を開始
                 const startedAt = activeLog[0].startedAt;
 
-                // 日付が異なる場合の処理
+                // 月が異なる場合の処理
                 if (isDifferentMonth(startedAt, now)) {
                     // 1. 既存の打刻を開始日の23:59:59で終了
                     const endOfStartMonth = getEndOfMonth(startedAt);
@@ -450,28 +450,15 @@ function getMonthsBetween(startDate: Date, endDate: Date): Date[] {
     const startJst = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
     const endJst = new Date(endDate.getTime() + 9 * 60 * 60 * 1000);
 
-    let currentYear = startJst.getUTCFullYear();
-    let currentMonth = startJst.getUTCMonth() + 1; // 翌月から開始
+    const startMonthKey =
+        startJst.getUTCFullYear() * 12 + startJst.getUTCMonth();
+    const endMonthKey = endJst.getUTCFullYear() * 12 + endJst.getUTCMonth();
 
-    // endMonth string for comparison
-    const endYear = endJst.getUTCFullYear();
-    const endMonth = endJst.getUTCMonth();
-
-    while (
-        currentYear < endYear ||
-        (currentYear === endYear && currentMonth < endMonth)
-    ) {
-        const monthIndex = currentMonth; // 0-indexed month value expected by Date.UTC is handled below
-        const monthStartUtc = new Date(
-            Date.UTC(currentYear, monthIndex, 1, -9, 0, 0, 0)
-        );
-        months.push(monthStartUtc);
-
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+    // 開始月の翌月〜終了月の前月まで（開始月/終了月は含めない）
+    for (let monthKey = startMonthKey + 1; monthKey < endMonthKey; monthKey++) {
+        const year = Math.floor(monthKey / 12);
+        const monthIndex = monthKey % 12;
+        months.push(new Date(Date.UTC(year, monthIndex, 1, -9, 0, 0, 0)));
     }
 
     return months;
