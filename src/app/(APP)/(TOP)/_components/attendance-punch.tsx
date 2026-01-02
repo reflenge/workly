@@ -149,6 +149,7 @@ const AttendancePunch = ({ userId }: AttendancePunchProps) => {
                 router.refresh();
             } else {
                 // 失敗時：エラーメッセージを表示
+                // console.error(result.message);
                 toast.error(result.message);
             }
         });
