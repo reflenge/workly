@@ -120,12 +120,17 @@ export async function updateSession(request: NextRequest) {
     const { data } = await supabase.auth.getClaims();
     const user = data?.claims;
 
+    const publicPaths = ["/privacy-policy", "/terms", "/error"];
+    const isPublicPath =
+        request.nextUrl.pathname.startsWith("/auth") ||
+        publicPaths.includes(request.nextUrl.pathname);
+
     // 以下の条件分岐は、ユーザーが未認証かつ特定のパス以外にアクセスした場合にログインページへリダイレクトするためのものです。
     if (
         // 1. userがnullまたはundefinedの場合（＝認証されていない状態）
         !user &&
-        // 2. 現在のリクエストパスが「/auth」で始まっていない場合
-        !request.nextUrl.pathname.startsWith("/auth")
+        // 2. 現在のリクエストパスが公開対象に含まれない場合
+        !isPublicPath
     ) {
         // 上記すべての条件を満たす場合（＝未認証ユーザーが認証関連ページ・トップページ以外にアクセスした場合）、
         // 強制的にログインページ（/auth/login）へリダイレクトする

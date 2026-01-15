@@ -88,6 +88,23 @@ export default async function Page({
                                 <p className="text-xs text-center text-slate-500 dark:text-slate-400">
                                     問題が解決しない場合は、システム管理者にお問い合わせください
                                 </p>
+                                <div className="mt-3 flex items-center justify-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                                    <Link
+                                        href="/terms"
+                                        className="hover:text-slate-800 hover:underline dark:hover:text-slate-200"
+                                    >
+                                        利用規約
+                                    </Link>
+                                    <span className="text-slate-300 dark:text-slate-700">
+                                        |
+                                    </span>
+                                    <Link
+                                        href="/privacy-policy"
+                                        className="hover:text-slate-800 hover:underline dark:hover:text-slate-200"
+                                    >
+                                        プライバシーポリシー
+                                    </Link>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
