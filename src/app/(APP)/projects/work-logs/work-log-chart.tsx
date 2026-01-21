@@ -9,6 +9,7 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
+    LabelList,
 } from "recharts";
 
 // チャートデータの型定義
@@ -26,24 +27,34 @@ interface WorkLogChartProps {
 
 // チャートの色定義 (ユーザーごとに異なる色を割り当てるため)
 const COLORS = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#0088fe",
-    "#00c49f",
-    "#ffbb28",
-    "#ff8042",
-    "#a4de6c",
-    "#d0ed57",
+    "#8f8fd0",
+    "#8fcf90",
+    "#ffcf50",
+    "#ff8f40",
+    "#0f8ff0",
+    "#0fcf90",
+    "#ffbf20",
+    "#ff8f40",
+    "#afdf60",
+    "#dfef50",
 ];
 
 export function WorkLogChart({ data, users }: WorkLogChartProps) {
+    const chartData = data.map((item) => {
+        const total = users.reduce((sum, key) => {
+            const value = item[key];
+            const numeric = typeof value === "string" ? Number(value) : value;
+            return typeof numeric === "number" && !Number.isNaN(numeric) ? sum + numeric : sum;
+        }, 0);
+
+        return { ...item, __total: total };
+    });
+
     return (
         <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                    data={data}
+                    data={chartData}
                     margin={{
                         top: 20,
                         right: 30,
@@ -63,7 +74,23 @@ export function WorkLogChart({ data, users }: WorkLogChartProps) {
                             dataKey={user}
                             stackId="a" // 同じstackIdを指定することで積み上げグラフになります
                             fill={COLORS[index % COLORS.length]} // 色を循環して割り当て
-                        />
+                        >
+                            {index === users.length - 1 && (
+                                <LabelList
+                                    dataKey="__total"
+                                    position="top"
+                                    formatter={(value: unknown) => {
+                                        if (typeof value === "number") {
+                                            return value.toFixed(2);
+                                        }
+                                        if (typeof value === "string") {
+                                            return value;
+                                        }
+                                        return "";
+                                    }}
+                                />
+                            )}
+                        </Bar>
                     ))}
                 </BarChart>
             </ResponsiveContainer>
