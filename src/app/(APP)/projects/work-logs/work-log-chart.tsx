@@ -39,6 +39,16 @@ const COLORS = [
     "#dfef50",
 ];
 
+const formatHoursToTime = (value: number) => {
+    if (!Number.isFinite(value)) return "";
+    const totalMinutes = Math.round(value * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours === 0) return `${minutes}分`;
+    if (minutes === 0) return `${hours}時間`;
+    return `${hours}時間${minutes}分`;
+};
+
 export function WorkLogChart({ data, users }: WorkLogChartProps) {
     const chartData = data.map((item) => {
         const total = users.reduce((sum, key) => {
@@ -81,7 +91,7 @@ export function WorkLogChart({ data, users }: WorkLogChartProps) {
                                     position="top"
                                     formatter={(value: unknown) => {
                                         if (typeof value === "number") {
-                                            return value.toFixed(2);
+                                            return formatHoursToTime(value);
                                         }
                                         if (typeof value === "string") {
                                             return value;
