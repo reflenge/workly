@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 
 import { ProjectSelector } from "./project-selector";
+import { WorkLogDownloadButton } from "./work-log-download-button";
 
 export default async function WorkLogsPage({
     searchParams,
@@ -167,6 +168,16 @@ export default async function WorkLogsPage({
     });
 
     const userList = Array.from(allUserNames);
+    const downloadRows = logs.map((log) => ({
+        createdAt: format(log.createdAt, "yyyy/MM/dd HH:mm"),
+        user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
+        project: log.projectName || "-",
+        content: log.content,
+        startedAt: log.startedAt
+            ? format(log.startedAt, "yyyy/MM/dd HH:mm")
+            : "-",
+        endedAt: log.endedAt ? format(log.endedAt, "yyyy/MM/dd HH:mm") : "-",
+    }));
 
     return (
         <div className="space-y-4">
@@ -213,6 +224,9 @@ export default async function WorkLogsPage({
             </div>
 
             <div className="rounded-md border">
+                <div className="flex items-center justify-end border-b p-2">
+                    <WorkLogDownloadButton rows={downloadRows} />
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
