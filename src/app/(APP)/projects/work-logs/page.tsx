@@ -168,15 +168,24 @@ export default async function WorkLogsPage({
     });
 
     const userList = Array.from(allUserNames);
+    const formatElapsedTime = (start: Date | null, end: Date | null) => {
+        if (!start || !end) return "-";
+        const diffMs = end.getTime() - start.getTime();
+        if (diffMs <= 0) return "0分";
+        const totalMinutes = Math.round(diffMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        if (hours === 0) return `${minutes}分`;
+        if (minutes === 0) return `${hours}時間`;
+        return `${hours}時間${minutes}分`;
+    };
     const downloadRows = logs.map((log) => ({
         createdAt: format(log.createdAt, "yyyy/MM/dd HH:mm"),
         user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
         project: log.projectName || "-",
         content: log.content,
-        startedAt: log.startedAt
-            ? format(log.startedAt, "yyyy/MM/dd HH:mm")
-            : "-",
-        endedAt: log.endedAt ? format(log.endedAt, "yyyy/MM/dd HH:mm") : "-",
+        startDate: log.startedAt ? format(log.startedAt, "yyyy/MM/dd") : "-",
+        elapsedTime: formatElapsedTime(log.startedAt, log.endedAt),
     }));
 
     return (

@@ -7,8 +7,8 @@ type DownloadRow = {
     user: string;
     project: string;
     content: string;
-    startedAt: string;
-    endedAt: string;
+    startDate: string;
+    elapsedTime: string;
 };
 
 interface WorkLogDownloadButtonProps {
@@ -17,12 +17,12 @@ interface WorkLogDownloadButtonProps {
 }
 
 const HEADERS = [
-    "日時",
+    "記録日時",
     "ユーザー",
     "プロジェクト",
     "内容",
-    "開始時間",
-    "終了時間",
+    "開始日",
+    "経過時間",
 ];
 
 const toCsvValue = (value: string) => {
@@ -44,8 +44,8 @@ export function WorkLogDownloadButton({
                     row.user,
                     row.project,
                     row.content,
-                    row.startedAt,
-                    row.endedAt,
+                    row.startDate,
+                    row.elapsedTime,
                 ]
                     .map(toCsvValue)
                     .join(",")
