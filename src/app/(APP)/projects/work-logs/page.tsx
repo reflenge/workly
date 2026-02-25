@@ -13,6 +13,7 @@ import { desc, eq, and, gte, lte, min, max, isNull } from "drizzle-orm";
 import { WorkLogRow } from "./work-log-row";
 import { MonthSelector } from "./month-selector";
 import { startOfMonth, endOfMonth, parse, format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { WorkLogChart, ChartData } from "./work-log-chart";
 import {
     Breadcrumb,
@@ -63,86 +64,86 @@ export default async function WorkLogsPage({
     const attendanceOnlyLogsQuery = projectId
         ? Promise.resolve([] as AttendanceOnlyLog[])
         : db
-              .select({
-                  id: attendanceLogs.id,
-                  createdAt: attendanceLogs.createdAt,
-                  startedAt: attendanceLogs.startedAt,
-                  endedAt: attendanceLogs.endedAt,
-                  userId: attendanceLogs.userId,
-                  userName: users.lastName,
-                  userFirstName: users.firstName,
-              })
-              .from(attendanceLogs)
-              .leftJoin(
-                  workLogs,
-                  eq(workLogs.attendanceLogId, attendanceLogs.id)
-              )
-              .leftJoin(users, eq(attendanceLogs.userId, users.id))
-              .where(
-                  and(
-                      gte(attendanceLogs.startedAt, start),
-                      lte(attendanceLogs.startedAt, end),
-                      isNull(workLogs.id),
-                      eq(attendanceLogs.statusId, 2)
-                  )
-              )
-              .orderBy(desc(attendanceLogs.startedAt));
-
-    const [logs, activeProjects, dateRangeResult, allProjects, attendanceOnlyLogs] =
-        await Promise.all([
-        // Logs for the selected month
-        db
             .select({
-                id: workLogs.id,
-                content: workLogs.content,
-                createdAt: workLogs.createdAt,
-                projectId: workLogs.projectId,
-                projectName: projects.name,
-                userId: workLogs.userId,
-                userName: users.lastName,
-                userFirstName: users.firstName,
+                id: attendanceLogs.id,
+                createdAt: attendanceLogs.createdAt,
                 startedAt: attendanceLogs.startedAt,
                 endedAt: attendanceLogs.endedAt,
-                attendanceLogId: workLogs.attendanceLogId,
+                userId: attendanceLogs.userId,
+                userName: users.lastName,
+                userFirstName: users.firstName,
             })
-            .from(workLogs)
-            .leftJoin(projects, eq(workLogs.projectId, projects.id))
-            .leftJoin(users, eq(workLogs.userId, users.id))
+            .from(attendanceLogs)
             .leftJoin(
-                attendanceLogs,
+                workLogs,
                 eq(workLogs.attendanceLogId, attendanceLogs.id)
             )
+            .leftJoin(users, eq(attendanceLogs.userId, users.id))
             .where(
                 and(
                     gte(attendanceLogs.startedAt, start),
                     lte(attendanceLogs.startedAt, end),
-                    projectId ? eq(workLogs.projectId, projectId) : undefined
+                    isNull(workLogs.id),
+                    eq(attendanceLogs.statusId, 2)
                 )
             )
-            .orderBy(desc(attendanceLogs.startedAt)),
-        // Active projects for edit dialog
-        db
-            .select({ id: projects.id, name: projects.name })
-            .from(projects)
-            .where(eq(projects.isActive, true)),
-        // Date range for pagination
-        db
-            .select({
-                minDate: min(workLogs.createdAt),
-                maxDate: max(workLogs.createdAt),
-            })
-            .from(workLogs),
-        // Projects with logs in the selected month
-        db
-            .selectDistinct({ id: projects.id, name: projects.name })
-            .from(workLogs)
-            .innerJoin(projects, eq(workLogs.projectId, projects.id))
-            .where(
-                and(
-                    gte(workLogs.createdAt, start),
-                    lte(workLogs.createdAt, end)
+            .orderBy(desc(attendanceLogs.startedAt));
+
+    const [logs, activeProjects, dateRangeResult, allProjects, attendanceOnlyLogs] =
+        await Promise.all([
+            // Logs for the selected month
+            db
+                .select({
+                    id: workLogs.id,
+                    content: workLogs.content,
+                    createdAt: workLogs.createdAt,
+                    projectId: workLogs.projectId,
+                    projectName: projects.name,
+                    userId: workLogs.userId,
+                    userName: users.lastName,
+                    userFirstName: users.firstName,
+                    startedAt: attendanceLogs.startedAt,
+                    endedAt: attendanceLogs.endedAt,
+                    attendanceLogId: workLogs.attendanceLogId,
+                })
+                .from(workLogs)
+                .leftJoin(projects, eq(workLogs.projectId, projects.id))
+                .leftJoin(users, eq(workLogs.userId, users.id))
+                .leftJoin(
+                    attendanceLogs,
+                    eq(workLogs.attendanceLogId, attendanceLogs.id)
                 )
-            ),
+                .where(
+                    and(
+                        gte(attendanceLogs.startedAt, start),
+                        lte(attendanceLogs.startedAt, end),
+                        projectId ? eq(workLogs.projectId, projectId) : undefined
+                    )
+                )
+                .orderBy(desc(attendanceLogs.startedAt)),
+            // Active projects for edit dialog
+            db
+                .select({ id: projects.id, name: projects.name })
+                .from(projects)
+                .where(eq(projects.isActive, true)),
+            // Date range for pagination
+            db
+                .select({
+                    minDate: min(workLogs.createdAt),
+                    maxDate: max(workLogs.createdAt),
+                })
+                .from(workLogs),
+            // Projects with logs in the selected month
+            db
+                .selectDistinct({ id: projects.id, name: projects.name })
+                .from(workLogs)
+                .innerJoin(projects, eq(workLogs.projectId, projects.id))
+                .where(
+                    and(
+                        gte(workLogs.createdAt, start),
+                        lte(workLogs.createdAt, end)
+                    )
+                ),
             attendanceOnlyLogsQuery,
         ]);
 
@@ -269,11 +270,11 @@ export default async function WorkLogsPage({
     ].sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
     const downloadRows = tableRows.map(({ log }) => ({
-        createdAt: format(log.createdAt, "yyyy/MM/dd HH:mm"),
+        createdAt: formatInTimeZone(log.createdAt, "Asia/Tokyo", "yyyy/MM/dd HH:mm"),
         user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
         project: log.projectName || "-",
         content: log.content,
-        startDate: log.startedAt ? format(log.startedAt, "yyyy/MM/dd") : "-",
+        startDate: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "yyyy/MM/dd") : "-",
         elapsedTime: formatElapsedTime(log.startedAt, log.endedAt),
     }));
 
@@ -367,9 +368,9 @@ export default async function WorkLogsPage({
                                         key={log.id}
                                         log={log}
                                         projects={activeProjects}
-                                    isOwner={isOwner}
-                                />
-                            ))
+                                        isOwner={isOwner}
+                                    />
+                                ))
                         )}
                     </TableBody>
                 </Table>
