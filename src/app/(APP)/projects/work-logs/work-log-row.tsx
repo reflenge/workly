@@ -42,7 +42,8 @@ export function WorkLogRow({ log, projects, isOwner }: WorkLogRowProps) {
         <>
             <TableRow
                 className={cn(
-                    isOwner ? "cursor-pointer hover:bg-muted/50" : ""
+                    isOwner ? "cursor-pointer hover:bg-muted/50" : "",
+                    log.content == "作業ログなし" ? "text-muted-foreground" : ""
                 )}
                 onClick={handleRowClick}
             >

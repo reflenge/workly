@@ -9,10 +9,11 @@ import {
 import { db } from "@/db";
 import { attendanceLogs, projects, users, workLogs } from "@/db/schema";
 import { requireUser } from "@/lib/auth/requireUser";
-import { desc, eq, and, gte, lte, min, max } from "drizzle-orm";
+import { desc, eq, and, gte, lte, min, max, isNull } from "drizzle-orm";
 import { WorkLogRow } from "./work-log-row";
 import { MonthSelector } from "./month-selector";
 import { startOfMonth, endOfMonth, parse, format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { WorkLogChart, ChartData } from "./work-log-chart";
 import {
     Breadcrumb,
@@ -25,6 +26,17 @@ import {
 import Link from "next/link";
 
 import { ProjectSelector } from "./project-selector";
+import { WorkLogDownloadButton } from "./work-log-download-button";
+
+type AttendanceOnlyLog = {
+    id: string;
+    createdAt: Date;
+    startedAt: Date;
+    endedAt: Date | null;
+    userId: string;
+    userName: string | null;
+    userFirstName: string | null;
+};
 
 export default async function WorkLogsPage({
     searchParams,
@@ -49,61 +61,91 @@ export default async function WorkLogsPage({
     // 2. 編集ダイアログ用の有効なプロジェクト一覧
     // 3. ページネーション制御用の全作業ログの期間 (最小/最大日時)
     // 4. フィルター用の全プロジェクト一覧
-    const [logs, activeProjects, dateRangeResult, allProjects] = await Promise.all([
-        // Logs for the selected month
-        db
+    const attendanceOnlyLogsQuery = projectId
+        ? Promise.resolve([] as AttendanceOnlyLog[])
+        : db
             .select({
-                id: workLogs.id,
-                content: workLogs.content,
-                createdAt: workLogs.createdAt,
-                projectId: workLogs.projectId,
-                projectName: projects.name,
-                userId: workLogs.userId,
-                userName: users.lastName,
-                userFirstName: users.firstName,
+                id: attendanceLogs.id,
+                createdAt: attendanceLogs.createdAt,
                 startedAt: attendanceLogs.startedAt,
                 endedAt: attendanceLogs.endedAt,
-                attendanceLogId: workLogs.attendanceLogId,
+                userId: attendanceLogs.userId,
+                userName: users.lastName,
+                userFirstName: users.firstName,
             })
-            .from(workLogs)
-            .leftJoin(projects, eq(workLogs.projectId, projects.id))
-            .leftJoin(users, eq(workLogs.userId, users.id))
+            .from(attendanceLogs)
             .leftJoin(
-                attendanceLogs,
+                workLogs,
                 eq(workLogs.attendanceLogId, attendanceLogs.id)
             )
+            .leftJoin(users, eq(attendanceLogs.userId, users.id))
             .where(
                 and(
-                    gte(workLogs.createdAt, start),
-                    lte(workLogs.createdAt, end),
-                    projectId ? eq(workLogs.projectId, projectId) : undefined
+                    gte(attendanceLogs.startedAt, start),
+                    lte(attendanceLogs.startedAt, end),
+                    isNull(workLogs.id),
+                    eq(attendanceLogs.statusId, 2)
                 )
             )
-            .orderBy(desc(workLogs.createdAt)),
-        // Active projects for edit dialog
-        db
-            .select({ id: projects.id, name: projects.name })
-            .from(projects)
-            .where(eq(projects.isActive, true)),
-        // Date range for pagination
-        db
-            .select({
-                minDate: min(workLogs.createdAt),
-                maxDate: max(workLogs.createdAt),
-            })
-            .from(workLogs),
-        // Projects with logs in the selected month
-        db
-            .selectDistinct({ id: projects.id, name: projects.name })
-            .from(workLogs)
-            .innerJoin(projects, eq(workLogs.projectId, projects.id))
-            .where(
-                and(
-                    gte(workLogs.createdAt, start),
-                    lte(workLogs.createdAt, end)
+            .orderBy(desc(attendanceLogs.startedAt));
+
+    const [logs, activeProjects, dateRangeResult, allProjects, attendanceOnlyLogs] =
+        await Promise.all([
+            // Logs for the selected month
+            db
+                .select({
+                    id: workLogs.id,
+                    content: workLogs.content,
+                    createdAt: workLogs.createdAt,
+                    projectId: workLogs.projectId,
+                    projectName: projects.name,
+                    userId: workLogs.userId,
+                    userName: users.lastName,
+                    userFirstName: users.firstName,
+                    startedAt: attendanceLogs.startedAt,
+                    endedAt: attendanceLogs.endedAt,
+                    attendanceLogId: workLogs.attendanceLogId,
+                })
+                .from(workLogs)
+                .leftJoin(projects, eq(workLogs.projectId, projects.id))
+                .leftJoin(users, eq(workLogs.userId, users.id))
+                .leftJoin(
+                    attendanceLogs,
+                    eq(workLogs.attendanceLogId, attendanceLogs.id)
                 )
-            ),
-    ]);
+                .where(
+                    and(
+                        gte(attendanceLogs.startedAt, start),
+                        lte(attendanceLogs.startedAt, end),
+                        projectId ? eq(workLogs.projectId, projectId) : undefined
+                    )
+                )
+                .orderBy(desc(attendanceLogs.startedAt)),
+            // Active projects for edit dialog
+            db
+                .select({ id: projects.id, name: projects.name })
+                .from(projects)
+                .where(eq(projects.isActive, true)),
+            // Date range for pagination
+            db
+                .select({
+                    minDate: min(workLogs.createdAt),
+                    maxDate: max(workLogs.createdAt),
+                })
+                .from(workLogs),
+            // Projects with logs in the selected month
+            db
+                .selectDistinct({ id: projects.id, name: projects.name })
+                .from(workLogs)
+                .innerJoin(projects, eq(workLogs.projectId, projects.id))
+                .where(
+                    and(
+                        gte(workLogs.createdAt, start),
+                        lte(workLogs.createdAt, end)
+                    )
+                ),
+            attendanceOnlyLogsQuery,
+        ]);
 
     const { minDate, maxDate } = dateRangeResult[0];
 
@@ -157,6 +199,31 @@ export default async function WorkLogsPage({
         projectData.users.set(userName, currentDuration + duration);
     });
 
+    attendanceOnlyLogs.forEach((attendanceLog) => {
+        const projectName = "作業ログなし";
+        const userName = `${attendanceLog.userName} ${attendanceLog.userFirstName}`;
+        allUserNames.add(userName);
+
+        if (!projectMap.has(projectName)) {
+            projectMap.set(projectName, {
+                name: projectName,
+                users: new Map(),
+            });
+        }
+
+        let duration = 0;
+        if (attendanceLog.startedAt && attendanceLog.endedAt) {
+            const diff =
+                attendanceLog.endedAt.getTime() -
+                attendanceLog.startedAt.getTime();
+            duration = diff / (1000 * 60 * 60);
+        }
+
+        const projectData = projectMap.get(projectName)!;
+        const currentDuration = projectData.users.get(userName) || 0;
+        projectData.users.set(userName, currentDuration + duration);
+    });
+
     // 3. チャートコンポーネント用のデータ形式に変換
     const chartData = Array.from(projectMap.values()).map((p) => {
         const entry: ChartData = { name: p.name };
@@ -167,6 +234,48 @@ export default async function WorkLogsPage({
     });
 
     const userList = Array.from(allUserNames);
+    const formatElapsedTime = (start: Date | null, end: Date | null) => {
+        if (!start || !end) return "-";
+        const diffMs = end.getTime() - start.getTime();
+        if (diffMs <= 0) return "0分";
+        const totalMinutes = Math.round(diffMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        if (hours === 0) return `${minutes}分`;
+        if (minutes === 0) return `${hours}時間`;
+        return `${hours}時間${minutes}分`;
+    };
+    const tableRows = [
+        ...logs.map((log) => ({
+            log,
+            isOwner: log.userId === user.id,
+            sortAt: log.startedAt ?? log.createdAt,
+        })),
+        ...attendanceOnlyLogs.map((attendanceLog) => ({
+            log: {
+                id: attendanceLog.id,
+                content: "作業ログなし",
+                createdAt: attendanceLog.createdAt,
+                projectId: "",
+                projectName: null,
+                userId: attendanceLog.userId,
+                userName: attendanceLog.userName,
+                userFirstName: attendanceLog.userFirstName,
+                startedAt: attendanceLog.startedAt,
+                endedAt: attendanceLog.endedAt,
+            },
+            isOwner: false,
+            sortAt: attendanceLog.createdAt,
+        })),
+    ].sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
+
+    const downloadRows = tableRows.map(({ log }) => ({
+        workDate: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "yyyy/MM/dd") : "-",
+        startTime: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "HH:mm") : "-",
+        elapsedTime: formatElapsedTime(log.startedAt, log.endedAt),
+        user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
+        content: log.content,
+    }));
 
     return (
         <div className="space-y-4">
@@ -213,10 +322,13 @@ export default async function WorkLogsPage({
             </div>
 
             <div className="rounded-md border">
+                <div className="flex items-center justify-end border-b p-2">
+                    <WorkLogDownloadButton rows={downloadRows} />
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[150px]">日時</TableHead>
+                            <TableHead className="w-[150px]">記録日時</TableHead>
                             <TableHead className="w-[150px]">
                                 ユーザー
                             </TableHead>
@@ -233,7 +345,7 @@ export default async function WorkLogsPage({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {logs.length === 0 ? (
+                        {tableRows.length === 0 ? (
                             <TableRow>
                                 <TableCell
                                     colSpan={6}
@@ -243,14 +355,21 @@ export default async function WorkLogsPage({
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            logs.map((log) => (
-                                <WorkLogRow
-                                    key={log.id}
-                                    log={log}
-                                    projects={activeProjects}
-                                    isOwner={log.userId === user.id}
-                                />
-                            ))
+                            tableRows
+                                .slice()
+                                .sort((a, b) => {
+                                    const aTime = a.log.startedAt?.getTime() ?? 0;
+                                    const bTime = b.log.startedAt?.getTime() ?? 0;
+                                    return bTime - aTime;
+                                })
+                                .map(({ log, isOwner }) => (
+                                    <WorkLogRow
+                                        key={log.id}
+                                        log={log}
+                                        projects={activeProjects}
+                                        isOwner={isOwner}
+                                    />
+                                ))
                         )}
                     </TableBody>
                 </Table>
