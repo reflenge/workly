@@ -26,6 +26,45 @@
    1. その勤怠記録のときにどのプロジェクトで何をやったかを記録することだけ実現できれば良い
    2. 誰がなんのプロジェクトにjoinして...とか複雑なものは不要
 
+## 技術スタック
+
+| カテゴリ              | 採用技術                                                          |
+| ----------------- | ------------------------------------------------------------- |
+| フレームワーク           | Next.js 15（App Router, Turbopack）                             |
+| 言語 / ランタイム        | TypeScript 5 / React 19                                       |
+| ORM               | Drizzle ORM + drizzle-kit                                     |
+| データベース            | PostgreSQL（Supabase）                                          |
+| 認証                | Supabase Auth（Google OAuth）                                   |
+| UI                | Tailwind CSS v4 / shadcn/ui（Radix UI）/ lucide-react           |
+| 状態管理              | Zustand / nuqs（URLステート）                                       |
+| 表 / グラフ           | @tanstack/react-table / recharts                              |
+| トースト              | sonner                                                        |
+| 数値計算 / 日時         | decimal.js / date-fns / date-fns-tz                           |
+| 観測 / アナリティクス      | Vercel Analytics / Vercel Speed Insights / Microsoft Clarity  |
+| パッケージマネージャ        | pnpm                                                          |
+| ドキュメント生成（任意）      | dependency-cruiser / typedoc（`pnpm docs:build`）                |
+
+## 認証フロー
+
+- ログインは Supabase Auth の Google OAuth を採用（[src/components/login-form.tsx](src/components/login-form.tsx)）。OAuth コールバックは [src/app/auth/oauth/route.ts](src/app/auth/oauth/route.ts) で受けてセッションを確立します。
+- 全リクエストは [src/middleware.ts](src/middleware.ts) → [src/lib/supabase/middleware.ts](src/lib/supabase/middleware.ts) の `updateSession` を通り、未認証ユーザーは `/auth/login` へリダイレクトします。公開パスは `/auth/*`、`/privacy-policy`、`/terms`、`/error` のみ。
+- 認証必須ページは `src/app/(APP)/` ルートグループに集約され、[src/app/(APP)/layout.tsx](src/app/(APP)/layout.tsx) で [requireUser()](src/lib/auth/requireUser.ts) を実行。Supabase Auth の UID と DB の `user.auth_id` を突合し、紐付くレコードが無ければ `/auth/login` に戻します。
+- `user.is_active = false` のユーザーは `/account/stopped` に遷移し、アプリ機能から遮断されます。
+- 管理者向けの**税理士バイパス**は、署名付きURL（`p`/`t`/`h`）の検証に成功すると `admin_bypass_token` Cookie を発行し、`/admin` トップのみ通常認証をスキップします（詳細は後述「税理士向け特別アクセス機能」）。
+- LINE 内ブラウザ対策として、`src/middleware.ts` が GET/HEAD のみ `?openExternalBrowser=1` を付与/除去するリダイレクトを行い、外部ブラウザでの起動を促します。
+
+## デプロイ環境
+
+- **ホスティング**: Vercel（`@vercel/analytics`、`@vercel/speed-insights` を組み込み済み）
+- **データベース / 認証**: Supabase（PostgreSQL + Auth）
+- **行動分析**: Microsoft Clarity（[src/components/clarity-init.tsx](src/components/clarity-init.tsx)）
+- **ビルド**: `pnpm build`（Turbopack 使用）
+- **マイグレーション運用**:
+  - スキーマ差分生成: `pnpm generate`（drizzle-kit）
+  - 適用: `pnpm migrate`
+  - 生成物の置き場所: [drizzle/](drizzle/)
+- **環境変数**: `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY` / `DATABASE_URL` / `ADMIN_BYPASS_PASSWORD` / `ADMIN_BYPASS_SECRET`（詳細は「環境変数の設定」を参照）
+
 ## 2. 要件定義
 
 ## 勤怠（Attendance Logs）
