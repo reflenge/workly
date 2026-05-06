@@ -43,6 +43,20 @@
       "when": 1758901329667,
       "tag": "0005_set",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777626752283,
+      "tag": "0006_lucky_nomad",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778022852554,
+      "tag": "0007_set",
+      "breakpoints": true
     }
   ]
 }

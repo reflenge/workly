@@ -7,8 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "generate": "pnpx drizzle-kit generate && pnpx drizzle-kit generate --custom --name=set && timeout 1 && powershell Copy-Item drizzle_temp/set.sql drizzle/0001_set.sql",
-    "migrate": "pnpx drizzle-kit migrate",
+    "generate": "pnpm exec drizzle-kit generate && pnpm exec drizzle-kit generate --custom --name=set && timeout 1 && powershell Copy-Item drizzle_temp/set.sql drizzle/0001_set.sql",
+    "migrate": "pnpm exec drizzle-kit migrate",
     "docs:build": "depcruise src --include-only \"^src\" --output-type html --no-config --output-to public/docs/dependency-report.html && typedoc --entryPointStrategy expand --out public/docs/api src/lib src/app && tsx scripts/generate-component-docs.ts"
   },
   "dependencies": {

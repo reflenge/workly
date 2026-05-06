@@ -25,7 +25,12 @@ const HEADERS = [
 
 const toCsvValue = (value: string) => {
     const normalized = value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-    const escaped = normalized.replace(/"/g, '""');
+    // CSVインジェクション対策: =,+,-,@,\t,\r で始まるセルはExcel等で数式として
+    // 評価される可能性があるため、先頭にシングルクォートを付けて文字列化する。
+    const sanitized = /^[=+\-@\t\r]/.test(normalized)
+        ? `'${normalized}`
+        : normalized;
+    const escaped = sanitized.replace(/"/g, '""');
     return `"${escaped}"`;
 };
 

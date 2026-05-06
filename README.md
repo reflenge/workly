@@ -95,14 +95,15 @@
 
 ### 記録（作業ログ）
 
-| アクション   | 説明                  | User:自分       | User:他人 | Admin |
-| ------- | ------------------- | ------------- | ------- | ----- |
-| report  | 集計・出力（各人の作業内容をまとめる） | ✅             | ✅       | ✅     |
-| read    | 閲覧（作業ログを読む）         | ✅             | ✅       | ✅     |
-| create  | 新規作成（作業記録を追加）       | ✅          | ❌       | ✅     |
-| update  | 修正（作業内容の変更）         | ❌             | ❌       | ✅     |
-| delete  | 論理削除（作業ログを無効化）      | ❌             | ❌       | ✅     |
-| restore | 復元（削除済み作業ログを戻す）     | ❌             | ❌       | ✅     |
+| アクション           | 説明                                                       | User:自分 | User:他人 | Admin |
+| --------------- | -------------------------------------------------------- | ------- | ------- | ----- |
+| report          | 集計・出力（各人の作業内容をまとめてCSV化）                                  | ✅       | ✅       | ✅     |
+| report(invoice) | 請求書付きCSV出力（プロジェクト別に役職別合計時間・単価・金額を算出）。プロジェクト選択時のみ。 | ❌       | ❌       | ✅     |
+| read            | 閲覧（作業ログを読む）                                              | ✅       | ✅       | ✅     |
+| create          | 新規作成（作業記録を追加）                                            | ✅       | ❌       | ✅     |
+| update          | 修正（作業内容の変更）                                              | ❌       | ❌       | ✅     |
+| delete          | 論理削除（作業ログを無効化）                                           | ❌       | ❌       | ✅     |
+| restore         | 復元（削除済み作業ログを戻す）                                          | ❌       | ❌       | ✅     |
 
 ---
 
@@ -199,6 +200,7 @@ erDiagram
     uuid id PK "ユーザーID // PK: 全システムの基準キー"
     uuid auth_id "Supabase Auth ID // Supabase認証と紐付けるため"
     boolean is_admin "管理者フラグ // 管理者権限を持つかどうか"
+    smallint role_id FK "役職ID // UserRole.id を参照（請求金額の単価切り替え等に使用）"
 
     string last_name "名字 // 表示や検索用。給与明細などに必要"
     string first_name "名前 // 同上"
@@ -272,6 +274,16 @@ erDiagram
     timestamptz updated_at "更新時刻(UTC) // 同上"
   }
 
+  UserRole {
+    smallint id PK "役職ID // 固定シード（enum代替）。1=代表, 2=その他従業員"
+    string code "機械用コード(UNIQUE) // 'REPRESENTATIVE','EMPLOYEE' 等。変更しない"
+    string label "表示名 // '代表','その他従業員' 等UI表示"
+    boolean is_active "有効フラグ // 将来の追加/廃止に備えて残す"
+    integer sort_no "表示順 // 一覧の並びを安定させるため"
+    timestamptz created_at "作成時刻(UTC) // 最小監査"
+    timestamptz updated_at "更新時刻(UTC) // 同上"
+  }
+
   WorkLog {
     uuid id PK "作業記録ID // 主キー（1レコード=1つの作業記述）"
     uuid user_id FK "ユーザーID // 誰の作業か（作成者）"
@@ -286,6 +298,8 @@ erDiagram
     uuid id PK "プロジェクトID // 主キー"
     string name "プロジェクト名 // UI表示・検索用"
     text description "説明 // 任意。目的やメモ"
+    numeric representative_hourly_rate "代表の時給単価(JPY) // NULL=未設定。請求書付きCSV出力で使用"
+    numeric employee_hourly_rate "その他従業員の時給単価(JPY) // NULL=未設定。請求書付きCSV出力で使用"
     boolean is_active "有効フラグ // アーカイブ/休止= false"
     string inactive_reason "無効理由 // 'アーカイブ'等。空なら現役"
     timestamptz created_at "作成時刻(UTC) // 最小監査"
@@ -358,6 +372,7 @@ erDiagram
   AttendanceLog ||--o{ WorkLog : "attendance_log_id（どの区間に紐づくか）"
 
   User ||--o{ UserCompensation : "時給/月給レートの履歴"
+  UserRole ||--o{ User : "role_id でユーザーの役職を指す"
   PayrollPeriod ||--o{ PayrollItem : "期間×ユーザーの確定明細"
   User ||--o{ PayrollItem : "user_id"
 

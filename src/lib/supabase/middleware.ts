@@ -9,6 +9,16 @@ export async function updateSession(request: NextRequest) {
         request,
     });
 
+    // 開発時の認証バイパス。NODE_ENV と DEV_AUTH_BYPASS の二重ガードで
+    // 本番では絶対に発動しない。ローカル開発で .env.local に
+    // DEV_AUTH_BYPASS=true を設定した時のみ、認証チェックをスキップする。
+    if (
+        process.env.NODE_ENV !== "production" &&
+        process.env.DEV_AUTH_BYPASS === "true"
+    ) {
+        return supabaseResponse;
+    }
+
     // バイパス: /admin (トップページのみ) で ?p=パスワード&t=タイムスタンプ&h=ハッシュ の場合、Cookieを設定してリダイレクト
     if (request.nextUrl.pathname === "/admin") {
         const password = request.nextUrl.searchParams.get("p");

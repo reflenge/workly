@@ -30,6 +30,14 @@ export const users = pgTable(
         // authIdがNULLの場合は未セットアップ。こちらはSupabase Auth ID。
         authId: uuid("auth_id").notNull().unique(),
         isAdmin: boolean("is_admin").notNull().default(false),
+        // 役職ID（user_roleマスターを参照）。デフォルトは2=EMPLOYEE（その他従業員）。
+        roleId: smallint("role_id")
+            .notNull()
+            .default(2)
+            .references(() => userRole.id, {
+                onDelete: "restrict",
+                onUpdate: "cascade",
+            }),
 
         lastName: varchar("last_name", { length: 191 }).notNull().default(""),
         firstName: varchar("first_name", { length: 191 }).notNull().default(""),
@@ -182,6 +190,27 @@ export const attendanceLogSource = pgTable(
     })
 );
 
+// ユーザーの役職（代表、その他従業員など）のマスターデータを管理するテーブル。
+export const userRole = pgTable(
+    "user_role",
+    {
+        id: smallint("id").primaryKey(), // 固定シード
+        code: varchar("code", { length: 64 }).notNull(), // 'REPRESENTATIVE','EMPLOYEE'
+        label: varchar("label", { length: 64 }).notNull(),
+        isActive: boolean("is_active").notNull().default(true),
+        sortNo: integer("sort_no").notNull().default(0),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp("updated_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => ({
+        codeUnique: uniqueIndex("uniq_user_role_code").on(t.code),
+    })
+);
+
 // 勤怠ログ（出退勤記録）を管理するテーブル。開始・終了時刻やステータスを記録します。
 export const attendanceLogs = pgTable(
     "attendance_log",
@@ -238,6 +267,9 @@ export const projects = pgTable(
         id: uuid("id").primaryKey().defaultRandom(),
         name: varchar("name", { length: 191 }).notNull(),
         description: text("description"),
+        // 役職別の時給単価（円/時）。NULL=未設定。請求金額の算出に使用。
+        representativeHourlyRate: numeric("representative_hourly_rate"),
+        employeeHourlyRate: numeric("employee_hourly_rate"),
         isActive: boolean("is_active").notNull().default(true),
         inactiveReason: varchar("inactive_reason", { length: 191 }),
         createdAt: timestamp("created_at", { withTimezone: true })
