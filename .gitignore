@@ -47,3 +47,7 @@ next-env.d.ts
 
 # 開発用テストデータ（個人作業用）
 scripts/test-seed.sql
+
+# 本番DBバックアップ（個人情報・給与情報含むため、絶対にcommitしない）
+backup-prod-*.sql
+*.dump
