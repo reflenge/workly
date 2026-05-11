@@ -17,6 +17,7 @@ export async function createUser(input: {
     firstName: string;
     email: string;
     isAdmin?: boolean;
+    roleId?: number;
 }) {
     try {
         const { data, error } = await admin.auth.admin.createUser({
@@ -34,6 +35,9 @@ export async function createUser(input: {
                     lastName: input.lastName,
                     firstName: input.firstName,
                     isAdmin: !!input.isAdmin,
+                    ...(input.roleId !== undefined
+                        ? { roleId: input.roleId }
+                        : {}),
                 })
                 .returning();
             await tx.insert(attendanceLogs).values({
@@ -54,7 +58,7 @@ export async function updateUser(
     values: Partial<
         Pick<
             typeof users.$inferInsert,
-            "lastName" | "firstName" | "isActive" | "bio" | "isAdmin"
+            "lastName" | "firstName" | "isActive" | "bio" | "isAdmin" | "roleId"
         >
     >
 ) {

@@ -1,6 +1,13 @@
 "use client";
 
-import { users } from "@/db/schema";
+import { users, userRole } from "@/db/schema";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn, formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
@@ -31,15 +38,25 @@ import { toast } from "sonner";
 import { updateUser } from "./user-actions";
 import Link from "next/link";
 
-const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
+const UserItems = ({
+    user,
+    userRoles,
+}: {
+    user: typeof users.$inferSelect;
+    userRoles: (typeof userRole.$inferSelect)[];
+}) => {
     const [open, setOpen] = useState(false);
     const [lastName, setLastName] = useState<string>(user.lastName ?? "");
     const [firstName, setFirstName] = useState<string>(user.firstName ?? "");
     const [isActive, setIsActive] = useState<boolean>(user.isActive);
     const [isAdmin, setIsAdmin] = useState<boolean>(user.isAdmin);
+    const [roleId, setRoleId] = useState<number>(user.roleId);
     const [bio, setBio] = useState<string>(user.bio ?? "");
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
+
+    const roleLabel =
+        userRoles.find((role) => role.id === roleId)?.label ?? "未設定";
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,6 +74,7 @@ const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
                 isActive,
                 isAdmin,
                 bio,
+                roleId,
             })
                 .then(() => {
                     toast.success("ユーザー情報を更新しました");
@@ -82,7 +100,8 @@ const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
                     {user.lastName} {user.firstName}
                 </CardTitle>
                 <CardDescription>
-                    {user.isActive ? "有効" : "無効"} {isAdmin && "管理者"}
+                    {user.isActive ? "有効" : "無効"} {isAdmin && "管理者"} ・{" "}
+                    {roleLabel}
                 </CardDescription>
                 <CardAction>
                     <div className="flex gap-2">
@@ -163,6 +182,29 @@ const UserItems = ({ user }: { user: typeof users.$inferSelect }) => {
                                         <Label htmlFor="isAdmin">
                                             管理者にする
                                         </Label>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="roleId">役職</Label>
+                                        <Select
+                                            value={String(roleId)}
+                                            onValueChange={(value) =>
+                                                setRoleId(Number(value))
+                                            }
+                                        >
+                                            <SelectTrigger id="roleId">
+                                                <SelectValue placeholder="役職を選択" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {userRoles.map((role) => (
+                                                    <SelectItem
+                                                        key={role.id}
+                                                        value={String(role.id)}
+                                                    >
+                                                        {role.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor="bio">

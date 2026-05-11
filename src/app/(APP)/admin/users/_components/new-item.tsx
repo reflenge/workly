@@ -12,17 +12,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { userRole } from "@/db/schema";
 import React, { useState, useTransition } from "react";
 import { createUser } from "./user-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const NewItem = () => {
+const DEFAULT_ROLE_ID = 2; // EMPLOYEE
+
+const NewItem = ({
+    userRoles,
+}: {
+    userRoles: (typeof userRole.$inferSelect)[];
+}) => {
     const [lastName, setLastName] = useState("");
     const [firstName, setFirstName] = useState("");
     const [email, setEmail] = useState("");
     const [isPending, startTransition] = useTransition();
     const [isAdmin, setIsAdmin] = useState(false);
+    const [roleId, setRoleId] = useState<number>(DEFAULT_ROLE_ID);
     const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -36,13 +51,20 @@ const NewItem = () => {
         }
 
         startTransition(async () => {
-            createUser({ lastName: ln, firstName: fn, email: em, isAdmin })
+            createUser({
+                lastName: ln,
+                firstName: fn,
+                email: em,
+                isAdmin,
+                roleId,
+            })
                 .then(() => {
                     toast.success("ユーザーを登録しました");
                     setLastName("");
                     setFirstName("");
                     setEmail("");
                     setIsAdmin(false);
+                    setRoleId(DEFAULT_ROLE_ID);
                     router.refresh();
                 })
                 .catch((error: unknown) => {
@@ -112,6 +134,29 @@ const NewItem = () => {
                                 }
                             />
                             <Label htmlFor="isAdmin">管理者にする</Label>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="roleId">役職</Label>
+                            <Select
+                                value={String(roleId)}
+                                onValueChange={(value) =>
+                                    setRoleId(Number(value))
+                                }
+                            >
+                                <SelectTrigger id="roleId">
+                                    <SelectValue placeholder="役職を選択" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {userRoles.map((role) => (
+                                        <SelectItem
+                                            key={role.id}
+                                            value={String(role.id)}
+                                        >
+                                            {role.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                 </CardContent>
