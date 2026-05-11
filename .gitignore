@@ -41,3 +41,13 @@ yarn-error.log*
 next-env.d.ts
 
 *secret*.json
+
+# Claude Code の個人権限設定
+.claude/
+
+# 開発用テストデータ（個人作業用）
+scripts/test-seed.sql
+
+# 本番DBバックアップ（個人情報・給与情報含むため、絶対にcommitしない）
+backup-prod-*.sql
+*.dump

@@ -7,13 +7,14 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { db } from "@/db";
-import { attendanceLogs, projects, users, workLogs } from "@/db/schema";
+import { attendanceLogs, projects, userRole, users, workLogs } from "@/db/schema";
 import { requireUser } from "@/lib/auth/requireUser";
 import { desc, eq, and, gte, lte, min, max, isNull } from "drizzle-orm";
 import { WorkLogRow } from "./work-log-row";
 import { MonthSelector } from "./month-selector";
 import { startOfMonth, endOfMonth, parse, format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
+import { Decimal } from "decimal.js";
 import { WorkLogChart, ChartData } from "./work-log-chart";
 import {
     Breadcrumb,
@@ -27,6 +28,7 @@ import Link from "next/link";
 
 import { ProjectSelector } from "./project-selector";
 import { WorkLogDownloadButton } from "./work-log-download-button";
+import { InvoiceDownloadButton } from "./invoice-download-button";
 
 type AttendanceOnlyLog = {
     id: string;
@@ -89,7 +91,24 @@ export default async function WorkLogsPage({
             )
             .orderBy(desc(attendanceLogs.startedAt));
 
-    const [logs, activeProjects, dateRangeResult, allProjects, attendanceOnlyLogs] =
+    // 請求書ダウンロード用に、選択中プロジェクトの単価を取得（プロジェクト選択時のみ）
+    const selectedProjectRatesPromise = projectId
+        ? db
+            .select({
+                representativeHourlyRate: projects.representativeHourlyRate,
+                employeeHourlyRate: projects.employeeHourlyRate,
+            })
+            .from(projects)
+            .where(eq(projects.id, projectId))
+            .limit(1)
+        : Promise.resolve(
+            [] as {
+                representativeHourlyRate: string | null;
+                employeeHourlyRate: string | null;
+            }[]
+        );
+
+    const [logs, activeProjects, dateRangeResult, allProjects, attendanceOnlyLogs, selectedProjectRates] =
         await Promise.all([
             // Logs for the selected month
             db
@@ -102,6 +121,7 @@ export default async function WorkLogsPage({
                     userId: workLogs.userId,
                     userName: users.lastName,
                     userFirstName: users.firstName,
+                    userRoleCode: userRole.code,
                     startedAt: attendanceLogs.startedAt,
                     endedAt: attendanceLogs.endedAt,
                     attendanceLogId: workLogs.attendanceLogId,
@@ -109,6 +129,7 @@ export default async function WorkLogsPage({
                 .from(workLogs)
                 .leftJoin(projects, eq(workLogs.projectId, projects.id))
                 .leftJoin(users, eq(workLogs.userId, users.id))
+                .leftJoin(userRole, eq(users.roleId, userRole.id))
                 .leftJoin(
                     attendanceLogs,
                     eq(workLogs.attendanceLogId, attendanceLogs.id)
@@ -145,6 +166,7 @@ export default async function WorkLogsPage({
                     )
                 ),
             attendanceOnlyLogsQuery,
+            selectedProjectRatesPromise,
         ]);
 
     const { minDate, maxDate } = dateRangeResult[0];
@@ -270,13 +292,119 @@ export default async function WorkLogsPage({
     ].sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
     const downloadRows = tableRows.map(({ log }) => ({
-        createdAt: formatInTimeZone(log.createdAt, "Asia/Tokyo", "yyyy/MM/dd HH:mm"),
-        user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
-        project: log.projectName || "-",
-        content: log.content,
-        startDate: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "yyyy/MM/dd") : "-",
+        workDate: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "yyyy/MM/dd") : "-",
+        startTime: log.startedAt ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "HH:mm") : "-",
         elapsedTime: formatElapsedTime(log.startedAt, log.endedAt),
+        user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
+        content: log.content,
     }));
+
+    // 請求書ダウンロード: admin かつ プロジェクト選択時のみ有効
+    const canShowInvoice = !!projectId && user.isAdmin;
+    const selectedProjectName = projectId
+        ? allProjects.find((p) => p.id === projectId)?.name ?? null
+        : null;
+
+    // 役職別の合計時間（分）と明細行を集計
+    const invoiceData = canShowInvoice
+        ? (() => {
+            let representativeMinutes = 0;
+            let employeeMinutes = 0;
+
+            logs.forEach((log) => {
+                if (!log.startedAt || !log.endedAt) return;
+                const diffMs = log.endedAt.getTime() - log.startedAt.getTime();
+                if (diffMs <= 0) return;
+                let minutes = diffMs / (1000 * 60);
+                // 同じ勤怠ログに複数の作業ログがある場合は時間を等分
+                if (log.attendanceLogId) {
+                    const count =
+                        attendanceLogCounts.get(log.attendanceLogId) || 1;
+                    minutes = minutes / count;
+                }
+                if (log.userRoleCode === "REPRESENTATIVE") {
+                    representativeMinutes += minutes;
+                } else {
+                    employeeMinutes += minutes;
+                }
+            });
+
+            const formatTotalMinutes = (m: number): string => {
+                const totalMinutes = Math.round(m);
+                if (totalMinutes <= 0) return "0分";
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                if (hours === 0) return `${minutes}分`;
+                if (minutes === 0) return `${hours}時間`;
+                return `${hours}時間${minutes}分`;
+            };
+
+            const rates = selectedProjectRates[0];
+            const repRate = rates?.representativeHourlyRate
+                ? Number(rates.representativeHourlyRate)
+                : null;
+            const empRate = rates?.employeeHourlyRate
+                ? Number(rates.employeeHourlyRate)
+                : null;
+
+            // 金額計算は浮動小数点誤差を避けるためDecimalで行う（請求書なので1円ズレ厳禁）
+            const repAmount =
+                repRate !== null
+                    ? new Decimal(representativeMinutes)
+                          .div(60)
+                          .mul(repRate)
+                          .round()
+                          .toNumber()
+                    : null;
+            const empAmount =
+                empRate !== null
+                    ? new Decimal(employeeMinutes)
+                          .div(60)
+                          .mul(empRate)
+                          .round()
+                          .toNumber()
+                    : null;
+
+            const grandTotalAmount = new Decimal(repAmount ?? 0)
+                .add(empAmount ?? 0)
+                .toNumber();
+
+            const detailRows = logs.map((log) => ({
+                workDate: log.startedAt
+                    ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "yyyy/MM/dd")
+                    : "-",
+                startTime: log.startedAt
+                    ? formatInTimeZone(log.startedAt, "Asia/Tokyo", "HH:mm")
+                    : "-",
+                elapsedTime: formatElapsedTime(log.startedAt, log.endedAt),
+                roleLabel:
+                    log.userRoleCode === "REPRESENTATIVE"
+                        ? "代表"
+                        : "その他従業員",
+                user: `${log.userName ?? ""} ${log.userFirstName ?? ""}`.trim(),
+                content: log.content,
+            }));
+
+            return {
+                detailRows,
+                totals: {
+                    representative: {
+                        totalElapsedTime: formatTotalMinutes(
+                            representativeMinutes
+                        ),
+                        rate: repRate,
+                        totalAmount: repAmount,
+                    },
+                    employee: {
+                        totalElapsedTime: formatTotalMinutes(employeeMinutes),
+                        rate: empRate,
+                        totalAmount: empAmount,
+                    },
+                    grandTotalAmount,
+                },
+            };
+        })()
+        : null;
 
     return (
         <div className="space-y-4">
@@ -323,8 +451,15 @@ export default async function WorkLogsPage({
             </div>
 
             <div className="rounded-md border">
-                <div className="flex items-center justify-end border-b p-2">
+                <div className="flex items-center justify-end gap-2 border-b p-2">
                     <WorkLogDownloadButton rows={downloadRows} />
+                    {canShowInvoice && invoiceData && (
+                        <InvoiceDownloadButton
+                            detailRows={invoiceData.detailRows}
+                            totals={invoiceData.totals}
+                            fileName={`invoice-${selectedProjectName ?? "project"}-${monthStr}.csv`}
+                        />
+                    )}
                 </div>
                 <Table>
                     <TableHeader>

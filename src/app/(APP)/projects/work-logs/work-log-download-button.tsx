@@ -3,12 +3,11 @@
 import { Button } from "@/components/ui/button";
 
 type DownloadRow = {
-    createdAt: string;
-    user: string;
-    project: string;
-    content: string;
-    startDate: string;
+    workDate: string;
+    startTime: string;
     elapsedTime: string;
+    user: string;
+    content: string;
 };
 
 interface WorkLogDownloadButtonProps {
@@ -17,17 +16,21 @@ interface WorkLogDownloadButtonProps {
 }
 
 const HEADERS = [
-    "記録日時",
-    "ユーザー",
-    "プロジェクト",
-    "内容",
-    "開始日",
-    "経過時間",
+    "作業日",
+    "開始時刻",
+    "作業時間",
+    "従業員名",
+    "作業内容",
 ];
 
 const toCsvValue = (value: string) => {
     const normalized = value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-    const escaped = normalized.replace(/"/g, '""');
+    // CSVインジェクション対策: =,+,-,@,\t,\r で始まるセルはExcel等で数式として
+    // 評価される可能性があるため、先頭にシングルクォートを付けて文字列化する。
+    const sanitized = /^[=+\-@\t\r]/.test(normalized)
+        ? `'${normalized}`
+        : normalized;
+    const escaped = sanitized.replace(/"/g, '""');
     return `"${escaped}"`;
 };
 
@@ -40,12 +43,11 @@ export function WorkLogDownloadButton({
             HEADERS.map(toCsvValue).join(","),
             ...rows.map((row) =>
                 [
-                    row.createdAt,
-                    row.user,
-                    row.project,
-                    row.content,
-                    row.startDate,
+                    row.workDate,
+                    row.startTime,
                     row.elapsedTime,
+                    row.user,
+                    row.content,
                 ]
                     .map(toCsvValue)
                     .join(",")
