@@ -68,6 +68,25 @@ const toPublicUser = (u: {
  * @throws 未認証またはユーザーが存在しない場合は `/auth/login` へリダイレクトするため、戻り値は返りません
  */
 export const requireUser = cache(async (): Promise<PublicUser> => {
+    // 開発時の認証バイパス。NODE_ENV と DEV_AUTH_BYPASS の二重ガードで
+    // 本番では絶対に発動しない。ローカル開発で .env.local に
+    // DEV_AUTH_BYPASS=true を設定した時のみ、scripts/test-seed.sql の
+    // 代表ユーザー(山田太郎)としてログインしているように振る舞う。
+    if (
+        process.env.NODE_ENV !== "production" &&
+        process.env.DEV_AUTH_BYPASS === "true"
+    ) {
+        return {
+            id: "00000000-0000-0000-0000-000000000001",
+            authId: "00000000-0000-0000-0000-000000000001",
+            firstName: "太郎",
+            lastName: "山田",
+            iconUrl: null,
+            isAdmin: true,
+            isActive: true,
+        };
+    }
+
     // バイパス: Cookieがある場合はダミーの管理者ユーザーを返す
     const cookieStore = await cookies();
     const bypassToken = cookieStore.get(ADMIN_BYPASS_COOKIE)?.value;
