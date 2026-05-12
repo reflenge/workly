@@ -1,5 +1,7 @@
 "use server";
 
+import { requireUser } from "@/lib/auth/requireUser";
+
 const ADMIN_BYPASS_PASSWORD = process.env.ADMIN_BYPASS_PASSWORD || "";
 const ADMIN_BYPASS_SECRET = process.env.ADMIN_BYPASS_SECRET || "";
 
@@ -28,6 +30,13 @@ export async function generateBypassUrl(baseUrl: string): Promise<{
     url: string;
     expiresAt: Date;
 }> {
+    const actor = await requireUser();
+
+    // 管理者権限チェック (bypassユーザーもisAdmin=trueなのでOK)
+    if (!actor.isAdmin) {
+        throw new Error("権限がありません");
+    }
+
     if (!ADMIN_BYPASS_PASSWORD || !ADMIN_BYPASS_SECRET) {
         console.error("環境変数エラー:", {
             hasPassword: !!ADMIN_BYPASS_PASSWORD,

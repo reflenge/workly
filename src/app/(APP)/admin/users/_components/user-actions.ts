@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { attendanceLogs, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/requireUser";
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -18,6 +19,13 @@ export async function createUser(input: {
     email: string;
     isAdmin?: boolean;
 }) {
+    const actor = await requireUser();
+
+    // 管理者権限チェック (bypassユーザーもisAdmin=trueなのでOK)
+    if (!actor.isAdmin) {
+        throw new Error("権限がありません");
+    }
+
     try {
         const { data, error } = await admin.auth.admin.createUser({
             email: input.email,
@@ -58,6 +66,13 @@ export async function updateUser(
         >
     >
 ) {
+    const actor = await requireUser();
+
+    // 管理者権限チェック (bypassユーザーもisAdmin=trueなのでOK)
+    if (!actor.isAdmin) {
+        throw new Error("権限がありません");
+    }
+
     try {
         await db.update(users).set(values).where(eq(users.id, id));
     } catch (error) {
