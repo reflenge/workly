@@ -20,6 +20,7 @@ import {
     IdCardIcon,
     KeyIcon,
     BanknoteIcon,
+    CoinsIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/components/providers/user-provider";
@@ -71,6 +72,17 @@ export function AppSidebarClient() {
                                     <Link href="/admin/payroll" prefetch={true}>
                                         <BanknoteIcon />
                                         <span>給与管理</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link
+                                        href="/admin/projects"
+                                        prefetch={true}
+                                    >
+                                        <CoinsIcon />
+                                        <span>プロジェクト単価管理</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
