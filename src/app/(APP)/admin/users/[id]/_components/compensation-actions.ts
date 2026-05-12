@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { userCompensation } from "@/db/schema";
 import { and, eq, isNull, gte, lte, sql } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/requireUser";
 
 export async function createCompensation(input: {
     userId: string;
@@ -14,6 +15,13 @@ export async function createCompensation(input: {
     effectiveFrom: Date;
     effectiveTo: Date | null;
 }) {
+    const actor = await requireUser();
+
+    // 管理者権限チェック (bypassユーザーもisAdmin=trueなのでOK)
+    if (!actor.isAdmin) {
+        throw new Error("権限がありません");
+    }
+
     try {
         // Step 1: effective_to が NULL ではない既存レコードと期間が重複しているかチェック
         if (input.effectiveTo !== null) {

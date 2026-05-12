@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { attendanceLogs, attendanceStatus } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/requireUser";
 import { revalidatePath } from "next/cache";
 import { isPeriodClosed } from "@/lib/payroll/service";
 
@@ -25,14 +25,7 @@ export async function updateAttendanceLog(
     input: UpdateAttendanceLogInput
 ): Promise<UpdateAttendanceLogResult> {
     try {
-        const supabase = await createClient();
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-            throw new Error("認証が必要です");
-        }
+        const actor = await requireUser();
 
         // トランザクションで実行
         await db.transaction(async (tx) => {
@@ -43,6 +36,11 @@ export async function updateAttendanceLog(
 
             if (!currentLog) {
                 throw new Error("ログが見つかりません");
+            }
+
+            // 所有者本人、または管理者のみ編集可能（仕様: 他人の勤怠 update は不可）
+            if (currentLog.userId !== actor.id && !actor.isAdmin) {
+                throw new Error("権限がありません");
             }
 
             // 変更前の値
