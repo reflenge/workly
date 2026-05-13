@@ -21,9 +21,5 @@ export async function updateProjectRates(
         throw new Error("権限がありません");
     }
 
-    try {
-        await db.update(projects).set(values).where(eq(projects.id, id));
-    } catch (error) {
-        throw error;
-    }
+    await db.update(projects).set(values).where(eq(projects.id, id));
 }

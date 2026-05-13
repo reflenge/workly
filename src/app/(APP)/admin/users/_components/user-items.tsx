@@ -1,13 +1,7 @@
 "use client";
 
 import { users, userRole } from "@/db/schema";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { RoleSelect } from "./role-select";
 import { cn, formatToJstDateTime } from "@/lib/utils";
 import {
     Card,
@@ -68,7 +62,7 @@ const UserItems = ({
         }
 
         startTransition(async () => {
-            updateUser(String(user.id), {
+            updateUser(user.id, {
                 lastName: ln,
                 firstName: fn,
                 isActive,
@@ -183,29 +177,12 @@ const UserItems = ({
                                             管理者にする
                                         </Label>
                                     </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="roleId">役職</Label>
-                                        <Select
-                                            value={String(roleId)}
-                                            onValueChange={(value) =>
-                                                setRoleId(Number(value))
-                                            }
-                                        >
-                                            <SelectTrigger id="roleId">
-                                                <SelectValue placeholder="役職を選択" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {userRoles.map((role) => (
-                                                    <SelectItem
-                                                        key={role.id}
-                                                        value={String(role.id)}
-                                                    >
-                                                        {role.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                    <RoleSelect
+                                        id="roleId"
+                                        value={roleId}
+                                        onChange={setRoleId}
+                                        userRoles={userRoles}
+                                    />
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor="bio">
                                             プロフィール

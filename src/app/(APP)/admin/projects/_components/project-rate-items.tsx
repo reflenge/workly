@@ -27,12 +27,12 @@ import { MoreVerticalIcon } from "lucide-react";
 import { updateProjectRates } from "./project-rate-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { formatCurrency } from "@/components/attendance/format-utils";
 
-const formatRate = (rate: string | null) => {
-    if (rate === null || rate === "") return "未設定";
+const formatRate = (rate: string | null): string => {
+    if (!rate) return "未設定";
     const n = Number(rate);
-    if (!Number.isFinite(n)) return "未設定";
-    return `¥${n.toLocaleString()}`;
+    return Number.isFinite(n) ? formatCurrency(n) : "未設定";
 };
 
 const ProjectRateItems = ({
@@ -49,6 +49,9 @@ const ProjectRateItems = ({
     );
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
+
+    const repRateDisplay = formatRate(project.representativeHourlyRate);
+    const empRateDisplay = formatRate(project.employeeHourlyRate);
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,7 +74,7 @@ const ProjectRateItems = ({
         }
 
         startTransition(async () => {
-            updateProjectRates(String(project.id), {
+            updateProjectRates(project.id, {
                 representativeHourlyRate: repValue,
                 employeeHourlyRate: empValue,
             })
@@ -173,7 +176,7 @@ const ProjectRateItems = ({
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">代表:</span>
                         <span className="font-medium">
-                            {formatRate(project.representativeHourlyRate)}
+                            {repRateDisplay}
                             <span className="text-xs text-muted-foreground ml-1">
                                 / 時
                             </span>
@@ -184,7 +187,7 @@ const ProjectRateItems = ({
                             その他従業員:
                         </span>
                         <span className="font-medium">
-                            {formatRate(project.employeeHourlyRate)}
+                            {empRateDisplay}
                             <span className="text-xs text-muted-foreground ml-1">
                                 / 時
                             </span>

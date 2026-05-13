@@ -12,32 +12,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { RoleSelect } from "./role-select";
 import { userRole } from "@/db/schema";
 import React, { useState, useTransition } from "react";
 import { createUser } from "./user-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const DEFAULT_ROLE_ID = 2; // EMPLOYEE
-
 const NewItem = ({
     userRoles,
 }: {
     userRoles: (typeof userRole.$inferSelect)[];
 }) => {
+    // 新規ユーザーのデフォルト役職は EMPLOYEE。schema 側の users.role_id の DEFAULT 2 と同義
+    const defaultRoleId =
+        userRoles.find((r) => r.code === "EMPLOYEE")?.id ??
+        userRoles[0]?.id ??
+        0;
+
     const [lastName, setLastName] = useState("");
     const [firstName, setFirstName] = useState("");
     const [email, setEmail] = useState("");
     const [isPending, startTransition] = useTransition();
     const [isAdmin, setIsAdmin] = useState(false);
-    const [roleId, setRoleId] = useState<number>(DEFAULT_ROLE_ID);
+    const [roleId, setRoleId] = useState<number>(defaultRoleId);
     const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -64,7 +62,7 @@ const NewItem = ({
                     setFirstName("");
                     setEmail("");
                     setIsAdmin(false);
-                    setRoleId(DEFAULT_ROLE_ID);
+                    setRoleId(defaultRoleId);
                     router.refresh();
                 })
                 .catch((error: unknown) => {
@@ -135,29 +133,12 @@ const NewItem = ({
                             />
                             <Label htmlFor="isAdmin">管理者にする</Label>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="roleId">役職</Label>
-                            <Select
-                                value={String(roleId)}
-                                onValueChange={(value) =>
-                                    setRoleId(Number(value))
-                                }
-                            >
-                                <SelectTrigger id="roleId">
-                                    <SelectValue placeholder="役職を選択" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {userRoles.map((role) => (
-                                        <SelectItem
-                                            key={role.id}
-                                            value={String(role.id)}
-                                        >
-                                            {role.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <RoleSelect
+                            id="roleId"
+                            value={roleId}
+                            onChange={setRoleId}
+                            userRoles={userRoles}
+                        />
                     </div>
                 </CardContent>
                 <CardFooter>

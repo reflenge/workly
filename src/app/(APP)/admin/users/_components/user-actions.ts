@@ -17,7 +17,7 @@ export async function createUser(input: {
     firstName: string;
     email: string;
     isAdmin?: boolean;
-    roleId?: number;
+    roleId: number;
 }) {
     try {
         const { data, error } = await admin.auth.admin.createUser({
@@ -35,9 +35,7 @@ export async function createUser(input: {
                     lastName: input.lastName,
                     firstName: input.firstName,
                     isAdmin: !!input.isAdmin,
-                    ...(input.roleId !== undefined
-                        ? { roleId: input.roleId }
-                        : {}),
+                    roleId: input.roleId,
                 })
                 .returning();
             await tx.insert(attendanceLogs).values({
