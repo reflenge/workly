@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, userRole } from "@/db/schema";
 import { requireUser } from "@/lib/auth/requireUser";
-import { desc } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import NewItem from "./_components/new-item";
 import UserItems from "./_components/user-items";
@@ -15,10 +15,14 @@ export default async function page() {
         redirect("/");
     }
 
-    const userList = await db
-        .select()
-        .from(users)
-        .orderBy(desc(users.updatedAt));
+    const [userList, userRoles] = await Promise.all([
+        db.select().from(users).orderBy(desc(users.updatedAt)),
+        db
+            .select()
+            .from(userRole)
+            .where(eq(userRole.isActive, true))
+            .orderBy(asc(userRole.sortNo)),
+    ]);
 
     const activeUsers = userList.filter((u) => u.isActive);
     const inactiveUsers = userList.filter((u) => !u.isActive);
@@ -30,9 +34,9 @@ export default async function page() {
                 description="従業員アカウントの新規作成、プロフィール編集（氏名・メール・電話番号など）、管理者権限の設定、アクティブ状態の管理、給与設定の履歴管理を一元的に行えます。"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <NewItem />
+                <NewItem userRoles={userRoles} />
                 {activeUsers.map((u) => (
-                    <UserItems key={u.id} user={u} />
+                    <UserItems key={u.id} user={u} userRoles={userRoles} />
                 ))}
                 {inactiveUsers.length > 0 && (
                     <>
@@ -43,7 +47,7 @@ export default async function page() {
                             </p>
                         </div>
                         {inactiveUsers.map((u) => (
-                            <UserItems key={u.id} user={u} />
+                            <UserItems key={u.id} user={u} userRoles={userRoles} />
                         ))}
                     </>
                 )}
