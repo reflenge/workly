@@ -51,3 +51,18 @@ export const formatCurrency = (amount: number): string => {
         maximumFractionDigits: 0,
     }).format(amount);
 };
+
+/**
+ * 時間（時単位の小数）を `${h}h` 形式で表示する。
+ * @example formatHours(92.5) // "92.5h"
+ */
+export const formatHours = (hours: number, digits: number = 1): string =>
+    `${hours.toFixed(digits)}h`;
+
+/**
+ * パーセンテージを `${p}%` 形式で表示する。
+ * @example formatPercent(79.1, 1) // "79.1%"
+ * @example formatPercent(79.1)    // "79%"
+ */
+export const formatPercent = (percent: number, digits: number = 0): string =>
+    `${percent.toFixed(digits)}%`;
