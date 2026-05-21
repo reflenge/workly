@@ -29,7 +29,7 @@ export default async function Page() {
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
             <PageHeaderMeta
-                title="プロジェクト単価・予算管理"
+                title="プロジェクト予算管理"
                 description="プロジェクトごとの役職別時給単価、見積もり総量、期間、バッファ率を設定します。見積もり超過リスクをカード上で素早く確認できます。プロジェクトの名称・説明・有効状態の編集は /projects から行ってください。"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

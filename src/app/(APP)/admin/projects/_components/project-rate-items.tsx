@@ -16,8 +16,13 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +31,12 @@ import { Badge } from "@/components/ui/badge";
 import { DatePicker } from "@/components/ui/date-picker";
 import Link from "next/link";
 import React, { useState, useTransition } from "react";
-import { ChevronRightIcon, MoreVerticalIcon } from "lucide-react";
+import {
+    ChevronRightIcon,
+    CoinsIcon,
+    MoreVerticalIcon,
+    TrendingUpIcon,
+} from "lucide-react";
 import { updateProjectBudget } from "./project-rate-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -73,7 +83,10 @@ const dateToString = (d: Date | undefined): string | null =>
 
 const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
     const { project } = summary;
-    const [open, setOpen] = useState(false);
+
+    const [rateDialogOpen, setRateDialogOpen] = useState(false);
+    const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
+
     const [representativeRate, setRepresentativeRate] = useState<string>(
         project.representativeHourlyRate ?? ""
     );
@@ -103,23 +116,65 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
     const empRateDisplay = formatRate(project.employeeHourlyRate);
     const statusBadge = getStatusBadgeInfo(summary.status);
 
-    const onSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const runSave = (
+        patch: Parameters<typeof updateProjectBudget>[1],
+        successMsg: string,
+        closeDialog: () => void
+    ) => {
+        startTransition(() => {
+            updateProjectBudget(project.id, patch)
+                .then(() => {
+                    toast.success(successMsg);
+                    router.refresh();
+                    closeDialog();
+                })
+                .catch((error: unknown) => {
+                    const message =
+                        (error as { message?: string })?.message ?? "";
+                    toast.error("更新に失敗しました", { description: message });
+                });
+        });
+    };
 
+    const resetRateFields = () => {
+        setRepresentativeRate(project.representativeHourlyRate ?? "");
+        setEmployeeRate(project.employeeHourlyRate ?? "");
+    };
+
+    const resetBudgetFields = () => {
+        setEstimatedHours(project.estimatedTotalHours ?? "");
+        setEstimatedAmount(project.estimatedTotalAmount ?? "");
+        setBufferRatio(project.bufferRatio ?? "0.3");
+        setStartDate(stringToDate(project.startDate));
+        setEndDate(stringToDate(project.endDate));
+    };
+
+    const onRateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
         const repValue = parseNonNegative(representativeRate);
         const empValue = parseNonNegative(employeeRate);
+        if (repValue === "invalid" || empValue === "invalid") {
+            toast.error("単価は 0 以上の数値、または空欄を指定してください");
+            return;
+        }
+        runSave(
+            {
+                representativeHourlyRate: repValue,
+                employeeHourlyRate: empValue,
+            },
+            "単価を更新しました",
+            () => setRateDialogOpen(false)
+        );
+    };
+
+    const onBudgetSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
         const hoursValue = parseNonNegative(estimatedHours);
         const amountValue = parseNonNegative(estimatedAmount);
         const bufferValue = parseBufferRatio(bufferRatio);
-
-        if (
-            repValue === "invalid" ||
-            empValue === "invalid" ||
-            hoursValue === "invalid" ||
-            amountValue === "invalid"
-        ) {
+        if (hoursValue === "invalid" || amountValue === "invalid") {
             toast.error(
-                "単価・見積もりは 0 以上の数値、または空欄を指定してください"
+                "見積もりは 0 以上の数値、または空欄を指定してください"
             );
             return;
         }
@@ -133,29 +188,29 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
             toast.error("終了予定日は開始日以降を指定してください");
             return;
         }
-
-        startTransition(async () => {
-            updateProjectBudget(project.id, {
-                representativeHourlyRate: repValue,
-                employeeHourlyRate: empValue,
+        runSave(
+            {
                 estimatedTotalHours: hoursValue,
                 estimatedTotalAmount: amountValue,
                 bufferRatio: bufferValue,
                 startDate: dateToString(startDate),
                 endDate: dateToString(endDate),
-            })
-                .then(() => {
-                    toast.success("プロジェクト設定を更新しました");
-                    router.refresh();
-                    setOpen(false);
-                })
-                .catch((error: unknown) => {
-                    const message =
-                        (error as { message?: string })?.message ?? "";
-                    toast.error("更新に失敗しました", { description: message });
-                });
-        });
+            },
+            "予算設定を更新しました",
+            () => setBudgetDialogOpen(false)
+        );
     };
+
+    const renderDialogActions = (onCancel: () => void) => (
+        <div className="flex gap-2 justify-end">
+            <Button type="button" variant="secondary" onClick={onCancel}>
+                キャンセル
+            </Button>
+            <Button type="submit" disabled={isPending}>
+                {isPending ? "保存中..." : "保存"}
+            </Button>
+        </div>
+    );
 
     return (
         <Card className="w-full">
@@ -168,172 +223,27 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                     </Badge>
                 </CardDescription>
                 <CardAction>
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                                 <MoreVerticalIcon />
                             </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>
-                                    プロジェクト設定の編集
-                                </DialogTitle>
-                                <DialogDescription>
-                                    {project.name} の単価・見積もり・期間を設定します。
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={onSubmit} className="space-y-6">
-                                <section className="space-y-3">
-                                    <h4 className="text-sm font-semibold">
-                                        役職別の時給単価
-                                    </h4>
-                                    <p className="text-xs text-muted-foreground">
-                                        請求書付きCSV出力で使用。空欄にすると未設定扱い。
-                                    </p>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="representativeRate">
-                                            代表の時給単価（円）
-                                        </Label>
-                                        <Input
-                                            id="representativeRate"
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value={representativeRate}
-                                            onChange={(e) =>
-                                                setRepresentativeRate(
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="未設定の場合は空欄"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="employeeRate">
-                                            その他従業員の時給単価（円）
-                                        </Label>
-                                        <Input
-                                            id="employeeRate"
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value={employeeRate}
-                                            onChange={(e) =>
-                                                setEmployeeRate(e.target.value)
-                                            }
-                                            placeholder="未設定の場合は空欄"
-                                        />
-                                    </div>
-                                </section>
-
-                                <Separator />
-
-                                <section className="space-y-3">
-                                    <h4 className="text-sm font-semibold">
-                                        見積もり（バッファ込み）
-                                    </h4>
-                                    <p className="text-xs text-muted-foreground">
-                                        クライアントとの契約値をそのまま入力。バッファ率から動的に警告閾値を算出します。
-                                    </p>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="estimatedHours">
-                                            見積もり総時間（h）
-                                        </Label>
-                                        <Input
-                                            id="estimatedHours"
-                                            type="number"
-                                            min="0"
-                                            step="0.5"
-                                            value={estimatedHours}
-                                            onChange={(e) =>
-                                                setEstimatedHours(
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="例: 200"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="estimatedAmount">
-                                            見積もり総金額（円）
-                                        </Label>
-                                        <Input
-                                            id="estimatedAmount"
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value={estimatedAmount}
-                                            onChange={(e) =>
-                                                setEstimatedAmount(
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="例: 1000000"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="bufferRatio">
-                                            バッファ率（0〜0.99、例: 0.3 = 30%）
-                                        </Label>
-                                        <Input
-                                            id="bufferRatio"
-                                            type="number"
-                                            min="0"
-                                            max="0.99"
-                                            step="0.01"
-                                            value={bufferRatio}
-                                            onChange={(e) =>
-                                                setBufferRatio(e.target.value)
-                                            }
-                                            placeholder="0.3"
-                                        />
-                                    </div>
-                                </section>
-
-                                <Separator />
-
-                                <section className="space-y-3">
-                                    <h4 className="text-sm font-semibold">
-                                        プロジェクト期間
-                                    </h4>
-                                    <p className="text-xs text-muted-foreground">
-                                        期間進捗との比較・ペース予測に使用。両方未設定の場合は予算管理対象外として扱われます。
-                                    </p>
-                                    <div className="flex flex-col gap-2">
-                                        <Label>開始日</Label>
-                                        <DatePicker
-                                            value={startDate}
-                                            onChange={setStartDate}
-                                            placeholder="開始日を選択"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label>終了予定日</Label>
-                                        <DatePicker
-                                            value={endDate}
-                                            onChange={setEndDate}
-                                            placeholder="終了予定日を選択"
-                                        />
-                                    </div>
-                                </section>
-
-                                <div className="flex gap-2 justify-end">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onClick={() => setOpen(false)}
-                                        disabled={isPending}
-                                    >
-                                        キャンセル
-                                    </Button>
-                                    <Button type="submit" disabled={isPending}>
-                                        {isPending ? "保存中..." : "保存"}
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => setRateDialogOpen(true)}
+                            >
+                                <CoinsIcon className="mr-2 h-4 w-4" />
+                                単価を編集
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setBudgetDialogOpen(true)}
+                            >
+                                <TrendingUpIcon className="mr-2 h-4 w-4" />
+                                予算を編集
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </CardAction>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -413,7 +323,8 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                                 ペース予測:
                             </span>
                             <span className="font-medium">
-                                終了時 {formatPercent(summary.paceProjection ?? 0)}
+                                終了時{" "}
+                                {formatPercent(summary.paceProjection ?? 0)}
                             </span>
                         </div>
                     </div>
@@ -435,6 +346,163 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                     </Link>
                 </Button>
             </CardFooter>
+
+            <Dialog
+                open={rateDialogOpen}
+                onOpenChange={(o) => {
+                    setRateDialogOpen(o);
+                    if (!o) resetRateFields();
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>単価の編集</DialogTitle>
+                        <DialogDescription>
+                            {project.name} の役職別時給単価を設定します。請求書付きCSV出力で使用。空欄にすると未設定扱い。
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={onRateSubmit} className="space-y-4">
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="representativeRate">
+                                代表の時給単価（円）
+                            </Label>
+                            <Input
+                                id="representativeRate"
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={representativeRate}
+                                onChange={(e) =>
+                                    setRepresentativeRate(e.target.value)
+                                }
+                                placeholder="未設定の場合は空欄"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="employeeRate">
+                                その他従業員の時給単価（円）
+                            </Label>
+                            <Input
+                                id="employeeRate"
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={employeeRate}
+                                onChange={(e) =>
+                                    setEmployeeRate(e.target.value)
+                                }
+                                placeholder="未設定の場合は空欄"
+                            />
+                        </div>
+                        {renderDialogActions(() => setRateDialogOpen(false))}
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={budgetDialogOpen}
+                onOpenChange={(o) => {
+                    setBudgetDialogOpen(o);
+                    if (!o) resetBudgetFields();
+                }}
+            >
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>予算の編集</DialogTitle>
+                        <DialogDescription>
+                            {project.name} の見積もり総量・期間・バッファ率を設定します。バッファ率から動的に警告閾値を算出。
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={onBudgetSubmit} className="space-y-6">
+                        <section className="space-y-3">
+                            <h4 className="text-sm font-semibold">
+                                見積もり（バッファ込み）
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                                クライアントとの契約値をそのまま入力。
+                            </p>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="estimatedHours">
+                                    見積もり総時間（h）
+                                </Label>
+                                <Input
+                                    id="estimatedHours"
+                                    type="number"
+                                    min="0"
+                                    step="0.5"
+                                    value={estimatedHours}
+                                    onChange={(e) =>
+                                        setEstimatedHours(e.target.value)
+                                    }
+                                    placeholder="例: 200"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="estimatedAmount">
+                                    見積もり総金額（円）
+                                </Label>
+                                <Input
+                                    id="estimatedAmount"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    value={estimatedAmount}
+                                    onChange={(e) =>
+                                        setEstimatedAmount(e.target.value)
+                                    }
+                                    placeholder="例: 1000000"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="bufferRatio">
+                                    バッファ率（0〜0.99、例: 0.3 = 30%）
+                                </Label>
+                                <Input
+                                    id="bufferRatio"
+                                    type="number"
+                                    min="0"
+                                    max="0.99"
+                                    step="0.01"
+                                    value={bufferRatio}
+                                    onChange={(e) =>
+                                        setBufferRatio(e.target.value)
+                                    }
+                                    placeholder="0.3"
+                                />
+                            </div>
+                        </section>
+
+                        <Separator />
+
+                        <section className="space-y-3">
+                            <h4 className="text-sm font-semibold">
+                                プロジェクト期間
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                                期間進捗との比較・ペース予測に使用。両方未設定の場合は予算管理対象外として扱われます。
+                            </p>
+                            <div className="flex flex-col gap-2">
+                                <Label>開始日</Label>
+                                <DatePicker
+                                    value={startDate}
+                                    onChange={setStartDate}
+                                    placeholder="開始日を選択"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label>終了予定日</Label>
+                                <DatePicker
+                                    value={endDate}
+                                    onChange={setEndDate}
+                                    placeholder="終了予定日を選択"
+                                />
+                            </div>
+                        </section>
+
+                        {renderDialogActions(() => setBudgetDialogOpen(false))}
+                    </form>
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 };

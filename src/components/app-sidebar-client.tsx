@@ -82,7 +82,7 @@ export function AppSidebarClient() {
                                         prefetch={true}
                                     >
                                         <CoinsIcon />
-                                        <span>プロジェクト単価管理</span>
+                                        <span>プロジェクト予算管理</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
