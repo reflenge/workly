@@ -16,6 +16,7 @@ import {
     integer,
     timestamp,
     numeric,
+    date,
     uniqueIndex,
     index,
 } from "drizzle-orm/pg-core";
@@ -270,6 +271,14 @@ export const projects = pgTable(
         // 役職別の時給単価（円/時）。NULL=未設定。請求金額の算出に使用。
         representativeHourlyRate: numeric("representative_hourly_rate"),
         employeeHourlyRate: numeric("employee_hourly_rate"),
+        // 予算管理（バッファ込みの総量と期間、バッファ率）。全てNULL可。
+        // estimated_total_hours/amount はバッファ込みの値（=クライアントとの契約値）
+        // buffer_ratio から「順調/注意/警告/超過」の閾値を動的に算出する
+        estimatedTotalHours: numeric("estimated_total_hours"),
+        estimatedTotalAmount: numeric("estimated_total_amount"),
+        bufferRatio: numeric("buffer_ratio").notNull().default("0.3"),
+        startDate: date("start_date"),
+        endDate: date("end_date"),
         isActive: boolean("is_active").notNull().default(true),
         inactiveReason: varchar("inactive_reason", { length: 191 }),
         createdAt: timestamp("created_at", { withTimezone: true })
