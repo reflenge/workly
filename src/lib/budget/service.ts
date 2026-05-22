@@ -56,9 +56,10 @@ const baseLogColumns = {
  * - 実績金額 = 役割別実績時間 × 役割別単価（Decimal で精度確保）
  * - 期間進捗率 = (今日 - startDate) / (endDate - startDate)
  * - 消化率 = 実績 / 見積もり
- * - ペース予測 = 消化率 / 期間進捗率 × 100（終了時の予測%）
+ * - 着地予測 = 金額消化率 / 期間進捗率 × 100（このペースで進んだ場合の終了時の金額消化予測%）
+ *   準委任契約の予算（請求金額）超過リスクを直接見るため、金額ベースで算出する
  * - 閾値は project.bufferRatio から動的計算: 注意=(1-b)×100, 警告=(1-b/2)×100, 超過=100
- * - ステータスは「時間消化率」「金額消化率」「ペース予測」のうち最も厳しい値で判定
+ * - ステータスは「時間消化率」「金額消化率」「着地予測」のうち最も厳しい値で判定
  *
  * @param projectId プロジェクトID
  * @param projectRow 既に取得済みのプロジェクトレコード（任意・あれば DB 1往復を節約）
@@ -267,8 +268,9 @@ function computeSummary(
 
     const hoursConsumption = (actualHours / estimatedHours!) * 100;
     const amountConsumption = (actualAmount / estimatedAmount!) * 100;
+    // 着地予測は金額ベース（準委任契約の予算＝請求金額の超過を見たいため）
     const paceProjection =
-        periodProgress > 0 ? (hoursConsumption / periodProgress) * 100 : 0;
+        periodProgress > 0 ? (amountConsumption / periodProgress) * 100 : 0;
 
     const thresholds: BudgetThresholds = {
         caution: (1 - bufferRatio) * 100,
@@ -276,7 +278,7 @@ function computeSummary(
         over: 100,
     };
 
-    // 「時間消化率」「金額消化率」「ペース予測」のうち最も厳しい値で判定
+    // 「時間消化率」「金額消化率」「着地予測」のうち最も厳しい値で判定
     const maxRatio = Math.max(
         hoursConsumption,
         amountConsumption,
