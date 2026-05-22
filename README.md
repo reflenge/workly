@@ -315,6 +315,11 @@ erDiagram
     text description "説明 // 任意。目的やメモ"
     numeric representative_hourly_rate "代表の時給単価(JPY) // NULL=未設定。請求書付きCSV出力で使用"
     numeric employee_hourly_rate "その他従業員の時給単価(JPY) // NULL=未設定。請求書付きCSV出力で使用"
+    numeric estimated_total_hours "見積もり総時間(h) // NULL=未設定。バッファ込み(契約値)"
+    numeric estimated_total_amount "見積もり総金額(JPY) // NULL=未設定。バッファ込み(契約値)"
+    numeric buffer_ratio "バッファ率 // NOT NULL default 0.3。予算警告の閾値を動的算出"
+    date start_date "開始日 // NULL=未設定。期間進捗の起点"
+    date end_date "終了予定日 // NULL=未設定。期間進捗の終点"
     boolean is_active "有効フラグ // アーカイブ/休止= false"
     string inactive_reason "無効理由 // 'アーカイブ'等。空なら現役"
     timestamptz created_at "作成時刻(UTC) // 最小監査"
@@ -407,7 +412,7 @@ erDiagram
 ```ts
 // src/db/schema.ts
 import {
-  pgTable, uuid, boolean, text, varchar, smallint, integer, timestamp, numeric,
+  pgTable, uuid, boolean, text, varchar, smallint, integer, timestamp, numeric, date,
   primaryKey, uniqueIndex, index, foreignKey
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -518,6 +523,15 @@ export const projects = pgTable("project", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 191 }).notNull(),
   description: text("description"),
+  // 役職別の時給単価（円/時）。NULL=未設定。請求金額の算出に使用
+  representativeHourlyRate: numeric("representative_hourly_rate"),
+  employeeHourlyRate: numeric("employee_hourly_rate"),
+  // 予算管理（バッファ込みの総量・期間・バッファ率）。buffer_ratio 以外は NULL 可
+  estimatedTotalHours: numeric("estimated_total_hours"),
+  estimatedTotalAmount: numeric("estimated_total_amount"),
+  bufferRatio: numeric("buffer_ratio").notNull().default("0.3"),
+  startDate: date("start_date"),
+  endDate: date("end_date"),
   isActive: boolean("is_active").notNull().default(true),
   inactiveReason: varchar("inactive_reason", { length: 191 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

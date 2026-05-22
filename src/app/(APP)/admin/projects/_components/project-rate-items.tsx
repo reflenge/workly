@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, formatToJstDateTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
     Card,
     CardAction,
@@ -41,15 +41,13 @@ import { updateProjectBudget } from "./project-rate-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format, parse } from "date-fns";
-import {
-    formatCurrency,
-    formatHours,
-    formatPercent,
-} from "@/components/attendance/format-utils";
+import { formatCurrency } from "@/components/attendance/format-utils";
 import {
     type ProjectBudgetSummary,
     getStatusBadgeInfo,
 } from "@/lib/budget/types";
+import { BudgetGauge } from "./budget-gauge";
+import { BudgetLandingBar } from "./budget-landing-bar";
 
 const formatRate = (rate: string | null): string => {
     if (!rate) return "未設定";
@@ -216,11 +214,21 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
         <Card className="w-full">
             <CardHeader>
                 <CardTitle>{project.name}</CardTitle>
-                <CardDescription className="flex items-center gap-2">
-                    <span>{project.isActive ? "有効" : "無効"}</span>
-                    <Badge className={cn("text-xs", statusBadge.className)}>
+                <CardDescription className="flex items-center gap-2 min-w-0">
+                    <span className="shrink-0">
+                        {project.isActive ? "有効" : "無効"}
+                    </span>
+                    <Badge
+                        className={cn("text-xs shrink-0", statusBadge.className)}
+                    >
                         {statusBadge.emoji} {statusBadge.label}
                     </Badge>
+                    {project.description && (
+                        // カード幅に収まらない分は ... で省略。全文は詳細ページで確認できる
+                        <span className="min-w-0 flex-1 truncate">
+                            {project.description}
+                        </span>
+                    )}
                 </CardDescription>
                 <CardAction>
                     <DropdownMenu>
@@ -247,11 +255,6 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                 </CardAction>
             </CardHeader>
             <CardContent className="space-y-3">
-                {project.description && (
-                    <p className="text-sm text-muted-foreground">
-                        {project.description}
-                    </p>
-                )}
                 <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">代表:</span>
@@ -285,55 +288,38 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                                期間進捗:
-                            </span>
-                            <span className="font-medium">
-                                {formatPercent(summary.periodProgress ?? 0)}
-                            </span>
+                    <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-1">
+                            <BudgetGauge
+                                value={summary.periodProgress ?? 0}
+                                label="期間進捗"
+                                color="#3b82f6"
+                            />
+                            <BudgetGauge
+                                value={summary.hoursConsumption ?? 0}
+                                label="時間消化"
+                                color="#06b6d4"
+                            />
+                            <BudgetGauge
+                                value={summary.amountConsumption ?? 0}
+                                label="金額消化"
+                                color="#f59e0b"
+                            />
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                                時間消化:
-                            </span>
-                            <span className="font-medium">
-                                {formatHours(summary.actualHours)} /{" "}
-                                {formatHours(
-                                    Number(project.estimatedTotalHours)
-                                )}{" "}
-                                ({formatPercent(summary.hoursConsumption ?? 0)})
-                            </span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                                金額消化:
-                            </span>
-                            <span className="font-medium">
-                                {formatCurrency(summary.actualAmount)} /{" "}
-                                {formatCurrency(
-                                    Number(project.estimatedTotalAmount)
-                                )}{" "}
-                                ({formatPercent(summary.amountConsumption ?? 0)})
-                            </span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                                ペース予測:
-                            </span>
-                            <span className="font-medium">
-                                終了時{" "}
-                                {formatPercent(summary.paceProjection ?? 0)}
-                            </span>
+                        <Separator />
+                        <div>
+                            <p className="text-xs text-muted-foreground mb-1">
+                                着地予測
+                            </p>
+                            <BudgetLandingBar
+                                value={summary.paceProjection ?? 0}
+                                thresholds={summary.thresholds!}
+                            />
                         </div>
                     </div>
                 )}
             </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-                <div className="w-full text-sm text-muted-foreground">
-                    更新日時: {formatToJstDateTime(project.updatedAt)}
-                </div>
+            <CardFooter>
                 <Button
                     asChild
                     variant="outline"
@@ -479,7 +465,7 @@ const ProjectRateItems = ({ summary }: { summary: ProjectBudgetSummary }) => {
                                 プロジェクト期間
                             </h4>
                             <p className="text-xs text-muted-foreground">
-                                期間進捗との比較・ペース予測に使用。両方未設定の場合は予算管理対象外として扱われます。
+                                期間進捗との比較・着地予測に使用。両方未設定の場合は予算管理対象外として扱われます。
                             </p>
                             <div className="flex flex-col gap-2">
                                 <Label>開始日</Label>

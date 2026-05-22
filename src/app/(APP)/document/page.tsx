@@ -258,6 +258,11 @@ export default function DocumentPage() {
                                 <li>id (PK)</li>
                                 <li>name</li>
                                 <li>description</li>
+                                <li>
+                                    estimated_total_hours / amount（見積もり）
+                                </li>
+                                <li>buffer_ratio（バッファ率）</li>
+                                <li>start_date / end_date（期間）</li>
                                 <li>is_active</li>
                             </ul>
                         </CardContent>
@@ -435,6 +440,18 @@ export default function DocumentPage() {
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground">
                                         カード管理ページ。NFCカードの登録、編集、無効化を行い、物理カードとシステムIDを管理します。
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base font-mono">
+                                        src/app/(APP)/admin/projects/page.tsx
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">
+                                        プロジェクト予算管理ページ（管理者のみ）。各プロジェクトの役職別単価・見積もり・期間・バッファ率を設定し、見積もり超過リスクをカードで可視化します。
                                     </p>
                                 </CardContent>
                             </Card>
