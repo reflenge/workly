@@ -11,6 +11,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * 数値を [min, max] の範囲に収める
+ */
+export function clamp(value: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, value));
+}
+
+/**
  * UTC時刻をJST(日本標準時)に変換して、読みやすい日本語形式でフォーマットします
  *
  * @param date - UTC時刻（Date オブジェクトまたは ISO文字列）

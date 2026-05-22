@@ -16,7 +16,7 @@ import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, formatToJstDateTime } from "@/lib/utils";
 import {
     Table,
     TableBody,
@@ -177,7 +177,7 @@ export default async function ProjectDetailPage({
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-base flex items-center gap-2">
-                                ⚡ ペース予測
+                                ⚡ 着地予測
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -295,6 +295,9 @@ export default async function ProjectDetailPage({
             </Card>
 
             <Separator />
+            <p className="text-sm text-muted-foreground">
+                更新日時: {formatToJstDateTime(project.updatedAt)}
+            </p>
         </div>
     );
 }

@@ -1,11 +1,34 @@
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth/requireUser";
-import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import ProjectRateItems from "./_components/project-rate-items";
 import { PageHeaderMeta } from "@/components/page-header/page-header-meta";
 import { getProjectBudgetSummaries } from "@/lib/budget/service";
+import type {
+    ProjectBudgetStatus,
+    ProjectBudgetSummary,
+} from "@/lib/budget/types";
+
+// ステータスの緊急度順（小さいほど先頭＝ヤバい順）。対象外は最後。
+const STATUS_SORT_ORDER: Record<ProjectBudgetStatus, number> = {
+    over: 0,
+    warning: 1,
+    caution: 2,
+    ok: 3,
+    out_of_scope: 4,
+};
+
+// 緊急度順 → 同順位はプロジェクト名の50音順（日本語ロケール）
+const byStatusThenName = (
+    a: ProjectBudgetSummary,
+    b: ProjectBudgetSummary
+): number => {
+    const statusDiff =
+        STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status];
+    if (statusDiff !== 0) return statusDiff;
+    return a.project.name.localeCompare(b.project.name, "ja");
+};
 
 export default async function Page() {
     const user = await requireUser();
@@ -15,16 +38,18 @@ export default async function Page() {
         redirect("/");
     }
 
-    const list = await db
-        .select()
-        .from(projects)
-        .orderBy(desc(projects.updatedAt));
+    // 並び順は status（DB 列ではない）で決めるため、取得後に JS でソートする
+    const list = await db.select().from(projects);
 
     // 一括取得（N+1 を回避）
     const summaries = await getProjectBudgetSummaries(list);
 
-    const activeSummaries = summaries.filter((s) => s.project.isActive);
-    const inactiveSummaries = summaries.filter((s) => !s.project.isActive);
+    const activeSummaries = summaries
+        .filter((s) => s.project.isActive)
+        .sort(byStatusThenName);
+    const inactiveSummaries = summaries
+        .filter((s) => !s.project.isActive)
+        .sort(byStatusThenName);
 
     return (
         <div className="container mx-auto py-6 space-y-6 px-4 sm:px-6 lg:px-8">
